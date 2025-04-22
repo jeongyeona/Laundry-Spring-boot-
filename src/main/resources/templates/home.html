@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+          rel="stylesheet"/>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+          rel="stylesheet" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+          crossorigin="anonymous"/>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+          crossorigin="anonymous"/>
+
+    <!-- 프로젝트 CSS -->
+    <link th:href="@{/css/nav.css}" rel="stylesheet"/>
+    <link th:href="@{/css/fullpage.css}" rel="stylesheet"/>
+
+    <!-- jQuery -->
+    <script th:src="@{/js/jquery-2.1.3.min.js}"></script>
+    <!-- Bootstrap JS bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"></script>
+
+    <style>
+        /* 인라인으로 남겨둔 custom style(필요시 별도 파일로 분리) */
+        * { font-family: 'Noto Sans KR', sans-serif !important; }
+        .nav { height: 80px; display: flex; justify-content: center; align-items: center; }
+        .nav ul { text-align: center; font-size: 0; }
+        .nav ul li { display: inline-block; margin: 0 10px; }
+        .nav ul li a { display: block; font-size: 18px; font-weight: 600; color: #000; }
+        .section { background-size: cover !important; }
+        .section h1 { font-size: 3em; font-weight: 600; }
+        /* ... 나머지 스타일은 그대로 복사 ... */
+    </style>
+</head>
+<body>
+<!-- nav fragment -->
+<div th:insert="fragments/nav :: nav"></div>
+
+<div id="fullpage">
+    <!-- section0: 비디오 배경 -->
+    <div class="section" id="section0">
+        <video class="myvideo" id="video_obj" autoplay muted loop>
+            <source th:src="@{/images/Laundry365_sample4.mp4}" type="video/mp4"/>
+        </video>
+        <div class="mov_bg">
+            <button onclick="video_pause()" id="video-pause-btn" style="margin-right:5px;">
+                <div class="video_play_btn" style="display:none;">
+                    <!-- play SVG -->
+                </div>
+                <div class="video_pause_btn">
+                    <!-- pause SVG -->
+                </div>
+            </button>
+            <button onclick="video_mute_on()">
+                <div class="volume_mute_btn">
+                    <!-- mute SVG -->
+                </div>
+                <div class="volume_up_btn" style="display:none;">
+                    <!-- volume-up SVG -->
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- section1: 서비스 소개 -->
+    <div class="section container" id="section1" style="margin:100px auto;">
+        <div class="col sec1_top">
+            <span class="pic_top">365일 깨끗하게</span>
+            <p class="pic_text_content pic_text_content_mid">
+                타협없는 세탁물질에 대한 철학으로 모든 세탁물을 철저한 단계별 스마트 클리닝 시스템으로 케어합니다.
+            </p>
+        </div>
+        <div class="flex">
+            <!-- 각 pic 블록 -->
+            <div class="pic">
+                <img th:src="@{/images/section2_1.jpg}" class="mx-auto d-block" alt="프리미엄 클리닝"/>
+                <div class="pic_text">
+                    <span class="pic_mid">프리미엄 클리닝</span>
+                    <p class="pic_text_content">
+                        한 번에 단 1~2벌만 세탁하는 Electroux의 프로페셔널 라인을 사용해 세탁 마찰에 의한 원단 손상을 최소화합니다.
+                    </p>
+                </div>
+            </div>
+            <!-- … 반복 … -->
+        </div>
+    </div>
+
+    <!-- section2: 검품 안내 -->
+    <div class="section container" id="section2" style="margin:100px auto;">
+        <div class="inspection grid">
+            <span class="pic_top_ins">검품</span>
+            <p class="pic_top_ins_text">
+                고객의 요청사항이 모두 반영되었는지 최선의 케어를 진행했는지 세탁물의 완성도를 체크합니다.<br/>
+                기준을 통과하지 못한 세탁물은 다시 클리닝단계로 이동해 재케어를 실시하고 출고 전 의류 별 안전포장을 진행합니다.
+            </p>
+        </div>
+        <div class="flex">
+            <div class="pic2">
+                <img th:src="@{/images/section3_1.jpg}" class="d-block" alt="수선사진" style="width:48%"/>
+            </div>
+            <div class="pic2 sec2_none">
+                <img th:src="@{/images/section3_2.jpg}" class="d-block" alt="세탁기" style="width:48%"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- section3: 예약하기 -->
+    <div class="section" id="section3">
+        <div class="imgbox">
+            <img th:src="@{/images/section4_4.jpg}" alt="예약하기 배경" style="width:auto; height:auto;"/>
+            <div>
+                <div><span class="imgbox_text">오늘밤, <br/>귀찮은 세탁은 <br/>Laundry365에게 맡기세요.</span></div>
+                <div>
+                    <a th:href="@{/reserve/reserve_select.do}" class="myButton">예약하기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- section4: footer -->
+    <div class="section" id="section4">
+        <div th:insert="fragments/footer :: footer"></div>
+    </div>
+</div>
+
+<!-- fullPage.js 초기화 -->
+<script th:src="@{/js/fullpage.js}"></script>
+<script>
+    $(document).ready(function () {
+      $('#fullpage').fullpage({
+        anchors: ['anchor1', 'anchor2', 'anchor3', 'anchor4', 'anchor5'],
+        sectionsColor: ['#ffcc00', '#ffffff', '#ffffff', '#ffffff', '#212121'],
+        autoScrolling: true,
+        scrollBar: false,
+        navigation: true,
+        navigationPosition: 'right',
+        navigationTooltips: ['Laundry365', '서비스소개', '검품안내', '예약하기'],
+        loopBottom: false,
+        continuousVertical: false,
+        responsiveWidth: 976
+      });
+    });
+
+    function video_mute_on() {
+      const v = document.getElementById('video_obj');
+      v.muted = !v.muted;
+      document.querySelector('.volume_mute_btn').style.display = v.muted ? 'block' : 'none';
+      document.querySelector('.volume_up_btn').style.display = v.muted ? 'none' : 'block';
+    }
+
+    function video_pause() {
+      const v = document.getElementById('video_obj');
+      if (v.paused) {
+        v.play();
+        document.querySelector('.video_pause_btn').style.display = 'block';
+        document.querySelector('.video_play_btn').style.display = 'none';
+      } else {
+        v.pause();
+        document.querySelector('.video_pause_btn').style.display = 'none';
+        document.querySelector('.video_play_btn').style.display = 'block';
+      }
+    }
+</script>
+</body>
+</html>

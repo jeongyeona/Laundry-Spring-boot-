@@ -1,0 +1,183 @@
+<!-- src/main/resources/templates/fragments/nav.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="nav">
+  <!-- CSS -->
+  <link th:href="@{/css/nav.css}" rel="stylesheet"/>
+
+  <!-- 네비바 시작 -->
+  <div class="main-wrapper1" id="menu">
+    <nav class="navbar1">
+      <div class="brand-and-icon1">
+        <a th:href="@{/}" class="navbar-brand1 logo">Laundry365</a>
+        <button type="button" class="navbar-toggler1">
+          <!-- 햄버거 아이콘 SVG 그대로 쓰시면 됩니다 -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+               fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                  d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1
+                       0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10
+                       a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5
+                       0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="navbar-collapse1">
+        <ul class="navbar-nav1">
+          <!-- 홈 링크 -->
+          <li class="home1"><a th:href="@{/}">home</a></li>
+
+          <!-- 브랜드소개 -->
+          <li>
+            <a href="#" class="menu-link1">브랜드소개</a>
+            <div class="sub-menu1">
+              <div class="sub-menu-item1"></div>
+              <div class="sub-menu-item1">
+                <h3>브랜드소개</h3>
+                <ul>
+                  <li><a th:href="@{/corporation/brand.do}">회사소개</a></li>
+                  <li><a th:href="@{/corporation/history.do}">연혁</a></li>
+                  <li><a th:href="@{/corporation/startup.do}">창업안내</a></li>
+                  <li><a th:href="@{/corporation/members.do}">팀원소개</a></li>
+                </ul>
+              </div>
+              <div class="sub-menu-item1" id="lili2">
+                <h2>명품을 명품답게<br/>명품 케어 서비스</h2>
+                <button type="button" class="btn1"
+                        th:onclick="|location.href='@{/corporation/brand.do}'|">
+                  회사소개
+                </button>
+              </div>
+              <div class="sub-menu-item1"></div>
+            </div>
+          </li>
+
+          <!-- 이용안내 -->
+          <li>
+            <a href="#" class="menu-link1">이용안내</a>
+            <div class="sub-menu1">
+              <div class="sub-menu-item1"></div>
+              <div class="sub-menu-item1">
+                <h3>이용안내</h3>
+                <ul>
+                  <li><a th:href="@{/guide/price_guide.do}">가격안내</a></li>
+                  <li><a th:href="@{/guide/area_guide.do}">지역안내</a></li>
+                </ul>
+              </div>
+              <div class="sub-menu-item1" id="lili2">
+                <h2>편안한 이용을 위해 Laundry365가 함께하겠습니다.</h2>
+                <button type="button" class="btn1"
+                        th:onclick="|location.href='@{/guide/price_guide.do}'|">
+                  가격안내
+                </button>
+              </div>
+              <div class="sub-menu-item1"></div>
+            </div>
+          </li>
+
+          <!-- 예약안내 -->
+          <li>
+            <a href="#" class="menu-link1">예약안내</a>
+            <div class="sub-menu1">
+              <div class="sub-menu-item1"></div>
+              <div class="sub-menu-item1">
+                <h3>예약안내</h3>
+                <ul>
+                  <li><a th:href="@{/reserve/reserve_select.do}">예약안내</a></li>
+                </ul>
+              </div>
+              <div class="sub-menu-item1" id="lili2">
+                <h2>365일 언제나!<br/>Laundry365와 함께해요~!</h2>
+                <button type="button" class="btn1"
+                        th:onclick="|location.href='@{/reserve/reserve_select.do}'|">
+                  예약안내
+                </button>
+              </div>
+              <div class="sub-menu-item1"></div>
+            </div>
+          </li>
+
+          <!-- 고객지원 -->
+          <li>
+            <a href="#" class="menu-link1">고객지원</a>
+            <div class="sub-menu1">
+              <div class="sub-menu-item1"></div>
+              <div class="sub-menu-item1">
+                <h3>고객지원</h3>
+                <ul>
+                  <li><a th:href="@{/review/list.do}">후기게시판</a></li>
+                  <li><a th:href="@{/faq/list.do}">질문게시판</a></li>
+                  <li><a th:href="@{/notice/list.do}">공지사항</a></li>
+                </ul>
+              </div>
+              <div class="sub-menu-item1" id="lili2">
+                <h2>Laundry에서<br/>여러분의 고민을 상담해 드립니다.</h2>
+                <button type="button" class="btn1"
+                        th:onclick="|location.href='@{/faq/list.do}'|">
+                  질문게시판
+                </button>
+              </div>
+              <div class="sub-menu-item1"></div>
+            </div>
+          </li>
+
+          <!-- 마이페이지 -->
+          <li>
+            <a href="#" class="menu-link1">마이페이지</a>
+            <div class="sub-menu1">
+              <div class="sub-menu-item1"></div>
+              <div class="sub-menu-item1">
+                <h3>마이페이지</h3>
+                <ul>
+                  <li><a th:href="@{/mypage/users/info.do}">회원정보</a></li>
+                  <li><a th:href="@{/mypage/order.do}">신청내역확인</a></li>
+                  <!-- 로그인 여부에 따라 -->
+                  <li th:if="${session.id == null}" class="lili1">
+                    <a th:href="@{/users/login_form.do}">로그인</a>
+                  </li>
+                  <li th:if="${session.id == null}" class="lili1">
+                    <a th:href="@{/users/signup_form.do}">회원가입</a>
+                  </li>
+                  <li th:if="${session.id != null}" class="lili1">
+                    <a th:href="@{/users/logout.do}">로그아웃</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="sub-menu-item1" id="lili2">
+                <h2>여러분의 배송정보를 여기서 확인해 보세요.</h2>
+                <button type="button" class="btn1"
+                        th:onclick="|location.href='@{/mypage/order.do}'|">
+                  신청내역확인
+                </button>
+              </div>
+              <div class="sub-menu-item1"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="header-top1">
+        <ul class="menu1">
+          <li th:if="${session.id == null}">
+            <a th:href="@{/users/login_form.do}"><strong>로그인</strong></a>
+          </li>
+          <li th:if="${session.id == null}">
+            <a th:href="@{/users/signup_form.do}"><strong>회원가입</strong></a>
+          </li>
+          <li th:if="${session.id != null}">
+            <a th:href="@{/users/logout.do}"><strong>로그아웃</strong></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <!-- 네비바 끝 -->
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script th:src="@{/js/nav.js}"></script>
+</div>
+</body>
+</html>
