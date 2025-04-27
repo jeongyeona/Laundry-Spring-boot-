@@ -24,58 +24,41 @@
     <!-- 프로젝트 CSS -->
     <link th:href="@{/css/nav.css}" rel="stylesheet"/>
     <link th:href="@{/css/fullpage.css}" rel="stylesheet"/>
+    <link th:href="@{/css/home.css}" rel="stylesheet"/>
 
     <!-- jQuery -->
-    <script th:src="@{/js/jquery-2.1.3.min.js}"></script>
+    <script th:src="@{/js/jquery-3.4.1.js}"></script>
     <!-- Bootstrap JS bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
             crossorigin="anonymous"></script>
-
-    <style>
-        /* 인라인으로 남겨둔 custom style(필요시 별도 파일로 분리) */
-        * { font-family: 'Noto Sans KR', sans-serif !important; }
-        .nav { height: 80px; display: flex; justify-content: center; align-items: center; }
-        .nav ul { text-align: center; font-size: 0; }
-        .nav ul li { display: inline-block; margin: 0 10px; }
-        .nav ul li a { display: block; font-size: 18px; font-weight: 600; color: #000; }
-        .section { background-size: cover !important; }
-        .section h1 { font-size: 3em; font-weight: 600; }
-        /* ... 나머지 스타일은 그대로 복사 ... */
-    </style>
 </head>
 <body>
 <!-- nav fragment -->
 <div th:insert="fragments/nav :: nav"></div>
 
-<div id="fullpage">
+<div id="fullpage" style="width: 100%; height: 100vh;">
     <!-- section0: 비디오 배경 -->
     <div class="section" id="section0">
         <video class="myvideo" id="video_obj" autoplay muted loop>
             <source th:src="@{/images/Laundry365_sample4.mp4}" type="video/mp4"/>
         </video>
         <div class="mov_bg">
-            <button onclick="video_pause()" id="video-pause-btn" style="margin-right:5px;">
-                <div class="video_play_btn" style="display:none;">
-                    <!-- play SVG -->
-                </div>
-                <div class="video_pause_btn">
-                    <!-- pause SVG -->
-                </div>
+            <!-- 재생/일시정지 버튼 -->
+            <button onclick="video_pause()" id="video-pause-btn" class="btn-icon">
+                <i id="play-icon" class="fas fa-play" style="display:none;"></i>
+                <i id="pause-icon" class="fas fa-pause"></i>
             </button>
-            <button onclick="video_mute_on()">
-                <div class="volume_mute_btn">
-                    <!-- mute SVG -->
-                </div>
-                <div class="volume_up_btn" style="display:none;">
-                    <!-- volume-up SVG -->
-                </div>
+            <!-- 음소거/소리 버튼 -->
+            <button onclick="video_mute_on()" id="video-mute-btn" class="btn-icon">
+                <i id="mute-icon" class="fas fa-volume-mute"></i>
+                <i id="vol-icon" class="fas fa-volume-up" style="display:none;"></i>
             </button>
         </div>
     </div>
 
     <!-- section1: 서비스 소개 -->
-    <div class="section container" id="section1" style="margin:100px auto;">
+    <div class="section container" id="section1" style="margin: 100px auto;">
         <div class="col sec1_top">
             <span class="pic_top">365일 깨끗하게</span>
             <p class="pic_text_content pic_text_content_mid">
@@ -89,13 +72,34 @@
                 <div class="pic_text">
                     <span class="pic_mid">프리미엄 클리닝</span>
                     <p class="pic_text_content">
-                        한 번에 단 1~2벌만 세탁하는 Electroux의 프로페셔널 라인을 사용해 세탁 마찰에 의한 원단 손상을 최소화합니다.
+                        한 번에 단 1~2벌만 세탁하는 Electroux의 프로페셔널 라인을
+                        사용해 세탁 마찰에 의한 원단 손상을 최소화합니다.
                     </p>
                 </div>
             </div>
-            <!-- … 반복 … -->
+            <div class="pic">
+                <img th:src="@{/images/section2_2.png}" class="mx-auto d-block" alt="편백나무 자연 건조실"/>
+                <div class="pic_text">
+                    <span class="pic_mid">편백나무 자연 건조실</span>
+                    <p class="pic_text_content">
+                        장시간 기계 건조 시 원단에 무리를 줄 수 있는
+                        세탁물은 편백나무 자연 건조실에서 케어합니다.
+                    </p>
+                </div>
+            </div>
+            <div class="pic">
+                <img th:src="@{/images/section2_3.jpg}" class="mx-auto d-block" alt="수선"/>
+                <div class="pic_text">
+                    <span class="pic_mid">수선</span>
+                    <p class="pic_text_content">
+                        수십년 경력의 전문 수선사들이 어려운 난이도의 의류
+                        수선까지 모두 고객 요청의 디테일을 반영해 수선합니다.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
+
 
     <!-- section2: 검품 안내 -->
     <div class="section container" id="section2" style="margin:100px auto;">
@@ -108,10 +112,10 @@
         </div>
         <div class="flex">
             <div class="pic2">
-                <img th:src="@{/images/section3_1.jpg}" class="d-block" alt="수선사진" style="width:48%"/>
+                <img th:src="@{/images/section3_1.jpg}" class="mx-auto d-block" alt="수선사진" style="width:98%"/>
             </div>
             <div class="pic2 sec2_none">
-                <img th:src="@{/images/section3_2.jpg}" class="d-block" alt="세탁기" style="width:48%"/>
+                <img th:src="@{/images/section3_2.jpg}" class="mx-auto d-block" alt="세탁기" style="width:98%"/>
             </div>
         </div>
     </div>
@@ -119,7 +123,7 @@
     <!-- section3: 예약하기 -->
     <div class="section" id="section3">
         <div class="imgbox">
-            <img th:src="@{/images/section4_4.jpg}" alt="예약하기 배경" style="width:auto; height:auto;"/>
+            <img th:src="@{/images/section4_4.jpg}" alt="예약하기 배경"/>
             <div>
                 <div><span class="imgbox_text">오늘밤, <br/>귀찮은 세탁은 <br/>Laundry365에게 맡기세요.</span></div>
                 <div>
@@ -138,40 +142,48 @@
 <!-- fullPage.js 초기화 -->
 <script th:src="@{/js/fullpage.js}"></script>
 <script>
-    $(document).ready(function () {
-      $('#fullpage').fullpage({
-        anchors: ['anchor1', 'anchor2', 'anchor3', 'anchor4', 'anchor5'],
-        sectionsColor: ['#ffcc00', '#ffffff', '#ffffff', '#ffffff', '#212121'],
-        autoScrolling: true,
-        scrollBar: false,
-        navigation: true,
-        navigationPosition: 'right',
-        navigationTooltips: ['Laundry365', '서비스소개', '검품안내', '예약하기'],
-        loopBottom: false,
-        continuousVertical: false,
-        responsiveWidth: 976
-      });
+    $(document).ready(function(){
+        $("#fullpage").fullpage({
+            anchors : ['anchor1','anchor2','anchor3','anchor4','anchor5'],
+            sectionsColor : ['#ffcc00','#ffffff','#ffffff','#ffffff','#212121'],//섹션의 색상
+            autoScrolling : true,//휠유무
+            scrollBar : false,//스크롤여부
+            showActiveTooltip : true, //블릿툴팁의 현재표시
+            navigation : true,//블릭네비
+            navigationPosition : 'right',//블릿위치
+            navigationTooltips : ['Laundry365','서비스소개','검품안내','예약하기'],
+            showActiveTooltip : true, //블릿툴팁의 현재표시
+            loopBottom : false,
+            continuousVertical : false, //연속수직
+            responsiveWidth : 976,
+        });
     });
 
-    function video_mute_on() {
-      const v = document.getElementById('video_obj');
-      v.muted = !v.muted;
-      document.querySelector('.volume_mute_btn').style.display = v.muted ? 'block' : 'none';
-      document.querySelector('.volume_up_btn').style.display = v.muted ? 'none' : 'block';
-    }
+function video_pause() {
+  const v = document.getElementById('video_obj');
+  const playI = document.getElementById('play-icon');
+  const pauseI = document.getElementById('pause-icon');
 
-    function video_pause() {
-      const v = document.getElementById('video_obj');
-      if (v.paused) {
-        v.play();
-        document.querySelector('.video_pause_btn').style.display = 'block';
-        document.querySelector('.video_play_btn').style.display = 'none';
-      } else {
-        v.pause();
-        document.querySelector('.video_pause_btn').style.display = 'none';
-        document.querySelector('.video_play_btn').style.display = 'block';
-      }
-    }
+  if (v.paused) {
+    v.play();
+    playI.style.display = 'none';
+    pauseI.style.display = 'block';
+  } else {
+    v.pause();
+    playI.style.display = 'block';
+    pauseI.style.display = 'none';
+  }
+}
+
+function video_mute_on() {
+  const v = document.getElementById('video_obj');
+  const muteI = document.getElementById('mute-icon');
+  const volI  = document.getElementById('vol-icon');
+
+  v.muted = !v.muted;
+  muteI.style.display = v.muted ? 'block' : 'none';
+  volI.style.display  = v.muted ? 'none'  : 'block';
+}
 </script>
 </body>
 </html>

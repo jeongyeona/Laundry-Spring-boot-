@@ -1,0 +1,267 @@
+@charset "UTF-8";
+
+#section1 .flex {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+#section4 {
+    padding: 50px 0;
+}
+#section4.fp-section,
+#section4 .fp-tableCell {
+    height: auto !important;
+}
+#fp-nav ul li:last-child a,
+.fp-slidesNav ul li:last-child a {
+    display: none;
+}
+#section4 footer p {
+    color: #fff;
+}
+
+/* 반응형 */
+@media screen and (max-width: 976px) {
+    #section0.fp-section,
+    #section0 .fp-tableCell,
+    #section1.fp-section,
+    #section1 .fp-tableCell,
+    #section2.fp-section,
+    #section2 .fp-tableCell,
+    #section3.fp-section,
+    #section3 .fp-tableCell {
+        height: auto !important;
+    }
+
+    #section0 {
+        padding: 100px 0;
+    }
+
+    /* section2: 사진 두 장 세로 배치 */
+    #section2 .flex {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media screen and (max-width: 976px) {
+    #section0 {
+        padding: 100px 0;
+    }
+}
+
+/* section2 */
+.fp-viewing-anchor2 {
+    background-image: url('/images/back3.jpg');
+    background-size: cover;
+}
+
+#section1 {
+    width: 100%;
+    margin: 0 auto;
+    text-align: left;
+    background-color: rgba(255, 255, 255, 0) !important;
+}
+#section1 .pic {
+    float: left;
+    width: 32%;
+}
+#section1 .pic img {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+}
+#section1 .pic .pic_text {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+}
+#section1 .pic .pic_mid {
+    font-size: 1.3em;
+    line-height: 70px;
+    font-weight: 600;
+    color: #fff;
+}
+#section1 .pic_top {
+    font-size: 2.2em;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #fff;
+}
+.pic_text_content_mid {
+    padding-top: 25px;
+    padding-bottom: 20px;
+}
+.pic_text_content {
+    font-size: 0.9em;
+    color: #fff;
+}
+
+/* section3 */
+.fp-viewing-anchor3 {
+    background-image: url('/images/back7.jpg');
+    background-size: cover;
+}
+#section2 {
+    width: 100%;
+    margin: 0 auto;
+    text-align: left;
+    background-color: rgba(255, 255, 255, 0) !important;
+}
+#section2 .inspection .pic_top_ins {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #fff;
+}
+#section2 .inspection .pic_top_ins_text {
+    text-align: left;
+    font-size: 1em;
+    padding-top: 25px;
+    padding-bottom: 20px;
+    color: #fff;
+}
+#section2 .flex {
+    display: flex;
+    justify-content: space-between;
+}
+#section2 .pic2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+#section2 .pic2 img {
+    width: 98%;
+}
+
+#section3 {
+    height: 100%;
+    margin: 0 auto;
+    text-align: left;
+}
+#section3 .imgbox {
+  position: relative;
+  width: 100%;
+  height: 100%;      /* 부모(#section3)의 100% 높이를 물려받음 */
+  overflow: hidden;
+}
+#section3 .imgbox img {
+  display: block;    /* inline spacing 제거 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 잘라내서 빈틈 없이 채우기 */
+}
+
+#section3 .imgbox > div {
+    position: absolute;
+    top: 50%;
+    left: 20%;
+    transform: translateY(-50%);
+}
+#section3 .imgbox .imgbox_text {
+    font-size: 2em;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+}
+
+/* 푸터 css */
+.footer1 {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+}
+.footer1 a {
+    text-decoration: none;
+    color: #ffffff;
+    margin-right: 8px;
+}
+.footermain {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+}
+.footer2 {
+    position: absolute;
+}
+.footer3 {
+    text-align: end;
+}
+.all2 {
+    font-size: 30px;
+}
+.footer_container {
+    width: 90%;
+    margin: 0 auto;
+}
+footer a:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* 푸터 수정 */
+@media (max-width: 768px) {
+    .footer3 {
+        display: block;
+        text-align: left;
+        padding-top: 65px;
+    }
+}
+
+/* 푸터 css 끝 */
+@media (max-width: 768px) {
+    .container {
+        width: 750px;
+    }
+    #section2 .flex {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        height: 150vw;
+    }
+    #section3 .imgbox .imgbox_text {
+        left: 10%;
+    }
+    .myButton {
+        left: 10%;
+    }
+    .section {
+        padding-top: 50px;
+    }
+    #section2 .sec2_none {
+        display: none;
+    }
+    #section2 .flex {
+        height: auto !important;
+    }
+    #section3 {
+        padding-top: 0;
+    }
+}
+@media (max-width: 992px) {
+    .container {
+        width: 970px;
+    }
+    #section1 .pic {
+        width: 100%;
+    }
+    #section1 .sec1_top {
+        margin-top: 110px;
+    }
+}
+@media (max-width: 1200px) {
+    .container {
+        width: 1170px;
+    }
+}
+.mov_bg {
+    position: absolute;
+    bottom: 5%;
+    right: 4%;
+    z-index: 4555;
+}
+.mov_bg > button {
+    border: 0;
+    background: transparent;
+}
