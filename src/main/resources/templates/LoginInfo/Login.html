@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+
+  <!-- Bootstrap CSS -->
+  <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous"/>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    main.content-wrap {
+      flex: 1;
+    }
+    #loginform_wr {
+      width: 100%;
+      text-align: center;
+      padding-top: 2rem;
+    }
+    #body-content {
+      width: 25%;
+      display: inline-block;
+    }
+    .input-group span {
+      background-color: white;
+    }
+    #sign_findBtn a {
+      border-color: #dddddd;
+      border-radius: 0;
+    }
+    #sign_findBtn a:hover {
+      background-color: black;
+      color: white;
+    }
+    .site-footer {
+      /* 푸터 고정 하단 */
+    }
+  </style>
+</head>
+<body>
+<!-- 네비게이션 -->
+<div th:insert="fragments/nav :: nav"></div>
+
+<!-- 서브 네비게이션 -->
+<div th:insert="fragments/subnav :: subnav('login','login')"></div>
+
+<main class="content-wrap">
+  <div class="container" id="loginform_wr">
+    <div id="body-content">
+      <form id="loginForm" th:action="@{/users/login}" method="post" autocomplete="off">
+        <!-- 리다이렉트 URL -->
+        <input type="hidden" name="url"
+               th:if="${url == null}"
+               th:value="@{/}"/>
+        <input type="hidden" name="url"
+               th:unless="${url == null}"
+               th:value="${url}"/>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" style="border-color:#dddddd; border-radius:0;">
+              <i class="bi bi-person" style="font-size:1.2rem;"></i>
+            </span>
+          <input class="form-control"
+                 type="text" name="id" id="id"
+                 th:value="${saveId}"
+                 style="border-color:#dddddd; border-radius:0;"/>
+        </div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" style="border-color:#dddddd; border-radius:0;">
+              <i class="bi bi-lock" style="font-size:1.2rem;"></i>
+            </span>
+          <input class="form-control"
+                 type="password" name="pwd" id="pwd"
+                 style="border-color:#dddddd; border-radius:0;"
+                 onkeyup="checkCapsLock(event)"/>
+        </div>
+
+        <p id="message" class="mt-1 mb-3"></p>
+
+        <div class="row row-cols-1">
+          <div class="col d-grid gap-1 mx-auto mb-3">
+            <button class="btn btn-dark" type="submit" style="border-radius:0;">Sign in</button>
+          </div>
+          <div class="col d-flex justify-content-between mb-2" id="sign_findBtn">
+            <a th:href="@{/Signup}" class="btn" style="width:150px;">Sign up</a>
+            <a th:href="@{/FindPwd}" class="btn" style="width:150px;">Password?</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- 푸터 -->
+<div th:insert="fragments/footer :: footer" class="site-footer"></div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
+
+<!-- 폼 검증 및 CapsLock 체크 -->
+<script th:inline="javascript">
+  /*<![CDATA[*/
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      var id = document.getElementById('id').value.trim();
+      var pwd = document.getElementById('pwd').value.trim();
+      if (!id || !pwd) {
+        event.preventDefault();
+        alert('아이디와 비밀번호를 입력해주세요.');
+      }
+    });
+
+    function checkCapsLock(event) {
+      document.getElementById('message').innerText =
+        event.getModifierState('CapsLock') ? 'Caps Lock이 켜져 있습니다.' : '';
+    }
+  /*]]>*/
+</script>
+</body>
+</html>

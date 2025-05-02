@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>아이디 찾기</n></title>
+
+  <!-- Bootstrap CSS -->
+  <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous"/>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { display: flex; flex-direction: column; }
+    main.content-wrap { flex: 1; }
+    #findidform_wr { width: 100%; text-align: center; padding-top: 2rem; }
+    #body_content { width: 25%; display: inline-block; }
+    .input-group-text { border-color: #dddddd; border-radius: 0; width: 80px; }
+    .input-group .form-control { border: 1px solid #dddddd; border-radius: 0; }
+    #successDiv { text-align: center; display: none; border: 1px solid #ededed; padding: 2rem; margin: 1rem auto; }
+    #successDiv h6 { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+<!-- Main Navigation -->
+<div th:insert="fragments/nav :: nav"></div>
+
+<!-- Sub Navigation -->
+<div th:insert="fragments/subnav :: subnav('findid','findid')"></div>
+
+<main class="content-wrap">
+  <div id="findidform_wr">
+    <div id="body_content">
+      <form id="findIdForm" th:action="@{/users/check_user}" method="post" autocomplete="off">
+        <div class="input-group mb-3">
+          <span class="input-group-text">이름</span>
+          <input class="form-control" type="text" id="name" name="name" required />
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">이메일</span>
+          <input class="form-control" type="email" id="email" name="email" required />
+        </div>
+        <div class="d-grid gap-1 mx-auto mb-3">
+          <button class="btn btn-dark" type="submit" style="border-radius:0;">계속</button>
+        </div>
+      </form>
+      <div id="successDiv">
+        <h6>회원님의 ID는 <strong id="data"></strong> 입니다.</h6>
+        <a th:href="@{/login}" class="btn btn-dark" style="border-radius:0; height:35px;">로그인</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<div th:insert="fragments/footer :: footer"></div>
+
+<!-- Bootstrap JS & jQuery -->
+<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
+<script th:src="@{https://code.jquery.com/jquery-2.1.3.min.js}"/>
+
+<!-- AJAX 처리 스크립트 -->
+<script th:inline="javascript">
+  /*<![CDATA[*/
+    document.getElementById('findIdForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var form = this;
+      var data = new URLSearchParams(new FormData(form)).toString();
+      fetch(/*[[@{/users/check_user}]]*/, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: data
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (!result.user) {
+          alert('존재하지 않는 회원정보입니다.');
+        } else {
+          form.style.display = 'none';
+          document.getElementById('data').innerText = result.user.id;
+          document.getElementById('successDiv').style.display = 'block';
+        }
+      });
+    });
+  /*]]>*/
+</script>
+</body>
+</html>

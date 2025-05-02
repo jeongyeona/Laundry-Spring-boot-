@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 찾기</title>
+
+  <!-- Bootstrap CSS -->
+  <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous"/>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { display: flex; flex-direction: column; }
+    main.content-wrap { flex: 1; }
+    #findpwdform_wr { width: 100%; text-align: center; padding-top: 2rem; }
+    #body_content { width: 25%; display: inline-block; }
+    .input-group-text { border-color: #dddddd; border-radius: 0; width: 80px; }
+    .input-group .form-control { border: 1px solid #dddddd; border-radius: 0; }
+    #idFindBtn { border-color: #dddddd; border-radius: 0; }
+    #idFindBtn:hover { background-color: black; color: white; }
+  </style>
+</head>
+<body>
+<!-- Main Navigation -->
+<div th:insert="fragments/nav :: nav"></div>
+
+<!-- Sub Navigation -->
+<div th:insert="fragments/subnav :: subnav('findpwd','findpwd')"></div>
+
+<main class="content-wrap">
+  <div id="findpwdform_wr">
+    <div id="body_content">
+      <form id="findPwdForm" th:action="@{/users/check_user}" method="post" autocomplete="off">
+        <div class="input-group mb-3">
+          <span class="input-group-text">아이디</span>
+          <input class="form-control" type="text" id="id" name="id" />
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">이름</span>
+          <input class="form-control" type="text" id="name" name="name" />
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">E-mail</span>
+          <input class="form-control" type="email" id="email" name="email" />
+        </div>
+        <div class="row row-cols-1">
+          <div class="col d-grid gap-1 mx-auto mb-3">
+            <button class="btn btn-dark" type="submit" style="border-radius:0;">계속</button>
+          </div>
+          <div class="col">
+            <a th:href="@{/FindId}" class="btn" id="idFindBtn">Forgot ID?</a>
+          </div>
+        </div>
+      </form>
+      <div id="addPwdForm"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<div th:insert="fragments/footer :: footer"></div>
+
+<!-- Bootstrap JS & jQuery -->
+<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
+<script th:src="@{https://code.jquery.com/jquery-2.1.3.min.js}"></script>
+
+<!-- AJAX 처리 스크립트 -->
+<script th:inline="javascript">
+  /*<![CDATA[*/
+    document.getElementById('findPwdForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var form = this;
+      var data = new URLSearchParams(new FormData(form)).toString();
+      fetch(/*[[@{/users/check_user}]]*/, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: data
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (!result.user) {
+          alert('입력하신 정보와 일치하는 회원정보가 없습니다.');
+        } else {
+          form.remove();
+
+        }
+      })
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('addPwdForm').innerHTML = html;
+      });
+    });
+  /*]]>*/
+</script>
+</body>
+</html>

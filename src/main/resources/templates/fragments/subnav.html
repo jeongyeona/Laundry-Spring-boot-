@@ -1,96 +1,89 @@
-<!-- 대메뉴별 중메뉴 문구 -->
-<div th:switch="${param.thisPage}">
-  <div th:case="'login'"><div id="subMenuText"><p>User Login</p></div></div>
-  <div th:case="'signup'"><div id="subMenuText"><p>회원가입</p></div></div>
-  <div th:case="'findpwd'"><div id="subMenuText"><p>비밀번호 찾기</p></div></div>
-  <div th:case="'findid'"><div id="subMenuText"><p>아이디 찾기</p></div></div>
-  <div th:case="*">
-    <nav class="bg-light">
-      <div id="subNavbar">
-        <div id="subNavbarNav" th:switch="${param.thisPage}">
+<!-- src/main/resources/templates/fragments/subnav.html -->
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="subnav(thisPage, subPage)">
 
-          <!-- 브랜드 서브 네비 -->
-          <ul th:case="'brand'" id="subNavUl">
-            <li class="subNavItem" th:classappend="${param.subPage == 'corpor'} ? ' deco'">
-              <a th:href="@{/corporation/brand.do}" th:classappend="${param.subPage == 'corpor'} ? ' active'">회사소개</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'history'} ? ' deco'">
-              <a th:href="@{/corporation/history.do}" th:classappend="${param.subPage == 'history'} ? ' active'">연혁</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'startup'} ? ' deco'">
-              <a th:href="@{/corporation/startup.do}" th:classappend="${param.subPage == 'startup'} ? ' active'">창업안내</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'members'} ? ' deco'">
-              <a th:href="@{/corporation/members.do}" th:classappend="${param.subPage == 'members'} ? ' active'">팀원소개</a>
-            </li>
-          </ul>
-
-          <!-- 이용안내 서브 네비 -->
-          <ul th:case="'guide'" id="subNavUl">
-            <li class="subNavItem" th:classappend="${param.subPage == 'price'} ? ' deco'">
-              <a th:href="@{/guide/price_guide.do}" th:classappend="${param.subPage == 'price'} ? ' active'">가격안내</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'area'} ? ' deco'">
-              <a th:href="@{/guide/area_guide.do}" th:classappend="${param.subPage == 'area'} ? ' active'">지역안내</a>
-            </li>
-          </ul>
-
-          <!-- 예약안내 서브 네비 -->
-          <ul th:case="'reserve'" id="subNavUl">
-            <li class="subNavItem">
-              <a th:href="@{/reserve/reserve_select.do}" class="active">예약안내</a>
-            </li>
-          </ul>
-
-          <!-- 고객지원 서브 네비 -->
-          <ul th:case="'support'" id="subNavUl">
-            <li class="subNavItem" th:classappend="${param.subPage == 'review'} ? ' deco'">
-              <a th:href="@{/review/list.do}" th:classappend="${param.subPage == 'review'} ? ' active'">후기게시판</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'faq'} ? ' deco'">
-              <a th:href="@{/faq/list.do}" th:classappend="${param.subPage == 'faq'} ? ' active'">질문게시판</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'notice'} ? ' deco'">
-              <a th:href="@{/notice/list.do}" th:classappend="${param.subPage == 'notice'} ? ' active'">공지사항</a>
-            </li>
-          </ul>
-
-          <!-- 마이페이지 서브 네비 -->
-          <ul th:case="'mypage'" id="subNavUl">
-            <li class="subNavItem" th:classappend="${param.subPage == 'info'} ? ' deco'">
-              <a th:href="@{/mypage/users/info.do}" th:classappend="${param.subPage == 'info'} ? ' active'">회원정보</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'orderlist'} ? ' deco'">
-              <a th:href="@{/mypage/order.do}" th:classappend="${param.subPage == 'orderlist'} ? ' active'">신청내역확인</a>
-            </li>
-          </ul>
-
-          <!-- 관리자 서브 네비 -->
-          <ul th:case="'manager'" id="subNavUl">
-            <li class="subNavItem" th:classappend="${param.subPage == 'user'} ? ' deco'">
-              <a th:href="@{/mypage/user.do}" th:classappend="${param.subPage == 'user'} ? ' active'">고객관리</a>
-            </li>
-            <li class="subNavItem" th:classappend="${param.subPage == 'order'} ? ' deco'">
-              <a th:href="@{/mypage/order.do}" th:classappend="${param.subPage == 'order'} ? ' active'">주문관리</a>
-            </li>
-          </ul>
-
+  <!-- 대메뉴별 중메뉴 문구 -->
+  <div th:switch="${thisPage}">
+    <div th:case="'login'">
+      <div id="subMenuText"><p>User Login</p></div>
+    </div>
+    <div th:case="'signup'">
+      <div id="subMenuText"><p></p></div>
+    </div>
+    <div th:case="'findpwd'">
+      <div id="subMenuText"><p>비밀번호 찾기</p></div>
+    </div>
+    <div th:case="'findid'">
+      <div id="subMenuText"><p>아이디 찾기</p></div>
+    </div>
+    <div th:case="*">
+      <!-- 기타 페이지 서브네비 -->
+      <nav class="bg-light">
+        <div id="subNavbar">
+          <div id="subNavbarNav" th:switch="${thisPage}">
+            <!-- 브랜드 서브 네비 -->
+            <ul th:case="'brand'" id="subNavUl">
+              <li class="subNavItem" th:classappend="${subPage=='corpor'} ? ' deco' : ''">
+                <a th:href="@{/corporation/brand.do}" th:classappend="${subPage=='corpor'} ? ' active' : ''">회사소개</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='history'} ? ' deco' : ''">
+                <a th:href="@{/corporation/history.do}" th:classappend="${subPage=='history'} ? ' active' : ''">연혁</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='startup'} ? ' deco' : ''">
+                <a th:href="@{/corporation/startup.do}" th:classappend="${subPage=='startup'} ? ' active' : ''">창업안내</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='members'} ? ' deco' : ''">
+                <a th:href="@{/corporation/members.do}" th:classappend="${subPage=='members'} ? ' active' : ''">팀원소개</a>
+              </li>
+            </ul>
+            <!-- 이용안내 서브 네비 -->
+            <ul th:case="'guide'" id="subNavUl">
+              <li class="subNavItem" th:classappend="${subPage=='price'} ? ' deco' : ''">
+                <a th:href="@{/guide/price_guide.do}" th:classappend="${subPage=='price'} ? ' active' : ''">가격안내</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='area'} ? ' deco' : ''">
+                <a th:href="@{/guide/area_guide.do}" th:classappend="${subPage=='area'} ? ' active' : ''">지역안내</a>
+              </li>
+            </ul>
+            <!-- 예약안내 서브 네비 -->
+            <ul th:case="'reserve'" id="subNavUl">
+              <li class="subNavItem">
+                <a th:href="@{/reserve/reserve_select.do}" class="active">예약안내</a>
+              </li>
+            </ul>
+            <!-- 고객지원 서브 네비 -->
+            <ul th:case="'support'" id="subNavUl">
+              <li class="subNavItem" th:classappend="${subPage=='review'} ? ' deco' : ''">
+                <a th:href="@{/review/list.do}" th:classappend="${subPage=='review'} ? ' active' : ''">후기게시판</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='faq'} ? ' deco' : ''">
+                <a th:href="@{/faq/list.do}" th:classappend="${subPage=='faq'} ? ' active' : ''">질문게시판</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='notice'} ? ' deco' : ''">
+                <a th:href="@{/notice/list.do}" th:classappend="${subPage=='notice'} ? ' active' : ''">공지사항</a>
+              </li>
+            </ul>
+            <!-- 마이페이지 서브 네비 -->
+            <ul th:case="'mypage'" id="subNavUl">
+              <li class="subNavItem" th:classappend="${subPage=='info'} ? ' deco' : ''">
+                <a th:href="@{/mypage/users/info.do}" th:classappend="${subPage=='info'} ? ' active' : ''">회원정보</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='orderlist'} ? ' deco' : ''">
+                <a th:href="@{/mypage/order.do}" th:classappend="${subPage=='orderlist'} ? ' active' : ''">신청내역확인</a>
+              </li>
+            </ul>
+            <!-- 관리자 서브 네비 -->
+            <ul th:case="'manager'" id="subNavUl">
+              <li class="subNavItem" th:classappend="${subPage=='user'} ? ' deco' : ''">
+                <a th:href="@{/mypage/user.do}" th:classappend="${subPage=='user'} ? ' active' : ''">고객관리</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='order'} ? ' deco' : ''">
+                <a th:href="@{/mypage/order.do}" th:classappend="${subPage=='order'} ? ' active' : ''">주문관리</a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
-    <div id="subMenuText" th:switch="${param.thisPage + '_' + param.subPage}">
-      <p th:case="'brand_corpor'">회사소개</p>
-      <p th:case="'brand_history'">연혁</p>
-      <p th:case="'brand_startup'">창업안내</p>
-      <p th:case="'brand_members'">팀원소개</p>
-      <p th:case="'guide_price'">가격안내</p>
-      <p th:case="'guide_area'">지역안내</p>
-      <p th:case="'reserve_reserve'">예약안내</p>
-      <p th:case="'support_review'">후기게시판</p>
-      <p th:case="'support_faq'">질문게시판</p>
-      <p th:case="'support_notice'">공지사항</p>
-      <p th:case="'mypage_info'">회원정보</p>
-      <p th:case="'mypage_orderlist'">신청내역</p>
+      </nav>
     </div>
   </div>
 </div>
