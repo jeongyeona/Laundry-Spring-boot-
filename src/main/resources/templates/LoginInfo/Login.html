@@ -63,7 +63,7 @@
 <main class="content-wrap">
   <div class="container" id="loginform_wr">
     <div id="body-content">
-      <form id="loginForm" th:action="@{/users/login}" method="post" autocomplete="off">
+      <form id="loginForm" th:action="@{/LoginInfo/login}" method="post" autocomplete="off">
         <!-- 리다이렉트 URL -->
         <input type="hidden" name="url"
                th:if="${url == null}"
@@ -99,8 +99,8 @@
             <button class="btn btn-dark" type="submit" style="border-radius:0;">Sign in</button>
           </div>
           <div class="col d-flex justify-content-between mb-2" id="sign_findBtn">
-            <a th:href="@{/Signup}" class="btn" style="width:150px;">Sign up</a>
-            <a th:href="@{/FindPwd}" class="btn" style="width:150px;">Password?</a>
+            <a th:href="@{/LoginInfo/Signup}" class="btn" style="width:150px;">Sign up</a>
+            <a th:href="@{/LoginInfo/FindPwd}" class="btn" style="width:150px;">Password?</a>
           </div>
         </div>
       </form>

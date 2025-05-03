@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 public class CountryPhoneService {
 
     private final CountryPhoneRepository repo;
@@ -21,11 +20,6 @@ public class CountryPhoneService {
                                CountryPhoneMapper mapper) {
         this.repo   = repo;
         this.mapper = mapper;
-    }
-
-    public CountryPhoneResponseDto create(CountryPhoneCreateDto dto) {
-        CountryPhone saved = repo.save(mapper.toEntity(dto));
-        return mapper.toDto(saved);
     }
 
     @Transactional(readOnly = true)

@@ -7,13 +7,13 @@ import jakarta.persistence.*;
 public class CountryPhone {
 
     @Id
-    @Column(name = "country_code", length = 2)
+    @Column(name = "countryCode", length = 2)
     private String countryCode;
 
-    @Column(name = "dial_code", nullable = false, length = 10)
+    @Column(name = "dialCode", nullable = false, length = 10)
     private String dialCode;
 
-    @Column(name = "country_name", nullable = false, length = 100)
+    @Column(name = "countryName", nullable = false, length = 100)
     private String countryName;
 
     protected CountryPhone() {}

@@ -4,18 +4,32 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.Laundry.config.JwtUtil;
 import com.example.Laundry.dto.CountryPhoneResponseDto;
 import com.example.Laundry.dto.UserCreateDto;
+import com.example.Laundry.dto.UserResponseDto;
 import com.example.Laundry.service.CountryPhoneService;
 import com.example.Laundry.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import com.example.Laundry.dto.CountryPhoneCreateDto;
+import com.example.Laundry.config.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("/LoginInfo")
 public class LoginController {
 
     private final CountryPhoneService countryPhoneService;
@@ -26,33 +40,26 @@ public class LoginController {
         this.userService = userService;
     }
 
-    // 국가 번호 목록 조회
-    @ModelAttribute("countryCodes")
-    public List<CountryPhoneResponseDto> countryCodes() {
-        return countryPhoneService.listAll();
-    }
-
     //로그인 화면으로 이동
     @GetMapping("/Login")
     public String loginForm() {
         return "LoginInfo/Login";
     }
 
-    //로그인하기
-
-    //로그아웃
-
     //회원가입 화면으로 이동
     @GetMapping("/Signup")
-    public String signupForm() {
+    public String signupForm(Model model) {
+        List<CountryPhoneResponseDto> countryCodes = countryPhoneService.listAll();
+        model.addAttribute("countryCodes", countryCodes);
         return "LoginInfo/Signup";
     }
 
-    //회원가입
+    // 회원가입
     @PostMapping("/SignupPost")
     public String signUp(UserCreateDto dto) {
         userService.register(dto);
-        return "mypage/login/signup";
+        // 가입 완료 후 로그인 페이지로 리다이렉트
+        return "redirect:/LoginInfo/Login";
     }
 
     //비밀번호 찾기 화면으로 이동
@@ -72,4 +79,5 @@ public class LoginController {
     public String ajaxUpdatePwdForm(String id){
         return "mypage/login/update_pwd_form";
     }
+
 }

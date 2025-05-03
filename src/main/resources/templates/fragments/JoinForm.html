@@ -14,21 +14,16 @@
   <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
   <script th:src="@{//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js}" defer></script>
   <style>
-    #container_form { text-align: left; display: none; padding: 2rem; }
-    .invalid-feedback { display: none; color: #dc3545; }
-    .is-invalid + .invalid-feedback { display: block; }
+
   </style>
 </head>
 <body>
 <!-- 네비게이션 -->
 <div th:insert="fragments/nav :: nav"></div>
 
-<!-- 서브 네비게이션 -->
-<div th:insert="fragments/subnav :: subnav('signup','signup')"></div>
-
 <!-- 회원가입 폼 -->
 <div id="container_form" class="container" th:fragment="JoinForm">
-  <form th:action="@{/Signup}" method="post" id="signupForm" autocomplete="off">
+  <form th:action="@{/LoginInfo/SignupPost}" method="post" id="signupForm" autocomplete="off">
     <!-- 이름 -->
     <div class="mb-3">
       <input name="name" id="name" class="form-control" type="text" placeholder="이름" required />
@@ -42,20 +37,24 @@
     <hr/>
     <!-- 아이디 -->
     <div class="mb-2 mt-4">
-      <input name="id" id="id" class="form-control" type="text" maxlength="10"
-             placeholder="아이디 (영문자+숫자 5~10자)" required />
+      <input name="id" id="id" class="form-control" type="text" maxlength="15"
+             placeholder="아이디 (영문자+숫자 5~15자)" required />
       <div class="invalid-feedback">사용할 수 없는 아이디 입니다.</div>
     </div>
     <!-- 비밀번호 -->
     <div class="mb-3">
-      <input name="pwd" id="pwd" class="form-control" type="password" maxlength="13"
-             placeholder="비밀번호 (영문자,숫자,특수문자 포함 8~13자)" required />
-      <div class="invalid-feedback">영문자, 숫자, 특수문자 포함 8~13자로 입력하세요.</div>
+      <input id="pwd" name="pwd" class="form-control" type="password" placeholder="비밀번호" />
+      <!-- 패턴 불만족 메시지 -->
+      <div id="pwdPatternFb" class="invalid-feedback" style="display:none;">
+        영문자, 숫자, 특수문자 포함 8자 이상으로 입력하세요.
+      </div>
     </div>
     <div class="mb-4">
-      <input name="pwd2" id="pwd2" class="form-control" type="password" maxlength="13"
-             placeholder="비밀번호 확인" required />
-      <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+      <input id="pwd2" name="pwd2" class="form-control" type="password" placeholder="비밀번호 확인" />
+      <!-- 일치 불일치 메시지만 필요 -->
+      <div id="pwd2MatchFb" class="invalid-feedback" style="display:none;">
+        비밀번호가 일치하지 않습니다.
+      </div>
     </div>
     <hr/>
     <!-- 주소 -->
@@ -86,13 +85,21 @@
     <hr/>
     <!-- 국가코드 -->
     <div class="mb-3">
-      <select name="countryCode">
+      <label for="countryCodeSelect" class="form-label">국가 선택</label>
+      <select id="countryCodeSelect"
+              name="countryCode"
+              class="form-select"
+              required>
+        <option value="" disabled selected>국가를 선택하세요</option>
         <option th:each="c : ${countryCodes}"
-                th:value="${c.dialCode}"
+                th:value="${c.countryCode}"
+                th:attr="data-dial=${c.dialCode}"
                 th:text="${c.countryName + ' (+' + c.dialCode + ')'}">
         </option>
       </select>
     </div>
+
+    <input type="hidden" name="dialCode" id="dialCode" />
     <!-- 전화번호 -->
     <div class="mb-3">
       <input name="phone" id="phone" class="form-control" type="text" maxlength="11"
@@ -137,54 +144,129 @@
 
     // 이름 검증
     document.getElementById('name').addEventListener('input', function(){
-      isNameValid = /^[가-힣]+$/.test(this.value);
-      this.classList.toggle('is-valid', isNameValid);
-      this.classList.toggle('is-invalid', !isNameValid);
+      let valid = /^[가-힣]+$/.test(this.value);
+
+      isNameValid = valid;
+      this.classList.toggle('is-valid',   valid);
+      this.classList.toggle('is-invalid', !valid);
+
+      // invalid-feedback 요소를 직접 찾아 보여주기
+      let fb = this.nextElementSibling;
+      if (fb && fb.classList.contains('invalid-feedback')) {
+        fb.style.display = valid ? 'none' : 'block';
+      }
     });
+
 
     // 아이디 중복검사
     document.getElementById('id').addEventListener('input', function(){
-      const el=this;
-      const v=el.value;
+      let el = this;
+      let v  = el.value;
+
       el.classList.remove('is-valid','is-invalid');
-      if(!/^[a-z].{4,9}$/.test(v)){ isIdValid=false; el.classList.add('is-invalid'); return; }
-      fetch(/*[[@{/users/checkid}]]*/ + '?inputId='+v)
-        .then(r=>r.json())
-        .then(d=>{
-          isIdValid = !d.isExist;
-          el.classList.toggle('is-valid', isIdValid);
-          el.classList.toggle('is-invalid', !isIdValid);
-        });
+      if (!/^[a-z].{4,9}$/.test(v)) {
+        isIdValid = false;
+        el.classList.add('is-invalid');
+        return;
+      }
+      fetch('/LoginInfo/CheckId?inputId=' + encodeURIComponent(v))
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP error ${r.status}`);
+        return r.json();
+      })
+      .then(exists => {
+        // exists === true 이면 이미 존재
+        isIdValid = !exists;
+        el.classList.toggle('is-valid',   isIdValid);
+        el.classList.toggle('is-invalid', !isIdValid);
+      })
+      .catch(err => {
+        console.error(err);
+      });
     });
 
     // 비밀번호 확인
-    function checkPwd(){
-      const p=document.getElementById('pwd').value;
-      const p2=document.getElementById('pwd2').value;
-      const reg = /^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&^]).{8,13}$/;
-      const ok = reg.test(p) && p===p2;
-      isPwdValid = ok;
-      ['pwd','pwd2'].forEach(id=>{
-        const i=document.getElementById(id);
-        i.classList.toggle('is-valid', ok);
-        i.classList.toggle('is-invalid', !ok);
-      });
+    function toggleFeedback(el, show) {
+      let fb = el.nextElementSibling;
+      if (fb && fb.classList.contains('invalid-feedback')) {
+        fb.style.display = show ? 'block' : 'none';
+      }
     }
-    ['pwd','pwd2'].forEach(id=>document.getElementById(id).addEventListener('input',checkPwd));
 
-    // 이메일 검증
-    document.getElementById('email').addEventListener('input', function(){
-      isEmailValid = /@/.test(this.value);
-      this.classList.toggle('is-valid', isEmailValid);
-      this.classList.toggle('is-invalid', !isEmailValid);
+    // 비밀번호 검증
+    document.addEventListener('DOMContentLoaded', () => {
+      let pwd       = document.getElementById('pwd');
+      let pwd2      = document.getElementById('pwd2');
+      let patternFb = document.getElementById('pwdPatternFb');
+      let matchFb2  = document.getElementById('pwd2MatchFb');
+
+      let reg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^]).{8,}$/;
+
+      // 1) 패턴 검사 함수
+      function validatePattern() {
+        let ok = reg.test(pwd.value);
+        pwd.classList.toggle('is-valid',   ok);
+        pwd.classList.toggle('is-invalid', !ok);
+        patternFb.style.display = ok ? 'none' : 'block';
+        if (ok) {
+          validateMatch();
+        } else {
+          pwd2.classList.remove('is-valid','is-invalid');
+          matchFb2.style.display = 'none';
+        }
+      }
+
+      // 2) 일치 검사 함수
+      function validateMatch() {
+        if (!reg.test(pwd.value)) return;
+        let ok = pwd.value === pwd2.value && pwd2.value.length > 0;
+        isPwdValid = ok;
+        pwd2.classList.toggle('is-valid',   ok);
+        pwd2.classList.toggle('is-invalid', !ok);
+        matchFb2.style.display = ok ? 'none' : 'block';
+      }
+
+      pwd.addEventListener('input',  validatePattern);
+      pwd2.addEventListener('input', validateMatch);
     });
 
-    // 전화번호 검증
-    document.getElementById('phone').addEventListener('input', function(){
-      this.value = this.value.replace(/[^0-9]/g,'');
-      isPhoneValid = /^01[016789]\\d{7,8}$/.test(this.value);
-      this.classList.toggle('is-valid', isPhoneValid);
-      this.classList.toggle('is-invalid', !isPhoneValid);
+    // 이메일 검증
+    document.addEventListener('DOMContentLoaded', () => {
+      let email = document.getElementById('email');
+      let fb    = email.nextElementSibling;  // 바로 아래 invalid-feedback
+
+      // 간단한 이메일 패턴 (필요에 따라 강화하세요)
+      let regEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      email.addEventListener('input', function() {
+        // 1) 값 그대로 두고
+        let ok = regEmail.test(this.value);
+
+        isEmailValid = ok;
+
+        // 2) is-valid / is-invalid 클래스 토글
+        this.classList.toggle('is-valid',   ok);
+        this.classList.toggle('is-invalid', !ok);
+
+        // 3) invalid-feedback 보이기/숨기기
+        if (fb && fb.classList.contains('invalid-feedback')) {
+          fb.style.display = ok ? 'none' : 'block';
+        }
+      });
+    });
+
+    // 주소 검증
+    document.getElementById('detailAddr').addEventListener('input', function() {
+      isAddrValid02 = this.value.trim().length > 0;
+
+      this.classList.toggle('is-valid',   isAddrValid02);
+      this.classList.toggle('is-invalid', !isAddrValid02);
+
+      // invalid-feedback 요소를 찾아서 표시/숨김
+      let feedback = this.nextElementSibling;
+      if (feedback && feedback.classList.contains('invalid-feedback')) {
+        feedback.style.display = isAddrValid02 ? 'none' : 'block';
+      }
     });
 
     // 상세주소 입력 확인
@@ -194,12 +276,41 @@
       this.classList.toggle('is-invalid', !isAddrValid02);
     });
 
+    // 전화번호
+    document.addEventListener('DOMContentLoaded', () => {
+      let phone = document.getElementById('phone');
+
+      phone.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        let ok = /^01[016789]\d{7,8}$/.test(this.value);
+
+        isPhoneValid = ok;
+
+        this.classList.toggle('is-valid',   ok);
+        this.classList.toggle('is-invalid', !ok);
+
+        let fb = this.nextElementSibling;
+        if (fb && fb.classList.contains('invalid-feedback')) {
+          fb.style.display = ok ? 'none' : 'block';
+        }
+      });
+    });
+
     // 폼 제출 전 최종 검증
-    document.getElementById('signupForm').addEventListener('submit', function(e){
-      const valid = isNameValid && isIdValid && isPwdValid
+   document.getElementById('signupForm').addEventListener('submit', function(e){
+      console.log({
+        isNameValid,
+        isIdValid,
+        isPwdValid,
+        isEmailValid,
+        isPhoneValid,
+        isAddrValid01,
+        isAddrValid02
+      });
+      let valid = isNameValid && isIdValid && isPwdValid
                   && isEmailValid && isPhoneValid
                   && isAddrValid01 && isAddrValid02;
-      if(!valid){
+      if (!valid) {
         e.preventDefault();
         alert('입력하신 정보를 다시 확인해주세요.');
       } else {
@@ -209,7 +320,19 @@
            document.getElementById('detailAddr').value,
            document.getElementById('extraAddr').value].join('_');
       }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    let select = document.getElementById('countryCodeSelect');
+    let dialIn = document.getElementById('dialCode');
+
+    select.addEventListener('change', function() {
+      // 선택된 <option> 의 data-dial 속성 값을 hidden input 에 복사
+      let dial = this.selectedOptions[0].dataset.dial;
+      dialIn.value = dial;
     });
+  });
+
   /*]]>*/
 </script>
 </body>
