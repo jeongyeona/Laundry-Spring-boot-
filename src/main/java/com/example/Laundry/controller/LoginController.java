@@ -10,11 +10,13 @@ import com.example.Laundry.dto.UserCreateDto;
 import com.example.Laundry.dto.UserResponseDto;
 import com.example.Laundry.service.CountryPhoneService;
 import com.example.Laundry.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,40 @@ public class LoginController {
     @GetMapping("/Login")
     public String loginForm() {
         return "LoginInfo/Login";
+    }
+
+    //로그인
+    @PostMapping("/LoginPost")
+    public String processLogin(
+            @RequestParam String id,
+            @RequestParam String pwd,
+            HttpSession session,
+            Model model
+    ) {
+        try {
+            boolean authenticated = userService.authenticate(id, pwd);
+
+            if (authenticated) {
+                session.setAttribute("LOGIN_USER", id);
+                return "redirect:/";
+            } else {
+                // 비밀번호 불일치 등
+                model.addAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
+                return "LoginInfo/Login";
+            }
+
+        } catch (UsernameNotFoundException ex) {
+            // 아이디가 없는 경우
+            model.addAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            return "LoginInfo/Login";
+        }
+    }
+
+    // 3) 로그아웃
+    @GetMapping("/Logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
     }
 
     //회원가입 화면으로 이동

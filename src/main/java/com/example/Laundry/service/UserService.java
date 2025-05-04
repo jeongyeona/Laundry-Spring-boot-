@@ -49,6 +49,21 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
     }
 
     /**
+     * 로그인 로직: 아이디와 비밀번호 검사
+     * @param id       사용자 아이디
+     * @param rawPwd   입력된 평문 비밀번호
+     * @return true면 인증 성공, false면 인증 실패
+     */
+    @Transactional(readOnly = true)
+    public boolean authenticate(String id, String rawPwd) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
+        // matches: rawPwd를 저장된 해시와 비교
+        return passwordEncoder.matches(rawPwd, user.getPwd());
+    }
+
+
+    /**
      * 전체 회원 조회
      */
     @Transactional(readOnly = true)
@@ -74,14 +89,18 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
     public UserResponseDto update(String id, UserCreateDto dto) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
-        // 필드 업데이트
+
         existing.setName(dto.name());
         existing.setEmail(dto.email());
-        existing.setPwd(dto.pwd());
+        // 비밀번호 변경 시 해싱
+        if (dto.pwd() != null && !dto.pwd().isEmpty()) {
+            existing.setPwd(passwordEncoder.encode(dto.pwd()));
+        }
         existing.setAddr(dto.addr());
         existing.setPhone(dto.phone());
         existing.setManager(dto.manager());
         existing.setProfile(dto.profile());
+
         User updated = userRepository.save(existing);
         return userMapper.toDto(updated);
     }
@@ -112,8 +131,8 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(entity.getId())
-                .password(entity.getPwd())      // DB에 이미 해시된 비밀번호
-                .authorities("ROLE_USER")       // 필요시 권한 추가
+                .password(entity.getPwd())
+                .authorities("ROLE_USER")
                 .build();
     }
 }

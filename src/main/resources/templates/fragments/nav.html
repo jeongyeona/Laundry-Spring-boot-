@@ -140,8 +140,8 @@
                   <li th:if="${session.id == null}" class="lili1">
                     <a th:href="@{/LoginInfo/Signup}">회원가입</a>
                   </li>
-                  <li th:if="${session.id != null}" class="lili1">
-                    <a th:href="@{/users/logout.do}">로그아웃</a>
+                  <li th:if="${session.LOGIN_USER != null}" class="lili1">
+                    <a th:href="@{/LoginInfo/Logout}">로그아웃</a>
                   </li>
                 </ul>
               </div>
@@ -166,8 +166,8 @@
           <li th:if="${session.id == null}">
             <a th:href="@{/LoginInfo/Signup}"><strong>회원가입</strong></a>
           </li>
-          <li th:if="${session.id != null}">
-            <a th:href="@{/users/logout.do}"><strong>로그아웃</strong></a>
+          <li th:if="${session.LOGIN_USER != null}">
+            <a th:href="@{/LoginInfo/Logout}"><strong>로그아웃</strong></a>
           </li>
         </ul>
       </div>

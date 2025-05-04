@@ -29,7 +29,8 @@ public class SecurityConfig {
                         // 2) 뷰를 반환하는 페이지들
                         .requestMatchers(
                                 "/", "/LoginInfo/home", "/LoginInfo/Login",
-                                "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup"
+                                "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup",
+                                "/LoginInfo/LoginPost", "/LoginInfo/Logout"
                         ).permitAll()
 
                         // 3) AJAX/API

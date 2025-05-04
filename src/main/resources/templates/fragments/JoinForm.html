@@ -12,7 +12,6 @@
   <link rel="stylesheet" th:href="@{/css/nav.css}"/>
   <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
   <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
-  <script th:src="@{//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js}" defer></script>
   <style>
 
   </style>
@@ -68,7 +67,7 @@
         </div>
       </div>
       <div class="mb-2">
-        <input name="addr" id="addr" class="form-control" type="text" placeholder="주소" readonly />
+        <input id="addr" class="form-control" type="text" placeholder="주소" readonly />
       </div>
       <div class="row g-2 mb-2">
         <div class="col-auto">
@@ -80,7 +79,7 @@
           <input name="extraAddr" id="extraAddr" class="form-control" type="text" placeholder="참고항목" readonly />
         </div>
       </div>
-      <input type="hidden" name="totalAddr" id="totalAddr" />
+      <input type="hidden" name="addr" id="totalAddr" />
     </div>
     <hr/>
     <!-- 국가코드 -->

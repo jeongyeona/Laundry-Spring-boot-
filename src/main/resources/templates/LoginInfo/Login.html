@@ -63,7 +63,7 @@
 <main class="content-wrap">
   <div class="container" id="loginform_wr">
     <div id="body-content">
-      <form id="loginForm" th:action="@{/LoginInfo/login}" method="post" autocomplete="off">
+      <form id="loginForm" th:action="@{/LoginInfo/LoginPost}" method="post" autocomplete="off">
         <!-- 리다이렉트 URL -->
         <input type="hidden" name="url"
                th:if="${url == null}"
@@ -104,6 +104,13 @@
           </div>
         </div>
       </form>
+      <th:block th:if="${loginError}">
+        <script th:inline="javascript">
+          /*<![CDATA[*/
+            alert([[${loginError}]]);
+          /*]]>*/
+        </script>
+      </th:block>
     </div>
   </div>
 </main>
