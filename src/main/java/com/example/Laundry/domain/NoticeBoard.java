@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notice_board")
@@ -28,7 +29,7 @@ public class NoticeBoard {
 
     private Integer viewCount;
 
-    private LocalDate regdate;
+    private LocalDateTime regdate;
 
     // Getters and Setters
     public Integer getNum() { return num; }
@@ -46,6 +47,6 @@ public class NoticeBoard {
     public Integer getViewCount() { return viewCount; }
     public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
 
-    public LocalDate getRegdate() { return regdate; }
-    public void setRegdate(LocalDate regdate) { this.regdate = regdate; }
+    public LocalDateTime getRegdate() { return regdate; }
+    public void setRegdate(LocalDateTime regdate) { this.regdate = regdate; }
 }

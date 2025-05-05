@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>가격 안내</title>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+          crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+
+  <style>
+    * { font-family: 'Noto Sans KR', sans-serif !important; }
+    #price-wr { text-align:center; }
+    #subMenuText { text-align:center; animation:fadeIn 1s; }
+    #btnGroup { display:flex; align-items: center; justify-content: center; margin: 30px auto 50px; gap:1rem; }
+    .btn { border:1px solid #000; background:#000; color:#fff; padding:.6rem 1rem;
+           text-transform:uppercase; cursor:pointer; transition: .3s; }
+    .btn:hover { background:transparent; color:#000; }
+    #btnGroup a { width:100px; }
+    .table-wrapper { display:inline-block; padding:20px; }
+    .table-wrapper table { width:750px; }
+    .table-wrapper th { padding-bottom:15px; border-bottom:3px solid #000; }
+    .table-wrapper td { padding:20px 0; border-bottom:1px solid #A1A1AB; }
+    .table-wrapper tr:hover td { color:rgba(0,0,0,0.6); cursor:pointer; }
+    .table-wrapper td:nth-child(2) { text-align:left; padding-left:20px; }
+    .footer-sticky {position: fixed; bottom: 0; left: 0; width: 100%; z-index: 10; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { display: flex; flex-direction: column; }
+    #price-wr { flex: 1; padding-bottom: 80px; }
+    .footer-sticky { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; z-index: 10; }
+  </style>
+</head>
+<body>
+<!-- main nav -->
+<div th:replace="fragments/nav :: nav"></div>
+
+<!-- sub nav -->
+<div th:replace="fragments/subnav :: subnav('guide','price')"></div>
+
+<div id="price-wr" class="container">
+  <div id="btnGroup">
+    <a href="javascript:clicked('clothes')" class="btn" id="clothes">의류</a>
+    <a href="javascript:clicked('bedding')" class="btn" id="bedding">침구</a>
+    <a href="javascript:clicked('shoes')" class="btn" id="shoes">신발</a>
+    <a href="javascript:clicked('living')" class="btn" id="living">리빙</a>
+  </div>
+
+  <div th:fragment="itemsTableDiv" id="itemsTableDiv" class="table-wrapper">
+    <table class="table">
+      <thead>
+      <tr>
+        <th style="width:20%">NO</th>
+        <th style="width:50%">품목</th>
+        <th style="width:30%">가격</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="tmp, stat : ${list}">
+        <td th:text="${stat.index + 1}"></td>
+        <td th:text="${tmp.item}"></td>
+        <td th:text="${#numbers.formatDecimal(tmp.price,0,'COMMA',0,'POINT')}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- footer -->
+<div th:replace="fragments/footer :: footer" class="footer-sticky"></div>
+
+<!-- scripts -->
+<script th:inline="javascript">
+  function clicked(category) {
+    let url = /*[[@{/Guide/PriceGuideFragment}]]*/ '/Guide/PriceGuideFragment';
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      data: { category: category }
+    }).done(function(fragmentHtml) {
+      $('#itemsTableDiv').html(fragmentHtml);
+    });
+  }
+</script>
+</body>
+</html>

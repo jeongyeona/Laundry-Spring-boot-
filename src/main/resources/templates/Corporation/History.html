@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>연혁</title>
+
+  <!-- 외부 CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif !important;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    /* 콘텐츠 중앙 60%, 반응형 100% */
+    .main-content {
+      flex: 1;
+      width: 60%;
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+    @media (max-width: 768px) {
+      .main-content { width: 100%; padding: 20px 10px; }
+    }
+
+    /* 헤드라인 영역: 중앙 블록, 텍스트 왼쪽 정렬 */
+    .history-hero h2 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      color: #333;
+      text-align: left;
+      max-width: 800px;
+      margin: 0 auto 1em;
+    }
+    .history-hero hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      width: 800px;
+      margin: 1.5em auto;
+    }
+
+    /* 년도 텍스트 중앙 배치 */
+    .timeline-year {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      margin-bottom: 1em;
+    }
+
+    /* 타임라인 리스트 중앙 블록, 텍스트 왼쪽 정렬 */
+    .timeline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 800px;
+      width: 100%;
+    }
+    .timeline-list li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1em;
+      width: 100%;
+    }
+    .timeline-list .date {
+      flex: 0 0 80px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #555;
+      margin-right: 1em;
+      text-align: left;
+    }
+    .timeline-list .desc {
+      flex: 1 1 auto;
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.4;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<!-- main nav -->
+<div th:replace="fragments/nav :: nav"></div>
+
+<!-- sub nav -->
+<div th:replace="fragments/subnav :: subnav('brand','history')"></div>
+
+<!-- 콘텐츠 -->
+<div class="main-content">
+
+  <!-- 히어로 텍스트 + 구분선 -->
+  <div class="history-hero">
+    <h2>런드리365는 비대면 모바일 세탁 서비스로<br/>세탁 산업의 혁신에 도전합니다</h2>
+    <hr/>
+  </div>
+
+  <!-- 2022년 타임라인 -->
+  <div class="timeline-year">2025</div>
+  <ul class="timeline-list">
+    <li><div class="date">6 SEP</div><div class="desc">프로젝트 아이디어 기획 및 요구사항 분석</div></li>
+    <li><div class="date">7 SEP</div><div class="desc">타 회사 참고 UI/UX 디자인 설계</div></li>
+    <li><div class="date">9 SEP</div><div class="desc">Front-end 환경 구성 및 첫 기능 구현 시작</div></li>
+    <li><div class="date">11 SEP</div><div class="desc">백엔드 아키텍처 설계 및 Spring Boot + JPA 연동</div></li>
+    <li><div class="date">12 SEP</div><div class="desc">JWT 토근을 이용한 회원가입, 로그인 구현</div></li>
+    <li><div class="date">14 SEP</div><div class="desc">화면 및 로직 개발</div></li>
+    <li><div class="date">19 SEP</div><div class="desc">모듈별 테스트 및 코드 리팩토링</div></li>
+    <li><div class="date">21 SEP</div><div class="desc">통합 테스트 및 CI/CD 파이프라인 구축</div></li>
+    <li><div class="date">22 SEP</div><div class="desc">클라우드 배포(AWS) 및 성능 최적화</div></li>
+    <li><div class="date">25 SEP</div><div class="desc">사용자 피드백 반영하여 UI/UX 개선 및 신규 기능 추가</div></li>
+    <li><div class="date">27 SEP</div><div class="desc">모바일 반응형 디자인 완성</div></li>
+    <li><div class="date">28 SEP</div><div class="desc">서비스 런칭 및 배포, 운영 모니터링 시작</div></li>
+  </ul>
+
+</div>
+
+<!-- footer -->
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>

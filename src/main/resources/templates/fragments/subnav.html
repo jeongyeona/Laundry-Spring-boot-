@@ -24,25 +24,22 @@
             <!-- 브랜드 서브 네비 -->
             <ul th:case="'brand'" id="subNavUl">
               <li class="subNavItem" th:classappend="${subPage=='corpor'} ? ' deco' : ''">
-                <a th:href="@{/corporation/brand.do}" th:classappend="${subPage=='corpor'} ? ' active' : ''">회사소개</a>
+                <a th:href="@{/Corporation/Brand}" th:classappend="${subPage=='corpor'} ? ' active' : ''">회사소개</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='history'} ? ' deco' : ''">
-                <a th:href="@{/corporation/history.do}" th:classappend="${subPage=='history'} ? ' active' : ''">연혁</a>
+                <a th:href="@{/Corporation/History}" th:classappend="${subPage=='history'} ? ' active' : ''">연혁</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='startup'} ? ' deco' : ''">
-                <a th:href="@{/corporation/startup.do}" th:classappend="${subPage=='startup'} ? ' active' : ''">창업안내</a>
-              </li>
-              <li class="subNavItem" th:classappend="${subPage=='members'} ? ' deco' : ''">
-                <a th:href="@{/corporation/members.do}" th:classappend="${subPage=='members'} ? ' active' : ''">팀원소개</a>
+                <a th:href="@{/Corporation/Startup}" th:classappend="${subPage=='startup'} ? ' active' : ''">창업안내</a>
               </li>
             </ul>
             <!-- 이용안내 서브 네비 -->
             <ul th:case="'guide'" id="subNavUl">
               <li class="subNavItem" th:classappend="${subPage=='price'} ? ' deco' : ''">
-                <a th:href="@{/guide/price_guide.do}" th:classappend="${subPage=='price'} ? ' active' : ''">가격안내</a>
+                <a th:href="@{/Guide/PriceGuide}" th:classappend="${subPage=='price'} ? ' active' : ''">가격안내</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='area'} ? ' deco' : ''">
-                <a th:href="@{/guide/area_guide.do}" th:classappend="${subPage=='area'} ? ' active' : ''">지역안내</a>
+                <a th:href="@{/Guide/AreaGuide}" th:classappend="${subPage=='area'} ? ' active' : ''">지역안내</a>
               </li>
             </ul>
             <!-- 예약안내 서브 네비 -->
@@ -60,7 +57,7 @@
                 <a th:href="@{/faq/list.do}" th:classappend="${subPage=='faq'} ? ' active' : ''">질문게시판</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='notice'} ? ' deco' : ''">
-                <a th:href="@{/notice/list.do}" th:classappend="${subPage=='notice'} ? ' active' : ''">공지사항</a>
+                <a th:href="@{/Notice/List}" th:classappend="${subPage=='notice'} ? ' active' : ''">공지사항</a>
               </li>
             </ul>
             <!-- 마이페이지 서브 네비 -->

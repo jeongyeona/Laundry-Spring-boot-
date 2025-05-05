@@ -2,6 +2,7 @@
 package com.example.Laundry.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record NoticeBoardResponseDto(
         Integer num,
@@ -9,5 +10,5 @@ public record NoticeBoardResponseDto(
         String title,
         String content,
         Integer viewCount,
-        LocalDate regdate
+        LocalDateTime regdate
 ) {}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>공지사항</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+  <style>
+    /* 전체 레이아웃 및 푸터 고정 */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    body {
+      font-family: 'Noto Sans KR', sans-serif !important;
+    }
+    /* 콘텐츠 영역이 푸터를 밀어내도록 */
+    .content-wrapper {
+      flex: 1;
+      margin-top: 30px; /* 본문 위 여백 */
+    }
+    /* 공지사항 본문 위쪽 추가 마진 */
+    .notice-inner {
+      margin-top: 30px;
+    }
+    /* 푸터 고정 */
+    .footer-sticky {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+    }
+    /* 버튼 */
+    .search-btn {
+      width: 120px;
+      height: 36px;
+    }
+    .write-btn {
+      height: 36px;
+      margin-left: 10px;
+    }
+    .btn { border-radius:0 !important; }
+    th, td { text-align:center !important; }
+    table a { text-decoration:none !important; color:#000 !important; }
+    a:hover, .tr-hover:hover { color: rgba(0,0,0,0.6) !important; }
+    tr { border-bottom:1px solid #ebebeb !important; }
+    .page-ui { margin:30px auto; }
+    .page-ui a { text-decoration:none; color:#000; }
+    .page-ui a:hover { text-decoration:underline; }
+    .page-ui a.active { font-weight:bold; text-decoration:underline; }
+    .page-ui ul { list-style:none; padding:0; margin:0; text-align:center; }
+    .page-ui ul li { display:inline-block; margin:0 5px; }
+    .form-inline { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:30px; }
+  </style>
+</head>
+<body>
+<!-- main nav -->
+<div th:replace="fragments/nav :: nav"></div>
+
+<!-- sub nav -->
+<div th:replace="fragments/subnav :: subnav('support','notice')"></div>
+
+<div class="content-wrapper container">
+  <!-- 검색 및 작성 버튼 그룹 -->
+  <div class="form-inline">
+    <form th:action="@{/Notice/List}" method="get" class="d-flex align-items-center">
+      <select name="condition" class="form-select" style="height:36px;">
+        <option value="title_content" th:selected="${condition=='title_content'}">제목+내용</option>
+        <option value="title" th:selected="${condition=='title'}">제목</option>
+        <option value="writer" th:selected="${condition=='writer'}">작성자</option>
+      </select>
+      <input type="text" name="keyword" class="form-control mx-2" placeholder="검색어..."
+             th:value="${keyword}" style="height:36px;" />
+      <button type="submit" class="btn btn-outline-dark search-btn">검색</button>
+    </form>
+    <a th:if="${manager=='Y'}"
+       th:href="@{/Notice/NoticeInsertForm}"
+       class="btn btn-outline-dark">작성</a>
+  </div>
+
+  <!-- 공지사항 리스트 -->
+  <div class="notice-inner">
+    <table class="table margin-auto" style="width:100%;">
+      <thead>
+      <tr>
+        <th style="width:20%">글번호</th>
+        <th style="width:60%">제목</th>
+        <th style="width:20%">등록일</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="tmp : ${list}"
+          th:class="'tr-hover'"
+          th:onclick="|location.href='@{/Notice/NoticeDetail(num=${tmp.num},condition=${condition},keyword=${keyword})}'|"
+          style="cursor:pointer;">
+        <td th:text="${tmp.num}">1</td>
+        <td th:text="${tmp.title}">제목</td>
+        <td th:text="${#temporals.format(tmp.regdate,'yyyy-MM-dd HH:mm:ss')}">2025-01-01</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div class="page-ui">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" th:if="${startPageNum > 1}">
+          <a class="page-link"
+             th:href="@{/notice/list(pageNum=${startPageNum-1},condition=${condition},keyword=${keyword})}">Prev</a>
+        </li>
+        <li class="page-item" th:each="i : ${pageNumbers}">
+          <a class="page-link"
+             th:classappend="${i==pageNum} ? ' active'"
+             th:href="@{/notice/list(pageNum=${i},condition=${condition},keyword=${keyword})}"
+             th:text="${i}">1</a>
+        </li>
+        <li class="page-item" th:if="${endPageNum < totalPageCount}">
+          <a class="page-link"
+             th:href="@{/notice/list(pageNum=${endPageNum+1},condition=${condition},keyword=${keyword})}">Next</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<div th:replace="fragments/footer :: footer" class="footer-sticky"></div>
+</body>
+</html>

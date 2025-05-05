@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>창업안내</title>
+
+  <!-- 외부 CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+  <!-- 스크립트 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+          crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    * {
+      font-family: 'Noto Sans KR', sans-serif !important;
+    }
+    .container > img {
+      width: 100%;
+      display: block;
+    }
+
+    .main-content {
+      width: 60%;
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+    @media (max-width: 768px) {
+      .main-content { width: 100%; padding: 20px 10px; }
+    }
+
+    .contact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1em;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    .contact-table th,
+    .contact-table td {
+      border: 1px solid #ddd;
+      padding: 0.75em 0.5em;
+    }
+    .contact-table thead th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+      text-align: center;
+    }
+    .contact-table tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: #555;
+      line-height: 1.4;
+      margin-top: 1em;
+    }
+
+    .step-timeline {
+      /* 기존 패딩 유지하면서, main-content와 동일하게 */
+      width: 60%;
+      margin: 40px auto 150px;
+      padding: 60px 20px; /* 기존 패딩 */
+    }
+    @media (max-width: 768px) {
+      .step-timeline {
+        width: 100%;
+        margin: 20px auto 100px;
+        padding: 40px 10px;
+      }
+    }
+
+    .steps {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    /* 가로선 */
+    .steps::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      border-top: 2px solid #ccc;
+      z-index: 1;
+    }
+
+    /* 각 스텝 */
+    .step {
+      position: relative;
+      text-align: center;
+      flex: 1;
+      z-index: 2; /* 선 위에 아이콘이 올라오도록 */
+    }
+    /* 헥사곤 클리핑한 아이콘 컨테이너 */
+    .step-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      background: #eee;
+      clip-path: polygon(
+        25% 0%, 75% 0%,
+        100% 50%,
+        75% 100%, 25% 100%,
+        0% 50%
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+    /* 홀수 스텝: 아이콘 위, 레이블 아래 */
+    .steps .step:nth-child(odd) .step-icon {
+      transform: translateY(-40px);
+    }
+    .steps .step:nth-child(odd) .step-label {
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+
+    /* 짝수 스텝: 아이콘 아래, 레이블 위 */
+    .steps .step:nth-child(even) .step-icon {
+      transform: translateY(100px);
+    }
+    .steps .step:nth-child(even) .step-label {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .step-label {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* 홀수 스텝(1,3,5): 라벨을 선 아래로 내려줌 */
+    .steps .step:nth-child(odd) .step-label {
+      transform: translateY(40px);
+    }
+
+    /* 짝수 스텝(2,4,6): 라벨을 선 위로 올려줌 */
+    .steps .step:nth-child(even) .step-label {
+      transform: translateY(-120px);
+    }
+
+    /* 반응형: 모바일에서는 세로 스택 */
+    @media (max-width: 600px) {
+      .steps {
+        flex-direction: column;
+      }
+      .steps::before { top: auto; left: 50%; height: 100%; border-top: none; border-left: 2px solid #ccc; }
+      .step {
+        flex: none;
+        margin: 40px 0;
+      }
+      .step-icon, .step-label { transform: none !important; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- main nav -->
+<div th:replace="fragments/nav :: nav"></div>
+
+<!-- sub nav -->
+<div th:replace="fragments/subnav :: subnav('brand','startup')"></div>
+
+<!-- 첫 번째 이미지 -->
+<section class="main-content">
+  <h2 class="section-title">지역별 담당자 안내</h2>
+  <table class="contact-table">
+    <thead>
+    <tr>
+      <th>구분</th>
+      <th>담당부서</th>
+      <th>담당지역</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td rowspan="2">수도권</td>
+      <td>수도권</td>
+      <td>
+        · 서울: 강동구, 강북구, 광진구, 노원구, 도봉구, 동대문구, 마포구, 서대문구, 성동구, 성북구, 용산구, 은평구, 종로구, 중구, 중랑구<br/>
+        · 경기: 가평, 고양, 구리, 김포, 남양주, 동두천, 부천, 성남, 양주, 연천, 의정부, 파주, 포천, 하남<br/>
+        · 강원<br/>
+        · 인천
+      </td>
+    </tr>
+    <tr>
+      <td>남부팀</td>
+      <td>
+        · 서울: 강남구, 강서구, 관악구, 구로구, 금천구, 동작구, 서초구, 송파구, 양천구, 영등포구<br/>
+        · 경기: 과천, 광명, 광주, 군포, 수원, 시흥, 안산, 안양, 양평, 여주, 오산, 용인, 의왕, 이천, 화성
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">지방</td>
+      <td>중부팀</td>
+      <td>
+        · 경기(평택, 안성), 충북, 충남, 대전, 세종, 전북, 전남, 광주
+      </td>
+    </tr>
+    <tr>
+      <td>영남팀</td>
+      <td>· 부산, 대구, 경북, 경남, 울산, 제주</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    ※ 지역별 담당자가 창업 상담 중일 경우 전화를 받지 못하는 경우가 많습니다.&nbsp;
+    원하시는 담당자와 통화가 되지 않을 경우<br/>
+    담당지역의 사무실로 전화하시거나 창업 문의하기를 신청하시면 신속히 연락 드리겠습니다.
+  </p>
+</section>
+
+
+<!-- 두 번째 이미지 -->
+<section class="step-timeline">
+  <ol class="steps">
+    <li class="step">
+      <div class="step-icon">
+        <i data-feather="headphones"></i>
+      </div>
+      <div class="step-label">STEP.1<br/>창업상담</div>
+    </li>
+    <li class="step">
+      <div class="step-icon">
+        <i data-feather="bar-chart-2"></i>
+      </div>
+      <div class="step-label">STEP.2<br/>상권분석</div>
+    </li>
+    <li class="step">
+      <div class="step-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 9l6 6m0 0l-6 6m6-6H8m-4-4l-4 4m4-4l4-4m-4 4h16"/>
+        </svg>
+      </div>
+      <div class="step-label">STEP.3<br/>계약체결</div>
+    </li>
+    <li class="step">
+      <div class="step-icon">
+        <i data-feather="settings"></i>
+      </div>
+      <div class="step-label">STEP.4<br/>설치공사</div>
+    </li>
+    <li class="step">
+      <div class="step-icon">
+        <i data-feather="book"></i>
+      </div>
+      <div class="step-label">STEP.5<br/>본사교육</div>
+    </li>
+    <li class="step">
+      <div class="step-icon">
+        <i data-feather="shopping-bag"></i>
+      </div>
+      <div class="step-label">STEP.6<br/>매장오픈</div>
+    </li>
+  </ol>
+</section>
+
+<script>
+  feather.replace({ width: '40', height: '40' });
+</script>
+
+<!-- footer -->
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

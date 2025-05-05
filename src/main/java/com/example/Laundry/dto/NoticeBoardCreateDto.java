@@ -2,11 +2,12 @@
 package com.example.Laundry.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record NoticeBoardCreateDto(
         String writer,
         String title,
         String content,
         Integer viewCount,
-        LocalDate regdate
+        LocalDateTime regdate
 ) {}

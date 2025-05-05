@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Items 엔티티 관련 비즈니스 로직 처리 서비스
@@ -45,36 +46,15 @@ public class ItemsService {
     }
 
     /**
-     * 지정한 inum 의 Items 조회
+     * 지정한 category 의 Items 조회
      */
     @Transactional(readOnly = true)
-    public ItemsResponseDto findById(Long inum) {
-        Items items = itemsRepository.findById(inum)
-                .orElseThrow(() -> new IllegalArgumentException("Items not found: " + inum));
-        return itemsMapper.toDto(items);
-    }
-
-    /**
-     * 지정한 inum 의 Items 정보 수정
-     */
-    public ItemsResponseDto update(Long inum, ItemsCreateDto dto) {
-        Items existing = itemsRepository.findById(inum)
-                .orElseThrow(() -> new IllegalArgumentException("Items not found: " + inum));
-        // 필드 업데이트
-        existing.setCategory(dto.category());
-        existing.setItem(dto.item());
-        existing.setPrice(dto.price());
-        Items updated = itemsRepository.save(existing);
-        return itemsMapper.toDto(updated);
-    }
-
-    /**
-     * 지정한 inum 의 Items 삭제
-     */
-    public void delete(Long inum) {
-        if (!itemsRepository.existsById(inum)) {
-            throw new IllegalArgumentException("Items not found: " + inum);
-        }
-        itemsRepository.deleteById(inum);
+    public List<ItemsResponseDto> findByCategory(String category) {
+        // 예: JPA 레포지토리에 findAllByCategory 메서드가 있어야 합니다.
+        List<Items> all = itemsRepository.findAllByCategory(category);
+        // 엔티티 리스트를 DTO 리스트로 매핑
+        return all.stream()
+                .map(itemsMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

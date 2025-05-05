@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 @EnableWebSecurity
 @Configuration
@@ -16,6 +17,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                    .frameOptions(frame -> frame.sameOrigin())
+                    .addHeaderWriter(new StaticHeadersWriter("Permissions-Policy", "unload=(self)"))
+                )
                 .authorizeHttpRequests(auth -> auth
                         // 1) 정적 리소스
                         .requestMatchers(
@@ -30,11 +35,15 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/", "/LoginInfo/home", "/LoginInfo/Login",
                                 "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup",
-                                "/LoginInfo/LoginPost", "/LoginInfo/Logout"
+                                "/LoginInfo/LoginPost", "/LoginInfo/Logout", "/Corporation/Brand",
+                                "/Corporation/History", "/Corporation/Startup","Guide/PriceGuide",
+                                "/Guide/AreaGuide", "/Notice/List", "/Notice/NoticeDetail"
                         ).permitAll()
 
                         // 3) AJAX/API
                         .requestMatchers(HttpMethod.GET,  "/CheckId", "/LoginInfo/CheckId")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/PriceGuide", "/PriceGuideFragment")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/SignupPost", "/LoginInfo/SignupPost")
                         .permitAll()
