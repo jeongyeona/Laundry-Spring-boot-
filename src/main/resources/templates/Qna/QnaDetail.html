@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>1:1 문의 상세</title>
+  <!-- CSS/JS -->
+  <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css}" />
+  <script async th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+          integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    /* 콘텐츠 영역이 푸터를 제외한 나머지를 채움 */
+    .content-wrapper {
+      flex: 1;
+    }
+    /* 푸터 고정 */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+    }
+    .btn { border-radius: 0 !important; }
+    * { font-family: 'Noto Sans KR', sans-serif !important; }
+    .container { width: 800px; margin-top: 30px; }
+    .container2 { margin-bottom: 10px; }
+    .content { border: 1px dotted gray; height: 300px; padding: 10px; }
+    .rcontent { border: 1px solid; padding: 10px; margin-top: 10px; }
+    .reply dt { margin-top: 5px; }
+    .reply dd { margin-left: 50px; }
+    .reply-form textarea, .reply-form button { float: left; }
+    .reply-form textarea { width: 84%; height: 100px; }
+    .reply-form button { width: 14%; height: 100px; }
+    .blind { position: absolute; width: 1px; height: 1px; clip: rect(0 0 0 0); overflow: hidden; }
+  </style>
+</head>
+<body>
+<!-- 네비게이션 -->
+<div th:insert="fragments/nav :: nav"></div>
+<!-- 서브 네비게이션 -->
+<div th:insert="fragments/subnav :: subnav(thisPage='support', subPage='faq')"></div>
+
+<!-- 본문 영역 -->
+<div class="content-wrapper container">
+  <h1 style="font-size:20px">1:1 문의 상세</h1>
+  <table class="table table-bordered table-striped-columns">
+    <tr><th>글번호</th><td th:text="${dto.num}"></td></tr>
+    <tr><th>작성자</th><td th:text="${dto.writer}"></td></tr>
+    <tr><th>제목</th><td th:text="${dto.title}"></td></tr>
+    <tr>
+      <th>등록일</th>
+      <td th:text="${#temporals.format(dto.regdate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <div class="content" th:utext="${dto.content}"></div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="btnContainer mt-4">
+    <button class="btn btn-outline-dark mt-3 float-start"
+            th:onclick="|location.href='@{/Qna/List}'|">
+      목록보기
+    </button>
+  </div>
+</div>
+
+<!-- 푸터 -->
+<div class="footer" th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

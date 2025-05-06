@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>공지사항 수정</title>
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link
+          th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+          rel="stylesheet"
+          integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+          crossorigin="anonymous" />
+  <style>
+    /* 1) html, body를 100% 높이 flex 컨테이너로 */
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    /* 2) .content-wrapper에 flex:1 주기 */
+    .content-wrapper {
+      flex: 1;
+    }
+    /* 3) footer 태그(또는 .footer)에 고정 스타일 */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100; /* 필요시 위로 띄우기 */
+    }
+    /* 기존 스타일 */
+    .btn { border-radius: 0 !important; }
+    * { font-family: 'Noto Sans KR', sans-serif !important; }
+    #content { height: 500px; width:100%; }
+  </style>
+</head>
+<body>
+<!-- 네비게이션 -->
+<div th:insert="fragments/nav :: nav"></div>
+
+<!-- 서브 네비게이션 (thisPage, subPage 파라미터 전달) -->
+<div th:insert="fragments/subnav :: subnav(thisPage='support', subPage='notice')"></div>
+
+<div class="container mt-4">
+  <form th:action="@{/Notice/NoticeUpdate}" method="post">
+    <input type="hidden" name="num" th:value="${dto.num}" />
+    <input type="hidden" name="viewCount" th:value="${dto.viewCount}" />
+    <input type="hidden" name="writer" th:value="${dto.writer}" />
+    <div class="mb-3">
+      <label for="writer" class="form-label">작성자</label>
+      <input
+              type="text"
+              id="writer"
+              class="form-control"
+              th:value="${dto.writer}"
+              disabled />
+    </div>
+    <div class="mb-3">
+      <label for="title" class="form-label">제목</label>
+      <input
+              type="text"
+              id="title"
+              name="title"
+              class="form-control"
+              th:value="${dto.title}" />
+    </div>
+    <div class="mb-3">
+      <label for="content" class="form-label">내용</label>
+      <textarea
+              id="content"
+              name="content"
+              class="form-control"
+              th:text="${dto.content}"></textarea>
+    </div>
+
+    <div class="mb-5">
+      <button
+              type="button"
+              class="btn btn-dark"
+              onclick="submitContents(this);">
+        수정확인
+      </button>
+      <a
+          th:href="@{/Notice/NoticeDetail(num=${dto.num},condition=${condition},keyword=${keyword})}"
+          class="btn btn-outline-dark">
+        취소
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- 푸터 -->
+<div th:insert="fragments/footer :: footer"></div>
+
+<!-- SmartEditor JS -->
+<script th:src="@{/SmartEditor/js/HuskyEZCreator.js}"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+  var oEditors = [];
+  nhn.husky.EZCreator.createInIFrame({
+    oAppRef: oEditors,
+    elPlaceHolder: "content",
+    sSkinURI: /*[[@{/SmartEditor/SmartEditor2Skin.html}]]*/,
+    htParams: {
+      bUseToolbar: true,
+      bUseVerticalResizer: true,
+      bUseModeChanger: true,
+      fOnBeforeUnload: function() { /* ... */ }
+    },
+    fOnAppLoad: function() { /* ... */ },
+    fCreator: "createSEditor2"
+  });
+
+  function submitContents(elClickedObj) {
+    if (!confirm('정말 수정하시겠습니까?')) {
+      return;
+    }
+    oEditors.getById['content'].exec('UPDATE_CONTENTS_FIELD', []);
+    // 3) 폼 전송
+    elClickedObj.form.submit();
+  }
+/*]]>*/
+</script>
+</body>
+</html>

@@ -46,9 +46,9 @@
       width: 120px;
       height: 36px;
     }
-    .write-btn {
+    #btnInsertForm {
+      width: 60px !important;
       height: 36px;
-      margin-left: 10px;
     }
     .btn { border-radius:0 !important; }
     th, td { text-align:center !important; }
@@ -86,7 +86,7 @@
     </form>
     <a th:if="${manager=='Y'}"
        th:href="@{/Notice/NoticeInsertForm}"
-       class="btn btn-outline-dark">작성</a>
+       class="btn btn-outline-dark search-btn" id="btnInsertForm">작성</a>
   </div>
 
   <!-- 공지사항 리스트 -->

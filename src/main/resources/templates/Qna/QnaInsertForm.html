@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>1:1 문의 작성</title>
+    <!-- Bootstrap Icons & JS -->
+    <link rel="stylesheet"
+          th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css}" />
+    <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+            integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+            crossorigin="anonymous"></script>
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/css/nav.css}" />
+    <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+    <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+    <link rel="stylesheet"
+          th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+          integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+          crossorigin="anonymous" />
+    <style>
+        .btn { border-radius: 0 !important; }
+        * { font-family: 'Noto Sans KR', sans-serif !important; }
+        .container { margin-bottom: 200px; }
+        #content { height: 400px; }
+    </style>
+</head>
+<body>
+<!-- 네비게이션 -->
+<div th:insert="fragments/nav :: nav"></div>
+<!-- 서브 네비게이션 -->
+<div th:insert="fragments/subnav :: subnav(thisPage='support', subPage='faq')"></div>
+
+<div class="container mt-4">
+    <h1 style="font-size:30px; font-weight:bold;">1:1 문의 작성</h1>
+    <form th:action="@{/Qna/QnaInsert}" method="post" id="insertForm">
+        <div class="mb-3">
+            <label for="title" class="form-label">제목</label>
+            <input type="text" id="title" name="title" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea id="content" name="content" class="form-control"></textarea>
+        </div>
+        <div class="mb-5">
+            <button type="submit" class="btn btn-outline-dark">문의 등록</button>
+            <button type="button" class="btn btn-outline-dark" style="float:right;" onclick="goBack()">취소</button>
+        </div>
+    </form>
+</div>
+
+<!-- SmartEditor JS -->
+<script th:src="@{/SmartEditor/js/HuskyEZCreator.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+      var oEditors = [];
+      nhn.husky.EZCreator.createInIFrame({
+        oAppRef: oEditors,
+        elPlaceHolder: 'content',
+        sSkinURI: /*[[@{/SmartEditor/SmartEditor2Skin.html}]]*/,
+        htParams: {
+          bUseToolbar: true,
+          bUseVerticalResizer: true,
+          bUseModeChanger: true,
+          fOnBeforeUnload: function() {}
+        },
+        fOnAppLoad: function() {},
+        fCreator: 'createSEditor2'
+      });
+
+      document.getElementById('insertForm').addEventListener('submit', function(e) {
+        // 저장 확인
+        if (!confirm('저장하시겠습니까?')) {
+          e.preventDefault();
+          return;
+        }
+        // 내용 업데이트
+        oEditors.getById['content'].exec('UPDATE_CONTENTS_FIELD', []);
+      });
+
+      function goBack() {
+        history.back();
+      }
+    /*]]>*/
+</script>
+
+<!-- 푸터 -->
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

@@ -2,13 +2,14 @@
 package com.example.Laundry.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record QnaBoardResponseDto(
         Integer num,
         String writer,
         String title,
         String content,
-        LocalDate regdate,
+        LocalDateTime regdate,
         String orgFileName,
         String saveFileName,
         Integer fileSize,

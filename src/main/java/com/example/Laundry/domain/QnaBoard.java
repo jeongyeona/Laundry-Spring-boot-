@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "qna_board")
@@ -26,7 +27,7 @@ public class QnaBoard {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private LocalDate regdate;
+    private LocalDateTime regdate;
 
     @Column(length = 100, nullable = false)
     private String orgFileName;
@@ -52,8 +53,8 @@ public class QnaBoard {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public LocalDate getRegdate() { return regdate; }
-    public void setRegdate(LocalDate regdate) { this.regdate = regdate; }
+    public LocalDateTime getRegdate() { return regdate; }
+    public void setRegdate(LocalDateTime regdate) { this.regdate = regdate; }
 
     public String getOrgFileName() { return orgFileName; }
     public void setOrgFileName(String orgFileName) { this.orgFileName = orgFileName; }

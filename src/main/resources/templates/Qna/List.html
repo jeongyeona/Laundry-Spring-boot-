@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>1:1 문의</title>
+  <!-- 아이콘 & Bootstrap JS -->
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css}" />
+  <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+          integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+          crossorigin="anonymous"></script>
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    /* 본문 영역: 푸터 위 공간 전부 채움 */
+    .content-wrapper {
+      flex: 1;
+      margin-top: 30px;
+    }
+    /* 푸터를 화면 하단에 고정 */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+    }
+    .btn { border-radius: 0 !important; }
+    * { font-family: 'Noto Sans KR', sans-serif !important; }
+    a:hover { color: rgba(0, 0, 0, 0.6) !important; }
+    .question:hover { cursor: pointer; color: rgba(0, 0, 0, 0.6) !important; }
+  </style>
+</head>
+<body>
+<!-- 메인 네비게이션 -->
+<div th:insert="fragments/nav :: nav"></div>
+<!-- 서브 네비게이션 -->
+<div th:insert="fragments/subnav :: subnav(thisPage='support', subPage='faq')"></div>
+
+<!-- 본문 영역 시작 -->
+<div class="content-wrapper container">
+  <h1 style="font-size:25px;"><strong>1:1 문의</strong></h1>
+  <span style="color:#696969; font-size:15px;">
+      궁금하신 점이나 의견을 남겨주시면 성실히 답변해 드리겠습니다.
+    </span>
+  <button class="btn btn-outline-dark" style="float:right"
+          th:onclick="|location.href='@{/Qna/QnaInsertForm}'|">
+    <i class="bi bi-plus"></i> 문의하기
+  </button>
+
+  <table class="table mt-5">
+    <thead>
+    <tr>
+      <th scope="col">제목</th>
+      <th scope="col">작성일</th>
+      <th scope="col">답변여부</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${#lists.isEmpty(list)} and ${manager} == 'N'">
+      <td colspan="3" class="text-center">
+        작성한 1:1 문의가 없습니다.
+      </td>
+    </tr>
+    <tr th:each="tmp : ${list}"
+        th:if="${tmp.writer == id or manager == 'Y'}"
+        class="question"
+        th:onclick="|location.href='@{/Qna/QnaDetail(num=${tmp.num})}'|">
+      <td th:text="${tmp.title}"></td>
+      <td th:text="${#temporals.format(tmp.regdate, 'yyyy-MM-dd HH:mm:ss')}"></td>      <td>
+        <span th:if="${tmp.checkReply == 0}">답변대기</span>
+        <span th:if="${tmp.checkReply != 0}">답변완료</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div> <!-- /content-wrapper -->
+
+<!-- 푸터 -->
+<div class="footer" th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

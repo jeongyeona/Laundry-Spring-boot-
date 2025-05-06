@@ -8,13 +8,12 @@ import com.example.Laundry.service.NoticeService;
 import com.example.Laundry.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -128,6 +127,7 @@ public class NoticeController {
 
         model.addAttribute("condition", condition);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("userId", userId);
 
         //List<NoticeBoardCommentResponseDto> commentList = noticeService.listByRefGroup(num);
         //model.addAttribute("commentList", commentList);
@@ -137,5 +137,80 @@ public class NoticeController {
         //model.addAttribute("totalPageCount", totalPageCount);
 
         return "Notice/NoticeDetail";  // templates/Notice/NoticeDetail.html
+    }
+
+    @GetMapping("/NoticeUpdateForm")
+    public String showUpdateForm(
+            HttpSession session,
+            @RequestParam("num") int num,
+            @RequestParam(value = "condition", required = false) String condition,
+            @RequestParam(value = "keyword",   required = false) String keyword,
+            @SessionAttribute("LOGIN_USER")   String loginUser,
+            Model model
+    ) {
+        // 1-1) DB에서 기존 공지사항 조회
+        NoticeBoardResponseDto dto = noticeService.findById(num);
+
+        String userId = (String) session.getAttribute("LOGIN_USER");
+        model.addAttribute("id", userId);
+
+        // 1-3) 뷰에 바인딩
+        model.addAttribute("dto", dto);
+        model.addAttribute("condition", condition);
+        model.addAttribute("keyword", keyword);
+        return "Notice/NoticeUpdateForm";
+    }
+
+    @PostMapping("/NoticeUpdate")
+    public String updateNotice(
+            HttpSession session,
+            @RequestParam("num") Integer num,
+            @RequestParam("writer") String writer,
+            @RequestParam("viewCount") Integer viewCount,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @SessionAttribute("LOGIN_USER") String loginUser,
+            Model model,
+            RedirectAttributes rttr
+    ) {
+        // 1) 작성자 검증
+        if (!writer.equals(loginUser)) {
+            // 권한 없으면 리스트로 돌려보내기
+            return "redirect:/Notice/List";
+        }
+
+        // 2) DTO 조립 후 service 호출
+        NoticeBoardCreateDto dto = new NoticeBoardCreateDto(writer, title, content, viewCount, LocalDateTime.now());
+        noticeService.update(num, dto);
+
+        String userId = (String) session.getAttribute("LOGIN_USER");
+        model.addAttribute("id", userId);
+
+        // 1-3) 뷰에 바인딩
+        model.addAttribute("dto", dto);
+
+        // 3) 리다이렉트 파라미터 (상세보기 num)
+        rttr.addAttribute("num", num);
+        return "redirect:/Notice/NoticeDetail";
+    }
+
+    @PostMapping("/NoticeDelete")
+    public String deleteNotice(
+            @RequestParam("num") Integer num,
+            @RequestParam(value = "condition", required = false) String condition,
+            @RequestParam(value = "keyword",   required = false) String keyword,
+            @SessionAttribute("LOGIN_USER") String loginUser,
+            RedirectAttributes rttr
+    ) {
+        // 1) 작성자 검증
+        NoticeBoardResponseDto dto = noticeService.findById(num);
+
+        // 2) 삭제 수행
+        noticeService.delete(num);
+
+        // 3) 리스트로 리다이렉트 (검색조건 유지)
+        rttr.addAttribute("condition", condition);
+        rttr.addAttribute("keyword",   keyword);
+        return "redirect:/Notice/List";
     }
 }
