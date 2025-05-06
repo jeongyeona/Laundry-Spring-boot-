@@ -10,13 +10,18 @@ import com.example.Laundry.dto.UserCreateDto;
 import com.example.Laundry.dto.UserResponseDto;
 import com.example.Laundry.service.CountryPhoneService;
 import com.example.Laundry.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -53,14 +58,20 @@ public class LoginController {
     public String processLogin(
             @RequestParam String id,
             @RequestParam String pwd,
-            HttpSession session,
+            HttpServletRequest request,
             Model model
     ) {
         try {
             boolean authenticated = userService.authenticate(id, pwd);
 
             if (authenticated) {
-                session.setAttribute("LOGIN_USER", id);
+                // 1) 기존 세션 무효화
+                request.getSession().invalidate();
+
+                // 2) 새 세션 생성 후 로그인 사용자 속성만 세팅
+                HttpSession newSession = request.getSession(true);
+                newSession.setAttribute("LOGIN_USER", id);
+
                 return "redirect:/";
             } else {
                 // 비밀번호 불일치 등
@@ -77,8 +88,23 @@ public class LoginController {
 
     // 3) 로그아웃
     @GetMapping("/Logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // 1) 세션 무효화
+        request.getSession().invalidate();
+        // 2) SecurityContext 초기화
+        SecurityContextHolder.clearContext();
+        // 3) 쿠키(JSESSIONID) 삭제(Optional)
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            // 세션 무효화 + SecurityContext 초기화 + 쿠키 삭제
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+
         return "redirect:/";
     }
 

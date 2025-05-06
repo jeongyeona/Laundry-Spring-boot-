@@ -1,21 +1,23 @@
 // Controller: com.example.Laundry.controller.QnaBoardController.java
 package com.example.Laundry.controller;
 
-import com.example.Laundry.dto.NoticeBoardResponseDto;
-import com.example.Laundry.dto.QnaBoardCreateDto;
-import com.example.Laundry.dto.QnaBoardResponseDto;
-import com.example.Laundry.dto.UserResponseDto;
+import com.example.Laundry.dto.*;
 import com.example.Laundry.service.QnaBoardService;
+import com.example.Laundry.service.ReplyBoardService;
 import com.example.Laundry.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -24,10 +26,12 @@ import java.util.stream.IntStream;
 public class QnaBoardController {
     private final QnaBoardService qnaBoardService;
     private final UserService userService;
+    private final ReplyBoardService replyBoardService;
 
-    public QnaBoardController(QnaBoardService qnaBoardService, UserService userService) {
+    public QnaBoardController(QnaBoardService qnaBoardService, UserService userService, ReplyBoardService replyBoardService) {
         this.qnaBoardService = qnaBoardService;
         this.userService = userService;
+        this.replyBoardService = replyBoardService;
     }
 
     /**
@@ -92,12 +96,21 @@ public class QnaBoardController {
     @GetMapping("/QnaDetail")
     public String detail(
             @RequestParam("num") int num,
-            Principal principal,
             Model model
     ) {
-        String loginUser = principal != null ? principal.getName() : null;
+        // 1) SecurityContext에서 Authentication 꺼내기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 2) 로그인 사용자 이름 구하기 (익명이면 null)
+        String loginUser = null;
+        if (auth != null
+                && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken)) {
+            loginUser = auth.getName();
+        }
         model.addAttribute("id", loginUser);
 
+        // 3) 관리자 여부 플래그
         String managerFlag = "N";
         if (loginUser != null) {
             UserResponseDto user = userService.findById(loginUser);
@@ -105,10 +118,11 @@ public class QnaBoardController {
         }
         model.addAttribute("manager", managerFlag);
 
+        // 4) QnA 본문과 댓글 리스트
         QnaBoardResponseDto dto = qnaBoardService.findById(num);
-        //QnaReplyDto dtoReply = qnaBoardService.findReplyByRefNum(num);
+        List<ReplyBoardResponseDto> replies = replyBoardService.listByRefNum(num);
         model.addAttribute("dto", dto);
-        //model.addAttribute("dtoReply", dtoReply);
+        model.addAttribute("dtoReplies", replies);
 
         return "Qna/QnaDetail";
     }
@@ -140,5 +154,44 @@ public class QnaBoardController {
         // 등록 후 상세화면으로 리다이렉트
         rttr.addAttribute("num", saved.num());
         return "redirect:/Qna/QnaDetail";
+    }
+
+    /** 댓글 등록 */
+    @PostMapping("/ReplyInsert")
+    public String replyInsert(@ModelAttribute ReplyBoardCreateDto dto,
+                              Principal principal) {
+        // 작성자, 등록일 설정
+        var name = principal.getName();
+        replyBoardService.create(dto, name);
+        return "redirect:/Qna/QnaDetail?num=" + dto.refNum();
+    }
+
+    /** 댓글 수정 (AJAX) */
+    @PostMapping("/ReplyUpdate")
+    @ResponseBody
+    public boolean replyUpdate(@RequestParam("rnum") Integer rnum,
+                               @RequestParam("refNum") Integer refNum,
+                               @RequestParam("content") String content,
+                               Principal principal
+    ) {
+        String writer = principal.getName();
+        ReplyBoardCreateDto dto = new ReplyBoardCreateDto(refNum, writer, content, null);
+        replyBoardService.update(rnum, dto);
+        return true;
+    }
+
+    /** 댓글 삭제 (AJAX) */
+    @GetMapping("/ReplyDelete")
+    @ResponseBody
+    public boolean replyDelete(@RequestParam("num") Integer rnum) {
+        replyBoardService.delete(rnum);
+        return true;
+    }
+
+    /** QnA 글 삭제 */
+    @GetMapping("/QnaDelete")
+    public String delete(@RequestParam("num") Integer num) {
+        qnaBoardService.delete(num);
+        return "redirect:/Qna/List";
     }
 }

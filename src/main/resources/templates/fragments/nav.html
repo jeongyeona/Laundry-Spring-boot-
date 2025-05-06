@@ -164,8 +164,8 @@
           <li th:if="${session.LOGIN_USER == null}">
             <a th:href="@{/LoginInfo/Signup}"><strong>회원가입</strong></a>
           </li>
-          <li th:if="${session.LOGIN_USER != null}">
-            <a th:href="@{/LoginInfo/Logout}"><strong>로그아웃</strong></a>
+          <li th:if="${session.LOGIN_USER != null}" class="lili1">
+            <a th:href="@{/LoginInfo/Logout}">로그아웃</a>
           </li>
         </ul>
       </div>

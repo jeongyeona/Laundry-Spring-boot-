@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reply_board")
@@ -26,7 +27,7 @@ public class ReplyBoard {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private LocalDate regdate;
+    private LocalDateTime regdate;
 
     @Column(name = "update_date")
     private LocalDate updateDate;
@@ -44,8 +45,8 @@ public class ReplyBoard {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public LocalDate getRegdate() { return regdate; }
-    public void setRegdate(LocalDate regdate) { this.regdate = regdate; }
+    public LocalDateTime getRegdate() { return regdate; }
+    public void setRegdate(LocalDateTime regdate) { this.regdate = regdate; }
 
     public LocalDate getUpdateDate() { return updateDate; }
     public void setUpdateDate(LocalDate updateDate) { this.updateDate = updateDate; }
