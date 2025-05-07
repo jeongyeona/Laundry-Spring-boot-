@@ -116,4 +116,14 @@ public class QnaBoardService {
         }
         repo.deleteById(num);
     }
+
+    @Transactional
+    public void replyUpdate(int num) {
+        repo.updateCheckReply(num);
+    }
+
+    @Transactional
+    public void unreplyUpdate(int num) {
+        repo.updateUncheckReply(num);
+    }
 }

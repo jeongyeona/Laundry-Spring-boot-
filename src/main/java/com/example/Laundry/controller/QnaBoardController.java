@@ -163,6 +163,7 @@ public class QnaBoardController {
         // 작성자, 등록일 설정
         var name = principal.getName();
         replyBoardService.create(dto, name);
+        qnaBoardService.replyUpdate(dto.refNum());
         return "redirect:/Qna/QnaDetail?num=" + dto.refNum();
     }
 
@@ -185,6 +186,7 @@ public class QnaBoardController {
     @ResponseBody
     public boolean replyDelete(@RequestParam("num") Integer rnum) {
         replyBoardService.delete(rnum);
+        qnaBoardService.unreplyUpdate(rnum);
         return true;
     }
 

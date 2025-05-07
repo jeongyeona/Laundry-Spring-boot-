@@ -45,7 +45,7 @@
     <tr><td colspan="2"><div class="content" th:utext="${dto.content}"></div></td></tr>
   </table>
 
-  <div class="reply" th:if="${manager == 'Y'}">
+<!--  <div class="reply" th:if="${manager == 'Y'}">-->
     <div th:if="${not #lists.isEmpty(dtoReplies)}">
       <div th:each="reply : ${dtoReplies}" class="rcontent">
         <div th:if="${manager == 'Y' and reply.writer == id}" id="btnGroup">
@@ -69,7 +69,7 @@
       </div>
     </div>
 
-    <form th:if="${manager == 'Y' and #lists.isEmpty(dtoReplies)}"
+    <form th:if="${manager == 'Y' and #lists.isEmpty(dtoReplies)}">
           th:action="@{/Qna/ReplyInsert}" method="post"
           class="reply-form insert-form mt-3" id="insertForm">
       <input type="hidden" name="refNum" th:value="${dto.num}" />
@@ -88,7 +88,7 @@
       <textarea name="content" th:text="${reply.content}"></textarea>
       <button class="btn btn-dark" type="submit">수정</button>
     </form>
-  </div>
+<!--  </div>-->
 
   <div class="btnContainer mt-4">
     <button class="btn btn-outline-dark mt-3 float-end" id="qnaDeleteBtn">글 삭제</button>

@@ -69,13 +69,13 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:if="${#lists.isEmpty(list)} and ${manager} == 'N'">
+    <tr th:if="${list != null and list.isEmpty() and list == 0 and manager eq 'N'}">
       <td colspan="3" class="text-center">
         작성한 1:1 문의가 없습니다.
       </td>
     </tr>
     <tr th:each="tmp : ${list}"
-        th:if="${tmp.writer == id or manager == 'Y'}"
+        th:if="${tmp.writer == id or manager eq 'Y'}"
         class="question"
         th:onclick="|location.href='@{/Qna/QnaDetail(num=${tmp.num})}'|">
       <td th:text="${tmp.title}"></td>

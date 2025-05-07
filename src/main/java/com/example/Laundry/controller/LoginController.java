@@ -34,6 +34,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/LoginInfo")
@@ -118,9 +119,9 @@ public class LoginController {
 
     // 회원가입
     @PostMapping("/SignupPost")
-    public String signUp(UserCreateDto dto) {
+    public String signUp(UserCreateDto dto, RedirectAttributes ra) {
         userService.register(dto);
-        // 가입 완료 후 로그인 페이지로 리다이렉트
+        ra.addFlashAttribute("signupSuccess", true);
         return "redirect:/LoginInfo/Login";
     }
 
