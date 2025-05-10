@@ -54,61 +54,6 @@ public class LoginController {
         return "LoginInfo/Login";
     }
 
-    //로그인
-    @PostMapping("/LoginPost")
-    public String processLogin(
-            @RequestParam String id,
-            @RequestParam String pwd,
-            HttpServletRequest request,
-            Model model
-    ) {
-        try {
-            boolean authenticated = userService.authenticate(id, pwd);
-
-            if (authenticated) {
-                // 1) 기존 세션 무효화
-                request.getSession().invalidate();
-
-                // 2) 새 세션 생성 후 로그인 사용자 속성만 세팅
-                HttpSession newSession = request.getSession(true);
-                newSession.setAttribute("LOGIN_USER", id);
-
-                return "redirect:/";
-            } else {
-                // 비밀번호 불일치 등
-                model.addAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
-                return "LoginInfo/Login";
-            }
-
-        } catch (UsernameNotFoundException ex) {
-            // 아이디가 없는 경우
-            model.addAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
-            return "LoginInfo/Login";
-        }
-    }
-
-    // 3) 로그아웃
-    @GetMapping("/Logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        // 1) 세션 무효화
-        request.getSession().invalidate();
-        // 2) SecurityContext 초기화
-        SecurityContextHolder.clearContext();
-        // 3) 쿠키(JSESSIONID) 삭제(Optional)
-        Cookie cookie = new Cookie("JSESSIONID", null);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            // 세션 무효화 + SecurityContext 초기화 + 쿠키 삭제
-            new SecurityContextLogoutHandler().logout(request, response, auth);
-        }
-
-        return "redirect:/";
-    }
-
     //회원가입 화면으로 이동
     @GetMapping("/Signup")
     public String signupForm(Model model) {

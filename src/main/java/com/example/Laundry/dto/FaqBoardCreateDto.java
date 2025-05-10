@@ -2,11 +2,13 @@
 package com.example.Laundry.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record FaqBoardCreateDto(
         String category,
         String writer,
         String title,
         String content,
-        LocalDate regdate
+        LocalDateTime regdate,
+        LocalDateTime updatedate
 ) {}

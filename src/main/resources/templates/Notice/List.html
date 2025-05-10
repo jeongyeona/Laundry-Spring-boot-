@@ -116,17 +116,17 @@
       <ul class="pagination justify-content-center">
         <li class="page-item" th:if="${startPageNum > 1}">
           <a class="page-link"
-             th:href="@{/notice/list(pageNum=${startPageNum-1},condition=${condition},keyword=${keyword})}">Prev</a>
+             th:href="@{/Notice/List(pageNum=${startPageNum-1},condition=${condition},keyword=${keyword})}">Prev</a>
         </li>
         <li class="page-item" th:each="i : ${pageNumbers}">
           <a class="page-link"
              th:classappend="${i==pageNum} ? ' active'"
-             th:href="@{/notice/list(pageNum=${i},condition=${condition},keyword=${keyword})}"
+             th:href="@{/Notice/List(pageNum=${i},condition=${condition},keyword=${keyword})}"
              th:text="${i}">1</a>
         </li>
         <li class="page-item" th:if="${endPageNum < totalPageCount}">
           <a class="page-link"
-             th:href="@{/notice/list(pageNum=${endPageNum+1},condition=${condition},keyword=${keyword})}">Next</a>
+             th:href="@{/Notice/List(pageNum=${endPageNum+1},condition=${condition},keyword=${keyword})}">Next</a>
         </li>
       </ul>
     </div>

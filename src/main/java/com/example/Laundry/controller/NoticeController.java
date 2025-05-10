@@ -129,13 +129,6 @@ public class NoticeController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("userId", userId);
 
-        //List<NoticeBoardCommentResponseDto> commentList = noticeService.listByRefGroup(num);
-        //model.addAttribute("commentList", commentList);
-
-        // 5) 댓글 페이징을 쓴다면 총 페이지 수도
-        //int totalPageCount = noticeService.totalPageCount(num);
-        //model.addAttribute("totalPageCount", totalPageCount);
-
         return "Notice/NoticeDetail";  // templates/Notice/NoticeDetail.html
     }
 

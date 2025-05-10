@@ -51,10 +51,13 @@
             <!-- 고객지원 서브 네비 -->
             <ul th:case="'support'" id="subNavUl">
               <li class="subNavItem" th:classappend="${subPage=='review'} ? ' deco' : ''">
-                <a th:href="@{/review/list.do}" th:classappend="${subPage=='review'} ? ' active' : ''">후기게시판</a>
+                <a th:href="@{#}" th:classappend="${subPage=='review'} ? ' active' : ''">후기게시판</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='faq'} ? ' deco' : ''">
-                <a th:href="@{/Qna/List}" th:classappend="${subPage=='faq'} ? ' active' : ''">질문게시판</a>
+                <a th:href="@{/Faq/List}" th:classappend="${subPage=='faq'} ? ' active' : ''">질문게시판</a>
+              </li>
+              <li class="subNavItem" th:classappend="${subPage=='qna'} ? ' deco' : ''">
+                <a th:href="@{/Qna/List}" th:classappend="${subPage=='qna'} ? ' active' : ''">1:1 문의</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='notice'} ? ' deco' : ''">
                 <a th:href="@{/Notice/List}" th:classappend="${subPage=='notice'} ? ' active' : ''">공지사항</a>

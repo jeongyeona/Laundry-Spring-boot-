@@ -2,6 +2,7 @@
 package com.example.Laundry.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record FaqBoardResponseDto(
         Integer num,
@@ -9,6 +10,6 @@ public record FaqBoardResponseDto(
         String writer,
         String title,
         String content,
-        LocalDate regdate,
-        LocalDate updateDate
+        LocalDateTime regdate,
+        LocalDateTime updateDate
 ) {}

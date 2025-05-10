@@ -93,7 +93,7 @@ public class SecurityConfig {
                         .usernameParameter("id")                   // <input name="id">
                         .passwordParameter("pwd")                  // <input name="pwd">
                         .successHandler(successHandler())          // 세션에 LOGIN_USER 저장
-                        .failureUrl("/LoginInfo/Login?error")      // 인증 실패 시
+                        .failureUrl("/LoginInfo/Login?error=true")      // 인증 실패 시
                         .permitAll()
                 );
 

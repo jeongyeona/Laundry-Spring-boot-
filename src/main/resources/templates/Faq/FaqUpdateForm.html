@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>FAQ 수정</title>
+
+  <!-- Bootstrap CSS & Icons -->
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous"/>
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css}"/>
+
+  <!-- 프로젝트 CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+
+  <style>
+    .btn { border-radius: 0 !important; }
+    * { font-family: 'Noto Sans KR', sans-serif !important; }
+    .container { margin-bottom: 200px; }
+    #content { height: 400px; }
+  </style>
+</head>
+<body>
+<!-- 메인 네비 -->
+<div th:replace="fragments/nav :: nav"></div>
+<!-- 서브 네비 -->
+<div th:replace="fragments/subnav :: subnav('support','faq')"></div>
+
+<div class="container">
+  <h5 class="mb-4">자주 묻는 질문 수정</h5>
+  <form th:action="@{/Faq/FaqUpdate}" method="post" id="updateForm">
+    <input type="hidden" name="num" th:value="${dto.num}"/>
+    <input type="hidden" name="writer" th:value="${dto.writer}"/>
+
+    <div class="mb-3">
+      <label for="category" class="form-label">카테고리</label>
+      <select id="category" name="category" class="form-select">
+        <option value="" disabled>카테고리 선택</option>
+        <option value="service" th:selected="${dto.category == 'service'}">서비스이용</option>
+        <option value="order"   th:selected="${dto.category == 'order'}">주문·결제·배송</option>
+        <option value="member"  th:selected="${dto.category == 'member'}">회원정보</option>
+        <option value="etc"     th:selected="${dto.category == 'etc'}">기타</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="title" class="form-label">질문</label>
+      <input id="title" name="title" type="text" class="form-control"
+             th:value="${dto.title}"/>
+    </div>
+
+    <div class="mb-3">
+      <label for="content" class="form-label">답변 내용</label>
+      <textarea id="content" name="content" class="form-control"
+                th:text="${dto.content}"></textarea>
+    </div>
+
+    <button type="button" class="btn btn-dark" onclick="submitContents(this)">
+      수정 확인
+    </button>
+    <button type="button" class="btn btn-dark float-end" onclick="history.back()">
+      취소
+    </button>
+  </form>
+</div>
+
+<!-- SmartEditor 로딩 -->
+<script th:src="@{/SmartEditor/js/HuskyEZCreator.js}"></script>
+<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+    var oEditors = [];
+    nhn.husky.EZCreator.createInIFrame({
+      oAppRef: oEditors,
+      elPlaceHolder: "content",
+      sSkinURI: /*[[@{/SmartEditor/SmartEditor2Skin.html}]]*/,
+      htParams : {
+        bUseToolbar        : true,
+        bUseVerticalResizer: true,
+        bUseModeChanger    : true,
+        fOnBeforeUnload    : function(){}
+      },
+      fOnAppLoad: function(){},
+      fCreator: "createSEditor2"
+    });
+
+	function pasteHTML() {
+		var sHTML = "<span style='color:#FF0000;'>이미지도 같은 방식으로 삽입합니다.<\/span>";
+		oEditors.getById["content"].exec("PASTE_HTML", [sHTML]);
+	}
+
+	function showHTML() {
+		var sHTML = oEditors.getById["content"].getIR();
+		alert(sHTML);
+	}
+
+   	function setDefaultFont() {
+		var sDefaultFont = '궁서';
+		var nFontSize = 24;
+		oEditors.getById["content"].setDefaultFont(sDefaultFont, nFontSize);
+	}
+
+		function submitContents(elClickedObj) {
+		oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);	// 에디터의 내용이 textarea에 적용됩니다.
+
+		try {
+			elClickedObj.form.submit();
+		} catch(e) {}
+	}
+  /*]]>*/
+</script>

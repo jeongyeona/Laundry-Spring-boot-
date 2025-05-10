@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>FAQ 작성</title>
+
+  <!-- Bootstrap Icons & CSS -->
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css}" />
+  <link rel="stylesheet"
+        th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous"/>
+
+  <!-- 프로젝트 CSS -->
+  <link rel="stylesheet" th:href="@{/css/nav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subnav.css}" />
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}" />
+
+  <style>
+    .btn { border-radius: 0 !important; }
+    * { font-family: 'Noto Sans KR', sans-serif !important; }
+    .container { margin-bottom: 200px; }
+    #content { height: 400px; }
+  </style>
+</head>
+<body>
+<!-- 메인 네비 -->
+<div th:replace="fragments/nav :: nav"></div>
+<!-- 서브 네비 -->
+<div th:replace="fragments/subnav :: subnav('support','faq')"></div>
+
+<div class="container">
+  <h1 class="mb-4" style="font-size:30px; font-weight:bold;">FAQ 등록</h1>
+
+  <form th:action="@{/Faq/FaqInsert}" method="post" id="insertForm">
+    <div class="mb-3">
+      <label for="category" class="form-label">카테고리</label>
+      <select id="category" name="category" class="form-select">
+        <option value="" disabled selected>카테고리 선택</option>
+        <option value="service">서비스 이용</option>
+        <option value="order">주문·결제·배송</option>
+        <option value="member">회원정보</option>
+        <option value="etc">기타</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="title" class="form-label">질문</label>
+      <input id="title" name="title" type="text" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+      <label for="content" class="form-label">답변 내용</label>
+      <textarea id="content" name="content" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-outline-dark">저장</button>
+    <button type="reset"
+            class="btn btn-outline-dark float-end"
+            onclick="goBack()">
+      취소
+    </button>
+  </form>
+</div>
+
+<!-- SmartEditor 로딩 -->
+<script th:src="@{/SmartEditor/js/HuskyEZCreator.js}"></script>
+<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+    var oEditors = [];
+    nhn.husky.EZCreator.createInIFrame({
+      oAppRef: oEditors,
+      elPlaceHolder: "content",
+      sSkinURI: /*[[@{/SmartEditor/SmartEditor2Skin.html}]]*/,
+      htParams : {
+        bUseToolbar        : true,
+        bUseVerticalResizer: true,
+        bUseModeChanger    : true,
+        fOnBeforeUnload    : function(){}
+      },
+      fOnAppLoad: function(){},
+      fCreator: "createSEditor2"
+    });
+
+    document.querySelector("#insertForm")
+      .addEventListener("submit", function(e){
+        oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+        alert('저장되었습니다.');
+      });
+
+    function goBack(){
+      history.back();
+    }
+  /*]]>*/
+</script>
+
+<!-- 푸터 -->
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

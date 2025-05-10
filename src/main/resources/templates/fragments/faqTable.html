@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <tbody th:fragment="faqRows">
+  <tr class="question" th:each="tmp,stat : ${list}" th:data-num="${tmp.num}">
+    <td th:text="${stat.index + 1}">1</td>
+    <td th:switch="${tmp.category}">
+      <span th:case="'service'">[서비스 이용]</span>
+      <span th:case="'order'">[주문·결제·배송]</span>
+      <span th:case="'member'">[회원정보]</span>
+      <span th:case="'etc'">[기타]</span>
+    </td>
+    <td>
+      <span th:text="${tmp.title}">제목</span>
+      <i class="bi bi-chevron-down" style="float:right"></i>
+    </td>
+    <td th:if="${id != null and manager=='Y'}">
+      <a th:href="@{/faq/updateform(num=${tmp.num})}"
+         class="btn btn-outline-white">
+        <i class="bi bi-pencil-fill"></i><span class="blind">수정</span>
+      </a>
+    </td>
+    <td th:if="${id != null and manager=='Y'}">
+      <a th:href="@{/faq/delete(num=${tmp.num})}"
+         class="btn btn-outline-white">
+        <i class="bi bi-x-circle-fill"></i><span class="blind">삭제</span>
+      </a>
+    </td>
+  </tr>
+  <tr class="answer d-none"
+      th:each="tmp : ${list}"
+      th:id="${'answer' + tmp.num}">
+    <td colspan="5">
+      <div th:utext="${tmp.content}"></div>
+    </td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(list)}">
+    <td colspan="5" class="text-center">조회된 FAQ가 없습니다.</td>
+  </tr>
+  </tbody>
+</body>
+</html>

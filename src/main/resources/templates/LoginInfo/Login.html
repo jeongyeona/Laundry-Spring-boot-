@@ -104,13 +104,6 @@
           </div>
         </div>
       </form>
-      <th:block th:if="${loginError}">
-        <script th:inline="javascript">
-          /*<![CDATA[*/
-            alert([[${loginError}]]);
-          /*]]>*/
-        </script>
-      </th:block>
     </div>
   </div>
 </main>
@@ -139,6 +132,12 @@
       document.getElementById('message').innerText =
         event.getModifierState('CapsLock') ? 'Caps Lock이 켜져 있습니다.' : '';
     }
+  /*]]>*/
+</script>
+
+<script th:if="${param.error}" th:inline="javascript">
+  /*<![CDATA[*/
+    alert('아이디 또는 비밀번호가 올바르지 않습니다.');
   /*]]>*/
 </script>
 
