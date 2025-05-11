@@ -92,7 +92,8 @@ public class NoticeController {
     public String insert(
             HttpSession session,
             @RequestParam String title,
-            @RequestParam String content
+            @RequestParam String content,
+            RedirectAttributes rttr
     ) {
         String writer = (String) session.getAttribute("LOGIN_USER");
         NoticeBoardCreateDto dto = new NoticeBoardCreateDto(
@@ -103,6 +104,7 @@ public class NoticeController {
                 LocalDateTime.now()
         );
         noticeService.create(dto);
+        rttr.addFlashAttribute("insertSuccess", "저장되었습니다.");
 
         return "redirect:/Notice/List";
     }
@@ -184,6 +186,7 @@ public class NoticeController {
 
         // 3) 리다이렉트 파라미터 (상세보기 num)
         rttr.addAttribute("num", num);
+        rttr.addFlashAttribute("updateSuccess", "수정되었습니다.");
         return "redirect:/Notice/NoticeDetail";
     }
 
@@ -204,6 +207,8 @@ public class NoticeController {
         // 3) 리스트로 리다이렉트 (검색조건 유지)
         rttr.addAttribute("condition", condition);
         rttr.addAttribute("keyword",   keyword);
+        rttr.addFlashAttribute("deleteSuccess", "삭제되었습니다.");
+
         return "redirect:/Notice/List";
     }
 }

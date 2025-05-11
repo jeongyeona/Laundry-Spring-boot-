@@ -151,6 +151,7 @@ public class QnaBoardController {
         String loginUser = principal != null ? principal.getName() : null;
         // 서비스 호출
         QnaBoardResponseDto saved = qnaBoardService.create(dto, loginUser);
+        rttr.addFlashAttribute("insertSuccess", "저장되었습니다.");
         // 등록 후 상세화면으로 리다이렉트
         rttr.addAttribute("num", saved.num());
         return "redirect:/Qna/QnaDetail";
@@ -192,8 +193,9 @@ public class QnaBoardController {
 
     /** QnA 글 삭제 */
     @GetMapping("/QnaDelete")
-    public String delete(@RequestParam("num") Integer num) {
+    public String delete(@RequestParam("num") Integer num, RedirectAttributes rttr) {
         qnaBoardService.delete(num);
+        rttr.addFlashAttribute("deleteSuccess", "삭제되었습니다.");
         return "redirect:/Qna/List";
     }
 }

@@ -87,7 +87,13 @@
     </tbody>
   </table>
 </div> <!-- /content-wrapper -->
-
+<th:block th:if="${deleteSuccess}">
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+      alert('[[${deleteSuccess}]]');
+    /*]]>*/
+  </script>
+</th:block>
 <!-- 푸터 -->
 <div class="footer" th:insert="fragments/footer :: footer"></div>
 </body>

@@ -129,43 +129,32 @@
            th:href="@{/Notice/NoticeUpdateForm(num=${dto.num},condition=${condition},keyword=${keyword})}">
           수정
         </a>
-        <button id="btnDelete" type="submit" class="btn btn-outline-dark">
+        <form th:action="@{/Notice/NoticeDelete}"
+              method="post"
+              onsubmit="return confirm('정말 삭제하시겠습니까?');"
+              style="display:inline">
+          <input type="hidden" name="num"       th:value="${dto.num}"       />
+          <input type="hidden" name="condition" th:value="${condition}"     />
+          <input type="hidden" name="keyword"   th:value="${keyword}"       />
+          <button type="submit"
+                  class="btn btn-outline-dark">
             삭제
-        </button>
+          </button>
+        </form>
       </span>
   </div>
 </div>
 
 <script th:src="@{/js/gura_util.js}"></script>
-<script th:inline="javascript">
-  let isLogin = /*[[${id != null}]]*/ false;
-  let currentPage = 1;
-  let lastPage    = /*[[${totalPageCount}]]*/ 1;
-  let isLoading   = false;
 
-/*<![CDATA[*/
-  $('#btnDelete').on('click', function() {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-    $.ajax({
-      url: /*[[@{/Notice/NoticeDelete}]]*/,
-      type: 'POST',
-      data: {
-        num:       /*[[${dto.num}]]*/,
-        condition: /*[[${condition}]]*/,
-        keyword:   /*[[${keyword}]]*/,
-      },
-      success: function() {
-        // 삭제 후 리스트로 이동
-        window.location.href = /*[[@{/Notice/List(condition=${condition},keyword=${keyword})}]]*/;
-      },
-      error: function(xhr) {
-        alert('삭제 중 오류가 발생했습니다: ' + xhr.responseText);
-      }
-    });
-  });
-/*]]>*/
-</script>
-</script>
+
+<th:block th:if="${updateSuccess}">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+          alert('[[${updateSuccess}]]');
+        /*]]>*/
+    </script>
+</th:block>
 
 <!-- footer -->
 <div th:replace="fragments/footer :: footer" class="footer-sticky"></div>

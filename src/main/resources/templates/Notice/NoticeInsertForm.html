@@ -95,6 +95,10 @@
   });
 
   document.getElementById("insertForm").addEventListener("submit", function(e){
+    if (!confirm('저장하시겠습니까?')) {
+      e.preventDefault();
+      return;
+    }
     oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
     var title = document.getElementById("title").value;
     if (title.length < 5) {

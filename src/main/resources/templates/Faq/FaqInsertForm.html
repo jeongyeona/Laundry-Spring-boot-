@@ -88,10 +88,14 @@
     });
 
     document.querySelector("#insertForm")
-      .addEventListener("submit", function(e){
-        oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
-        alert('저장되었습니다.');
-      });
+    .addEventListener("submit", function(e){
+      if (!confirm('저장하시겠습니까?')) {
+        e.preventDefault();
+        return;
+      }
+      oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+      alert('저장되었습니다.');
+    });
 
     function goBack(){
       history.back();

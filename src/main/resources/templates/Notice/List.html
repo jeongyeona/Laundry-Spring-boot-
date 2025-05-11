@@ -132,7 +132,21 @@
     </div>
   </div>
 </div>
-
+<th:block th:if="${insertSuccess}">
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+      alert('[[${insertSuccess}]]');
+    /*]]>*/
+  </script>
+</th:block>
+<th:block th:if="${deleteSuccess}">
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+      alert('[[${deleteSuccess}]]');
+      console.log('deleteSuccess:', [[${deleteSuccess}]]);
+    /*]]>*/
+  </script>
+</th:block>
 <!-- footer -->
 <div th:replace="fragments/footer :: footer" class="footer-sticky"></div>
 </body>

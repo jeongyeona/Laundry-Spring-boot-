@@ -108,11 +108,25 @@
 	}
 
 		function submitContents(elClickedObj) {
-		oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);	// 에디터의 내용이 textarea에 적용됩니다.
+		oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
 
 		try {
 			elClickedObj.form.submit();
 		} catch(e) {}
 	}
+
+	function submitContents(elClickedObj) {
+      if (!confirm('정말 수정하시겠습니까?')) {
+        return;
+      }
+
+      // 2) 에디터 내용 textarea에 업데이트
+      oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+
+      // 3) 폼 제출
+      try {
+        elClickedObj.form.submit();
+      } catch (e) {}
+    }
   /*]]>*/
 </script>

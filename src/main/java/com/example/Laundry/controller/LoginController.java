@@ -62,6 +62,28 @@ public class LoginController {
         return "LoginInfo/Signup";
     }
 
+    // 3) 로그아웃
+    @GetMapping("/Logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // 1) 세션 무효화
+        request.getSession().invalidate();
+        // 2) SecurityContext 초기화
+        SecurityContextHolder.clearContext();
+        // 3) 쿠키(JSESSIONID) 삭제(Optional)
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            // 세션 무효화 + SecurityContext 초기화 + 쿠키 삭제
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+
+        return "redirect:/";
+    }
+
     // 회원가입
     @PostMapping("/SignupPost")
     public String signUp(UserCreateDto dto, RedirectAttributes ra) {

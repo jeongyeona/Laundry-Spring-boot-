@@ -44,10 +44,10 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/Logout")
                         .logoutRequestMatcher(new AntPathRequestMatcher("/Logout","GET"))
+                        .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
@@ -56,6 +56,7 @@ public class SecurityConfig {
                     .addHeaderWriter(new StaticHeadersWriter("Permissions-Policy", "unload=(self)"))
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/Logout").permitAll()
                         // 1) 정적 리소스
                         .requestMatchers(
                                 "/css/**",

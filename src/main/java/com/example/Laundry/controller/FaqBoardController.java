@@ -182,4 +182,14 @@ public class FaqBoardController {
         rttr.addAttribute("num", dto.num());
         return "redirect:/Faq/List";
     }
+
+    @GetMapping("/FaqDelete")
+    public String deleteFaq(@ModelAttribute("dto") FaqBoardResponseDto dto, RedirectAttributes ra) {
+        // 실제 삭제 수행
+        faqBoardService.delete(dto.num());
+        // 플래시 속성으로 성공 메시지 전달
+        ra.addFlashAttribute("deleteSuccess", "삭제되었습니다.");
+        // 삭제 후 목록으로 리다이렉트
+        return "redirect:/Faq/List";
+    }
 }
