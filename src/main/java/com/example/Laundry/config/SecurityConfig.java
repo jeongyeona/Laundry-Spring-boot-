@@ -15,6 +15,9 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 import java.io.IOException;
 
@@ -68,10 +71,10 @@ public class SecurityConfig {
 
                         // 2) 뷰를 반환하는 페이지들
                         .requestMatchers(
-                                "/", "/LoginInfo/home", "/LoginInfo/Login",
-                                "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup",
-                                "/LoginInfo/LoginPost", "/LoginInfo/Logout", "/Corporation/Brand",
-                                "/Corporation/History", "/Corporation/Startup","Guide/PriceGuide",
+                                "/", "/LoginInfo/home", "/LoginInfo/Login", "/LoginInfo/CheckUser",
+                                "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup", "/LoginInfo/FindPwdForm",
+                                "/LoginInfo/LoginPost", "/LoginInfo/Logout", "/Corporation/Brand", "LoginInfo/FindPwdCheck",
+                                "/Corporation/History", "/Corporation/Startup","Guide/PriceGuide", "/LoginInfo/UpdatePwd",
                                 "/Guide/AreaGuide", "/Notice/List", "/Notice/NoticeDetail"
                         ).permitAll()
 
@@ -99,5 +102,13 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig
+    ) throws Exception {
+        // UserDetailsService + PasswordEncoder 를 사용해서 AuthenticationManager 를 만들어 줍니다.
+        return authConfig.getAuthenticationManager();
     }
 }

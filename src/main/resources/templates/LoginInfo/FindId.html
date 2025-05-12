@@ -37,7 +37,7 @@
 <main class="content-wrap">
   <div id="findidform_wr">
     <div id="body_content">
-      <form id="findIdForm" th:action="@{/users/check_user}" method="post" autocomplete="off">
+      <form id="findIdForm" th:action="@{/LoginInfo/CheckUser}" method="post" autocomplete="off">
         <div class="input-group mb-3">
           <span class="input-group-text">이름</span>
           <input class="form-control" type="text" id="name" name="name" required />
@@ -65,7 +65,7 @@
 <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
-<script th:src="@{https://code.jquery.com/jquery-2.1.3.min.js}"/>
+<script th:src="@{https://code.jquery.com/jquery-2.1.3.min.js}"></script>
 
 <!-- AJAX 처리 스크립트 -->
 <script th:inline="javascript">
@@ -74,7 +74,7 @@
       event.preventDefault();
       var form = this;
       var data = new URLSearchParams(new FormData(form)).toString();
-      fetch(/*[[@{/users/check_user}]]*/, {
+      fetch(/*[[@{/LoginInfo/CheckUser}]]*/, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
         body: data

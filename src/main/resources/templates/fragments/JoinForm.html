@@ -19,7 +19,8 @@
 <body>
 <!-- 네비게이션 -->
 <div th:insert="fragments/nav :: nav"></div>
-
+<div th:if="${signupError}" class="alert alert-danger" th:text="${signupError}"></div>
+<div th:if="${signupSuccess}" class="alert alert-success" th:text="${signupSuccess}"></div>
 <!-- 회원가입 폼 -->
 <div id="container_form" class="container" th:fragment="JoinForm">
   <form th:action="@{/LoginInfo/SignupPost}" method="post" id="signupForm" autocomplete="off">
@@ -234,11 +235,9 @@
       let email = document.getElementById('email');
       let fb    = email.nextElementSibling;  // 바로 아래 invalid-feedback
 
-      // 간단한 이메일 패턴 (필요에 따라 강화하세요)
       let regEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       email.addEventListener('input', function() {
-        // 1) 값 그대로 두고
         let ok = regEmail.test(this.value);
 
         isEmailValid = ok;

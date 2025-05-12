@@ -1,0 +1,26 @@
+<div th:fragment="updatePwdForm">
+  <div class="container mt-5" style="max-width: 400px;">
+    <h4 class="mb-4 text-center">비밀번호 수정</h4>
+    <form th:action="@{/LoginInfo/UpdatePwd}" method="post"
+          id="updatePwdForm" autocomplete="off">
+      <input type="hidden" name="id" th:value="${id}" />
+      <!-- 이하 폼 필드들 그대로 -->
+      <div class="mb-3">
+        <label for="pwd" class="form-label">새 비밀번호</label>
+        <input class="form-control" type="password" name="pwd"
+               id="pwd" maxlength="13" placeholder="비밀번호" />
+        <div class="invalid-feedback">
+          최소 하나의 영문자, 숫자, 특수문자가 들어가고 8~13글자 이내로 입력해주세요.
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="pwd2" class="form-label">비밀번호 확인</label>
+        <input class="form-control" type="password" name="pwd2"
+               id="pwd2" maxlength="13" placeholder="비밀번호 확인" />
+        <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+      </div>
+      <button type="submit" class="btn btn-dark w-100">확인</button>
+    </form>
+    <div id="successDiv" class="mt-4" style="display:none;"></div>
+  </div>
+</div>

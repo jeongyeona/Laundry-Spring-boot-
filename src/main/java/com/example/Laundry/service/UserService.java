@@ -1,5 +1,6 @@
 package com.example.Laundry.service;
 
+import com.example.Laundry.config.JwtTokenProvider;
 import com.example.Laundry.domain.User;
 import com.example.Laundry.dto.UserCreateDto;
 import com.example.Laundry.dto.UserResponseDto;
@@ -22,13 +23,17 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+
     }
 
     /**
@@ -47,6 +52,18 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
         User saved = userRepository.save(entity);
         return userMapper.toDto(saved);
     }
+
+    @Transactional(readOnly = true)
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    /** 아이디 중복 여부 */
+    @Transactional(readOnly = true)
+    public boolean idExists(String id) {
+        return userRepository.existsById(id);
+    }
+
 
     /**
      * 로그인 로직: 아이디와 비밀번호 검사
@@ -134,5 +151,68 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
                 .password(entity.getPwd())
                 .authorities("ROLE_USER")
                 .build();
+    }
+
+    /**
+     * 아이디 찾기
+     * @param name 조회할 이름
+     * @param email 조회할 이메일
+     */
+    public UserResponseDto findByNameAndEmail(String name, String email) {
+        return userRepository.findByNameAndEmail(name, email)
+                .map(user -> new UserResponseDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getAddr(),
+                        user.getPhone(),
+                        user.getCountryCode(),
+                        user.getDialCode(),
+                        user.getManager(),
+                        user.getProfile(),
+                        user.getRegdate()
+                ))
+                .orElse(null);
+    }
+
+    /**
+     * 비밀번호 찾기
+     * @param id 조회할 아이디
+     * @param name 조회할 이름
+     * @param email 조회할 이메일
+     */
+    public boolean existsByIdAndNameAndEmail(String id, String name, String email) {
+        return userRepository.existsByIdAndNameAndEmail(id, name, email);
+    }
+
+    /**
+     * 비밀번호 재설정 로직
+     * @param id      아이디(username)
+     * @param rawPwd  평문 비밀번호
+     * @return 성공 시 true, 실패 시 false
+     */
+    public boolean updatePassword(String id, String rawPwd) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    // JPA 영속성 컨텍스트 내에서 dirty-checking으로 자동 반영
+                    user.setPwd(passwordEncoder.encode(rawPwd));
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    /**
+     * 즉시 새 JWT 토큰 발급
+     * @param userId 아이디(PK)
+     */
+    public String generateNewJwt(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found: " + userId)
+                );
+        return jwtTokenProvider.createToken(
+                user.getId(),
+                List.of("ROLE_USER")
+        );
     }
 }
