@@ -75,7 +75,7 @@ public class SecurityConfig {
                                 "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup", "/LoginInfo/FindPwdForm",
                                 "/LoginInfo/LoginPost", "/LoginInfo/Logout", "/Corporation/Brand", "LoginInfo/FindPwdCheck",
                                 "/Corporation/History", "/Corporation/Startup","Guide/PriceGuide", "/LoginInfo/UpdatePwd",
-                                "/Guide/AreaGuide", "/Notice/List", "/Notice/NoticeDetail"
+                                "/Guide/AreaGuide", "/Notice/List", "/Notice/NoticeDetail", "/LoginInfo/CheckEmail"
                         ).permitAll()
 
                         // 3) AJAX/API

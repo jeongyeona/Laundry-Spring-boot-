@@ -101,10 +101,12 @@ public class LoginController {
         return "redirect:/LoginInfo/Login";
     }
 
+    // 이메일 검증
     @GetMapping("/CheckEmail")
     @ResponseBody
-    public boolean checkEmail(@RequestParam("inputEmail") String email) {
-        return userService.emailExists(email);
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        boolean exists = userService.emailExists(email);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
     }
 
     //비밀번호 찾기 화면으로 이동
@@ -158,7 +160,7 @@ public class LoginController {
         }
 
         // 3) 성공 시 로그인 폼으로 리다이렉트
-        ra.addFlashAttribute("updateSuccess", "비밀번호가 성공적으로 변경되었습니다. 로그인해주세요.");
+        ra.addFlashAttribute("updateSuccess", "비밀번호가 성공적으로 변경되었습니다.");
         return "redirect:/LoginInfo/Login";
     }
 

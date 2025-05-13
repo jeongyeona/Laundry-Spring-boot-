@@ -20,7 +20,7 @@ $(document).ready(function(){
          /* 네비 수정 */
         $('.main-wrapper1 a').toggleClass('mini_menu_a_toggle');
     });
-    
+
     smallScreenMenu();
     let temp;
     function resizeEnd(){

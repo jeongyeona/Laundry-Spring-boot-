@@ -33,13 +33,14 @@
     <div class="mb-4">
       <input name="email" id="email" class="form-control" type="email" placeholder="name@example.com" required />
       <div class="invalid-feedback">이메일 형식에 맞게 입력하세요.</div>
+      <div class="invalid-feedback2 text-danger">이미 가입한 이메일입니다.</div>
     </div>
     <hr/>
     <!-- 아이디 -->
     <div class="mb-2 mt-4">
       <input name="id" id="id" class="form-control" type="text" maxlength="15"
              placeholder="아이디 (영문자+숫자 5~15자)" required />
-      <div class="invalid-feedback">사용할 수 없는 아이디 입니다.</div>
+      <div class="invalid-feedback">사용할 수 없는 아이디입니다.</div>
     </div>
     <!-- 비밀번호 -->
     <div class="mb-3">
@@ -230,27 +231,59 @@
       pwd2.addEventListener('input', validateMatch);
     });
 
-    // 이메일 검증
+    //이메일 검증
     document.addEventListener('DOMContentLoaded', () => {
       let email = document.getElementById('email');
-      let fb    = email.nextElementSibling;  // 바로 아래 invalid-feedback
+      let fb    = email.nextElementSibling;
+      let fb2   = fb.nextElementSibling;
+      let reg   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      let regEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      isEmailValid = false;
 
+      // 1) 입력할 때마다 형식 검사
       email.addEventListener('input', function() {
-        let ok = regEmail.test(this.value);
-
+        let ok = reg.test(this.value);
         isEmailValid = ok;
 
-        // 2) is-valid / is-invalid 클래스 토글
         this.classList.toggle('is-valid',   ok);
         this.classList.toggle('is-invalid', !ok);
 
-        // 3) invalid-feedback 보이기/숨기기
-        if (fb && fb.classList.contains('invalid-feedback')) {
-          fb.style.display = ok ? 'none' : 'block';
-        }
+        fb.style.display  = ok ? 'none' : 'block';
+        fb2.style.display = 'none';
       });
+
+      // 중복 검사 함수
+      async function checkDuplicate() {
+        if (!reg.test(email.value)) return;
+
+        try {
+          let res  = await fetch(`/LoginInfo/CheckEmail?email=${encodeURIComponent(email.value)}`);
+          let data = await res.json();
+
+          if (data.exists) {
+            // 중복 있을 때
+            email.classList.replace('is-valid', 'is-invalid');
+            fb2.style.display = 'block';
+            isEmailValid = false;
+          } else {
+            // 중복 없을 때
+            email.classList.replace('is-invalid', 'is-valid');
+            fb2.style.display = 'none';
+            isEmailValid = true;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // 2) 포커스 아웃 시 중복 검사
+      email.addEventListener('blur', checkDuplicate);
+
+      // 페이지 로딩 직후 값이 있으면 형식 검사 + 중복 검사
+      if (email.value.trim() !== '') {
+        fb.style.display  = reg.test(email.value) ? 'none' : 'block';
+        checkDuplicate();
+      }
     });
 
     // 주소 검증
