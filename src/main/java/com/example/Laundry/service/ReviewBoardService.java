@@ -1,11 +1,18 @@
 // Service: com.example.Laundry.service.ReviewBoardService.java
 package com.example.Laundry.service;
 
+import com.example.Laundry.domain.NoticeBoard;
 import com.example.Laundry.domain.ReviewBoard;
+import com.example.Laundry.dto.NoticeBoardResponseDto;
 import com.example.Laundry.dto.ReviewBoardCreateDto;
 import com.example.Laundry.dto.ReviewBoardResponseDto;
 import com.example.Laundry.mapper.ReviewBoardMapper;
 import com.example.Laundry.repository.ReviewBoardRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +35,44 @@ public class ReviewBoardService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+    // 페이징+검색 처리
+    public Page<ReviewBoardResponseDto> findNotices(
+            String condition,
+            String keyword,
+            int pageNum,
+            int pageSize
+    ) {
+        // 0-based 페이지 인덱스
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
+                Sort.by("regdate").descending());
+
+        Specification<ReviewBoard> spec = (root, query, cb) -> {
+            if (keyword == null || keyword.isBlank()) {
+                return cb.conjunction();
+            }
+            String like = "%" + keyword.trim() + "%";
+            switch (condition) {
+                case "title":
+                    return cb.like(root.get("title"), like);
+                case "writer":
+                    return cb.like(root.get("writer"), like);
+                case "title_content":
+                default:
+                    return cb.or(
+                            cb.like(root.get("title"), like),
+                            cb.like(root.get("content"), like)
+                    );
+            }
+        };
+
+        Page<ReviewBoard> page = repo.findAll(spec, pageable);
+        return page.map(mapper::toDto);
+    }
+
+
+
+
 
     public ReviewBoardResponseDto create(ReviewBoardCreateDto dto) {
         ReviewBoard entity = mapper.toEntity(dto);

@@ -2,6 +2,8 @@
 package com.example.Laundry.domain;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -76,4 +78,7 @@ public class ServiceOrder {
 
     public Integer getSendInvoiceNum() { return sendInvoiceNum; }
     public void setSendInvoiceNum(Integer sendInvoiceNum) { this.sendInvoiceNum = sendInvoiceNum; }
+
+    public interface ServiceOrderRepository extends JpaRepository<ServiceOrder,Long> {
+    }
 }

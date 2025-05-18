@@ -1,7 +1,10 @@
 package com.example.Laundry.domain;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -91,5 +94,9 @@ public class Items {
                 ", item='" + item + '\'' +
                 ", price=" + price +
                 '}';
+    }
+
+    public interface ItemRepository extends JpaRepository<Items,Integer> {
+        List<Items> findAllByCategory(String category);
     }
 }

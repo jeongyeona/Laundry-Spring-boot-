@@ -83,13 +83,13 @@
               <div class="sub-menu-item1">
                 <h3>예약안내</h3>
                 <ul>
-                  <li><a th:href="@{/reserve/reserve_select.do}">예약안내</a></li>
+                  <li><a th:href="@{/Reserve/ReserveSelect}">예약안내</a></li>
                 </ul>
               </div>
               <div class="sub-menu-item1" id="lili2">
                 <h2>365일 언제나!<br/>Laundry365와 함께해요~!</h2>
                 <button type="button" class="btn1"
-                        th:onclick="|location.href='@{/reserve/reserve_select.do}'|">
+                        th:onclick="|location.href='@{/Reserve/ReserveSelect}'|">
                   예약안내
                 </button>
               </div>
@@ -105,7 +105,7 @@
               <div class="sub-menu-item1">
                 <h3>고객지원</h3>
                 <ul>
-                  <li><a th:href="@{#}">후기게시판</a></li>
+                  <li><a th:href="@{/Review/List}">후기게시판</a></li>
                   <li><a th:href="@{/Faq/List}">질문게시판</a></li>
                   <li><a th:href="@{/Notice/List}">공지사항</a></li>
                 </ul>

@@ -22,47 +22,12 @@ public class ServiceOrderService {
         this.repo = repo;
     }
 
-    public List<ServiceOrderResponseDto> listAll() {
-        return repo.findAll()
-                .stream()
-                .map(mapper::toDto)
+    /**
+     * category 값만 바꿔서 조회
+     */
+    public List<ServiceOrderResponseDto> getItemsByCategory(String category) {
+        return repo.findAllByCategory(category).stream()
+                .map(ServiceOrderResponseDto::new)
                 .toList();
-    }
-
-    public ServiceOrderResponseDto create(ServiceOrderCreateDto dto) {
-        ServiceOrder entity = mapper.toEntity(dto);
-        entity.setRegdate(dto.regdate());
-        ServiceOrder saved = repo.save(entity);
-        return mapper.toDto(saved);
-    }
-
-    public ServiceOrderResponseDto findById(Integer code) {
-        ServiceOrder entity = repo.findById(code)
-                .orElseThrow(() -> new IllegalArgumentException("ServiceOrder not found: " + code));
-        return mapper.toDto(entity);
-    }
-
-    public ServiceOrderResponseDto update(Integer code, ServiceOrderCreateDto dto) {
-        ServiceOrder existing = repo.findById(code)
-                .orElseThrow(() -> new IllegalArgumentException("ServiceOrder not found: " + code));
-        existing.setOrderer(dto.orderer());
-        existing.setCategory(dto.category());
-        existing.setOrderPrice(dto.orderPrice());
-        existing.setOrderAddr(dto.orderAddr());
-        existing.setRegdate(LocalDate.now());
-        existing.setReservationDate(dto.reservationDate());
-        existing.setRequest(dto.request());
-        existing.setState(dto.state());
-        existing.setGetInvoiceNum(dto.getInvoiceNum());
-        existing.setSendInvoiceNum(dto.sendInvoiceNum());
-        ServiceOrder updated = repo.save(existing);
-        return mapper.toDto(updated);
-    }
-
-    public void delete(Integer code) {
-        if (!repo.existsById(code)) {
-            throw new IllegalArgumentException("ServiceOrder not found: " + code);
-        }
-        repo.deleteById(code);
     }
 }

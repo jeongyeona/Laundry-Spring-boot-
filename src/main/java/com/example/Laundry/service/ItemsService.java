@@ -20,10 +20,12 @@ public class ItemsService {
 
     private final ItemsRepository itemsRepository;
     private final ItemsMapper itemsMapper;
+    private final ItemsRepository repo;
 
-    public ItemsService(ItemsRepository itemsRepository, ItemsMapper itemsMapper) {
+    public ItemsService(ItemsRepository itemsRepository, ItemsMapper itemsMapper, ItemsRepository repo) {
         this.itemsRepository = itemsRepository;
         this.itemsMapper = itemsMapper;
+        this.repo = repo;
     }
 
     /**
@@ -55,6 +57,12 @@ public class ItemsService {
         // 엔티티 리스트를 DTO 리스트로 매핑
         return all.stream()
                 .map(itemsMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItemsResponseDto> getItemsByCategory(String category) {
+        return repo.findAllByCategory(category).stream()
+                .map(ItemsResponseDto::new)
                 .collect(Collectors.toList());
     }
 }

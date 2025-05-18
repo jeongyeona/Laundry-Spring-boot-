@@ -45,13 +45,13 @@
             <!-- 예약안내 서브 네비 -->
             <ul th:case="'reserve'" id="subNavUl">
               <li class="subNavItem">
-                <a th:href="@{/reserve/reserve_select.do}" class="active">예약안내</a>
+                <a th:href="@{/Reserve/ReserveSelect}" class="active"></a>
               </li>
             </ul>
             <!-- 고객지원 서브 네비 -->
             <ul th:case="'support'" id="subNavUl">
               <li class="subNavItem" th:classappend="${subPage=='review'} ? ' deco' : ''">
-                <a th:href="@{#}" th:classappend="${subPage=='review'} ? ' active' : ''">후기게시판</a>
+                <a th:href="@{/Review/List}" th:classappend="${subPage=='review'} ? ' active' : ''">후기게시판</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='faq'} ? ' deco' : ''">
                 <a th:href="@{/Faq/List}" th:classappend="${subPage=='faq'} ? ' active' : ''">질문게시판</a>
