@@ -1,6 +1,7 @@
 // Service: com.example.Laundry.service.ServiceOrderService.java
 package com.example.Laundry.service;
 
+import com.example.Laundry.domain.QnaBoard;
 import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.dto.ServiceOrderCreateDto;
 import com.example.Laundry.dto.ServiceOrderResponseDto;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -29,5 +31,31 @@ public class ServiceOrderService {
         return repo.findAllByCategory(category).stream()
                 .map(ServiceOrderResponseDto::new)
                 .toList();
+    }
+
+    /**
+     * 주문 저장
+     * @param dto 컨트롤러에서 받은 주문 정보 DTO
+     * @return 저장된 엔티티 (필요 없으면 void 로 해도 괜찮습니다)
+     */
+    public ServiceOrder saveOrder(
+            String orderer,
+            String product,
+            String inum,
+            String count,
+            String reservationDate,  // "yyyy-MM-dd" 형식
+            String orderAddr,
+            String request,
+            String payment,
+            String email,
+            String category
+    ) {
+        ServiceOrder o = new ServiceOrder();
+        o.setOrderer(orderer);
+        o.setOrderAddr(orderAddr);
+        o.setRequest(request);
+        o.setCategory(category);
+
+        return repo.save(o);
     }
 }
