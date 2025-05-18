@@ -34,30 +34,34 @@
 
   <main id="order_wrap">
     <div class="left">
-      <img th:src="@{/images/10_1555258129.png}"
-           style="border-radius:2%;"
-           alt="상품 이미지"/>
+      <img th:src="${category == 'clothes'  ? '/images/990A4A4A5DB90F5C2F.png'
+             : category == 'bedding' ? '/images/10_1555258129.png'
+             : category == 'shoes' ? '/images/운동화빨래방법.jpg'
+             : '/images/Z4C60MKTH4DOG0TBN5AL.jpg'}"
+           alt="상품 이미지"
+           style="border-radius:2%;" />
     </div>
-
     <div class="right">
       <div class="top">
         <h1>상품 구매</h1>
         <dl>
           <dt>상품명</dt>
-          <dd>침구류</dd>
-
+          <dd th:text="
+            ${category == 'clothes' ? '생활빨래'
+             : category == 'bedding' ? '침구류'
+             : category == 'shoes' ? '운동화·구두'
+             : category == 'living' ? '리빙'
+             : ''}">
+          </dd>
           <dt>옵션</dt>
           <dd>
-            <select name="product"
-                    id="product"
-                    class="form-select">
+            <select id="product" class="form-select">
               <optgroup label="상품선택">
-                <option value="">선택</option>
-                <option th:each="tmp : ${list}"
-                        th:id="${tmp.inum}"
-                        th:attr="data-inum=${tmp.inum}"
-                        th:value="${tmp.price}"
-                        th:text="${tmp.item}">
+                <option value="">선택해주세요</option>
+                <option th:each="item : ${list}"
+                        th:attr="data-inum=${item.inum}"
+                        th:value="${item.price}"
+                        th:text="${item.item}">
                 </option>
               </optgroup>
             </select>

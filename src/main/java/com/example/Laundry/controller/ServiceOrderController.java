@@ -38,6 +38,6 @@ public class ServiceOrderController {
         List<ItemsResponseDto> items = itemService.getItemsByCategory(category);
         model.addAttribute("list", items);
 
-        return "Reserve/Reserve" + category;
+        return "Reserve/Reserve";
     }
 }
