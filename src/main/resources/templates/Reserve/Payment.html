@@ -164,7 +164,7 @@
       </div>
 
       <div class="creditBtn">
-        <button class="btn btn-dark" type="submit"
+        <button class="btn btn-dark" type="button"
                 onclick="creditComplete()"
                 style="border-radius:0;">결제하기</button>
       </div>
@@ -177,7 +177,11 @@
 
   </div>
 </form>
-
+<script th:inline="javascript">
+  function creditComplete() {
+    alert('아직 개발 중입니다.');
+  }
+</script>
 <!-- 푸터 -->
 <div th:replace="fragments/footer :: footer"></div>
 
@@ -187,10 +191,12 @@
 <script th:inline="javascript">
   /*<![CDATA[*/
     // 주소 선택
+    $(function () {
+    // 주소 선택
     let oldAddrSelect = true;
     $('#selectAddr_newAddr').hide();
     $("input[name='addr']").change(function(){
-      if($(this).val()=='기존배송지'){
+      if($(this).val()==='기존배송지'){
         oldAddrSelect = true;
         $('#selectAddr_newAddr').hide();
         $('#selectAddr_curAddr').show();
@@ -211,11 +217,11 @@
     });
 
     // 주문정보 화면 채우기
-    const n = /*[[${param.name}]]*/''.split('/');
-    const p = /*[[${param.price}]]*/''.split('/');
-    const c = /*[[${param.count}]]*/''.split('/');
-    const d = /*[[${param.date}]]*/''.split('/');
-    const e = /*[[${param.number}]]*/''.split('/');
+    const n = /*[['${param.name}']]]*/''.split('/').filter(Boolean);
+    const p = /*[['${param.price}']]]*/''.split('/').filter(Boolean);
+    const c = /*[['${param.count}']]]*/''.split('/').filter(Boolean);
+    const d = /*[['${param.date}']]]*/''.split('/').filter(Boolean);
+    const e = /*[['${param.number}']]]*/''.split('/').filter(Boolean);
 
     let tot = 0;
     let productName='', inumList='', countList='';

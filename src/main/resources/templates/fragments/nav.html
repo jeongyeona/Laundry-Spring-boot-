@@ -129,8 +129,15 @@
               <div class="sub-menu-item1">
                 <h3>마이페이지</h3>
                 <ul>
-                  <li><a th:href="@{/mypage/users/info.do}">회원정보</a></li>
-                  <li><a th:href="@{/mypage/order.do}">신청내역확인</a></li>
+<!--                  <li><a th:href="@{/mypage/users/info.do}">회원정보</a></li>-->
+<!--                  <li><a th:href="@{/mypage/order.do}">신청내역확인</a></li>-->
+                  <li>
+                    <a href="#" onclick="alert('아직 개발되지 않은 기능입니다.'); return false;">회원정보</a>
+                  </li>
+                  <li>
+                    <a href="#" onclick="alert('아직 개발되지 않은 기능입니다.'); return false;">신청내역확인</a>
+                  </li>
+
                   <!-- 로그인 여부에 따라 -->
                   <li th:if="${session.LOGIN_USER == null}" class="lili1">
                     <a th:href="@{/LoginInfo/Login}">로그인</a>
@@ -145,8 +152,12 @@
               </div>
               <div class="sub-menu-item1" id="lili2">
                 <h2>여러분의 배송정보를 여기서 확인해 보세요.</h2>
+<!--                <button type="button" class="btn1"-->
+<!--                        th:onclick="|location.href='@{/mypage/order.do}'|">-->
+<!--                  신청내역확인-->
+<!--                </button>-->
                 <button type="button" class="btn1"
-                        th:onclick="|location.href='@{/mypage/order.do}'|">
+                        onclick="alert('아직 개발되지 않은 기능입니다.');">
                   신청내역확인
                 </button>
               </div>
