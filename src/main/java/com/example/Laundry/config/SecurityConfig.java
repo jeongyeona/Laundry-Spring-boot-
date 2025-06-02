@@ -73,9 +73,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/", "/LoginInfo/home", "/LoginInfo/Login", "/LoginInfo/CheckUser",
                                 "/LoginInfo/FindId", "/LoginInfo/FindPwd", "/LoginInfo/Signup", "/LoginInfo/FindPwdForm",
-                                "/LoginInfo/LoginPost", "/LoginInfo/Logout", "/Corporation/Brand", "LoginInfo/FindPwdCheck",
-                                "/Corporation/History", "/Corporation/Startup","Guide/PriceGuide", "/LoginInfo/UpdatePwd",
-                                "/Guide/AreaGuide", "/Notice/List", "/Notice/NoticeDetail", "/LoginInfo/CheckEmail"
+                                "/LoginInfo/LoginPost", "/LoginInfo/Logout", "/Corporation/Brand", "/LoginInfo/FindPwdCheck",
+                                "/Corporation/History", "/Corporation/Startup","/Guide/PriceGuide", "/LoginInfo/UpdatePwd",
+                                "/Guide/AreaGuide", "/Notice/List", "/Notice/NoticeDetail", "/LoginInfo/CheckEmail", "/Guide/PriceGuideFragment"
                         ).permitAll()
 
                         // 3) AJAX/API
