@@ -10,7 +10,9 @@ import com.example.Laundry.repository.ServiceOrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -48,13 +50,18 @@ public class ServiceOrderService {
             String request,
             String payment,
             String email,
-            String category
+            String category,
+            BigDecimal order_price
     ) {
         ServiceOrder o = new ServiceOrder();
         o.setOrderer(orderer);
         o.setOrderAddr(orderAddr);
         o.setRequest(request);
         o.setCategory(category);
+        o.setOrderPrice(order_price);
+        o.setRegdate(LocalDate.now());
+        o.setReservationDate(reservationDate);
+
 
         return repo.save(o);
     }

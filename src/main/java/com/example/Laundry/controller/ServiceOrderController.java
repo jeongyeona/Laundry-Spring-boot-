@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -88,13 +89,14 @@ public class ServiceOrderController {
             @RequestParam String payment,
             @RequestParam String username,
             @RequestParam String category,
+            @RequestParam BigDecimal order_price,
             @RequestParam(required = false) Long idx,
             RedirectAttributes ra
     ) {
         // ServiceOrderService 의 save 메서드에 필요한 DTO를 만들어 넘김
         service.saveOrder(orderer, product, inum, count,
                 reservation_date, order_addr,
-                request, payment, username, category);
+                request, payment, username, category, order_price);
 
         ra.addFlashAttribute("msg", "결제가 완료되었습니다.");
         return "redirect:/";

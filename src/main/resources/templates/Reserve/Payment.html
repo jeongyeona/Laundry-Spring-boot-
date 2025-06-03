@@ -42,7 +42,7 @@
 <!-- 서브내비게이션 -->
 <div th:replace="fragments/subnav :: subnav('reserve','reserve')"></div>
 
-<form th:action="@{/reserve/insert}" method="post" id="insertForm">
+<form th:action="@{/Reserve/Insert}" method="post" id="insertForm">
   <div class="container">
 
     <!-- Step03 결제창 -->
@@ -177,6 +177,14 @@
 
   </div>
 </form>
+
+<div id="paramData"
+     th:data-name="${paramName}"
+     th:data-price="${paramPrice}"
+     th:data-count="${paramCount}"
+     th:data-date="${paramDate}"
+     th:data-number="${paramNumber}">
+</div>
 <script th:inline="javascript">
   function creditComplete() {
     alert('아직 개발 중입니다.');
@@ -196,6 +204,7 @@
     let oldAddrSelect = true;
     $('#selectAddr_newAddr').hide();
     $("input[name='addr']").change(function(){
+      console.log('배송지 선택됨:', $(this).val()); // ← 추가
       if($(this).val()==='기존배송지'){
         oldAddrSelect = true;
         $('#selectAddr_newAddr').hide();
@@ -210,23 +219,24 @@
     // 결제수단 선택
     $('#selectPay_noBank, #selectPay_transpay').hide();
     $("input[name='payment']").change(function(){
-      const v = $(this).val();
+      let v = $(this).val();
       $('#selectPay_current').toggle(v==='현장결제');
       $('#selectPay_noBank').toggle(v==='무통장입금');
       $('#selectPay_transpay').toggle(v==='QR코드결제');
     });
 
     // 주문정보 화면 채우기
-    const n = /*[['${param.name}']]]*/''.split('/').filter(Boolean);
-    const p = /*[['${param.price}']]]*/''.split('/').filter(Boolean);
-    const c = /*[['${param.count}']]]*/''.split('/').filter(Boolean);
-    const d = /*[['${param.date}']]]*/''.split('/').filter(Boolean);
-    const e = /*[['${param.number}']]]*/''.split('/').filter(Boolean);
+    let el = document.getElementById('paramData');
+    let n = el.dataset.name.split('/').filter(Boolean);
+    let p = el.dataset.price.split('/').filter(Boolean);
+    let c = el.dataset.count.split('/').filter(Boolean);
+    let d = el.dataset.date.split('/').filter(Boolean);
+    let e = el.dataset.number.split('/').filter(Boolean);
 
     let tot = 0;
     let productName='', inumList='', countList='';
-    const year = d[1], month = d[2], day = d[3].substring(0,2);
-    const productDate = `${year}년 ${month}월 ${day}일`;
+    let year = d[1], month = d[2], day = d[3].substring(0,2);
+    let productDate = `${year}년 ${month}월 ${day}일`;
     for(let i=1; i<n.length; i++){
       tot += parseInt(p[i],10);
       productName += (i>1?', ':'') + n[i]+' '+c[i]+'개';
@@ -241,48 +251,52 @@
     $('#inum').val(inumList);
     $('.datein').text(productDate+' 에 현장결제를 선택하셨습니다.');
 
-    // 주소 API
-    function sample6_execDaumPostcode() {
-      new daum.Postcode({ oncomplete(data) {
-        let addr = data.userSelectedType==='R'
-          ? data.roadAddress
-          : data.jibunAddress;
-        let extra = '';
-        if(data.userSelectedType==='R'){
-          if(data.bname && /[동|로|가]$/.test(data.bname))
-            extra += data.bname;
-          if(data.buildingName && data.apartment==='Y')
-            extra += (extra?`, ${data.buildingName}`:data.buildingName);
-          if(extra) extra = ` (${extra})`;
+    window.sample6_execDaumPostcode = function() {
+      new daum.Postcode({
+        oncomplete(data) {
+          let addr = data.userSelectedType === 'R'
+            ? data.roadAddress
+            : data.jibunAddress;
+          let extra = '';
+          if (data.userSelectedType === 'R') {
+            if (data.bname && /[동|로|가]$/.test(data.bname))
+              extra += data.bname;
+            if (data.buildingName && data.apartment === 'Y')
+              extra += (extra ? `, ${data.buildingName}` : data.buildingName);
+            if (extra) extra = ` (${extra})`;
+          }
+          $('#postcode').val(data.zonecode);
+          $('#address').val(addr);
+          $('#extraAddress').val(extra);
+          $('#detailAddress').focus();
         }
-        $('#postcode').val(data.zonecode);
-        $('#address').val(addr);
-        $('#extraAddress').val(extra);
-        $('#detailAddress').focus();
-      }}).open();
-    }
+      }).open();
+    };
 
     // 결제 버튼 유효성
-    function creditComplete(){
-      if(!oldAddrSelect){
-        if(!$('#postcode').val()||!$('#address').val()||!$('#detailAddress').val()){
-          event.preventDefault();
+    window.creditComplete = function() {
+      if (!oldAddrSelect) {
+        if (!$('#postcode').val() || !$('#address').val() || !$('#detailAddress').val()) {
           alert('배송지를 입력해주세요');
           return;
         } else {
           $('input[name="order_addr"]').val(
-            $('#postcode').val()+'_'+
-            $('#address').val()+'_'+
-            $('#detailAddress').val()+'_'+
+            $('#postcode').val() + '_' +
+            $('#address').val() + '_' +
+            $('#detailAddress').val() + '_' +
             $('#extraAddress').val()
           );
         }
       }
-      if(!$('#creditEmail').val()){
-        event.preventDefault();
+      if (!$('#creditEmail').val()) {
         alert('이메일을 입력해주세요');
+        return;
       }
-    }
+
+      // submit form (추가)
+      $('#insertForm').submit();
+    };
+  });
   /*]]>*/
 </script>
 </body>
