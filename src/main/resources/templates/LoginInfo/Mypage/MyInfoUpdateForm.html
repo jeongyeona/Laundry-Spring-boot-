@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원정보 수정</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/MyInfoUpdateForm.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원정보 수정</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/MyInfoUpdateForm.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .mt-auto {
+      margin-top: auto;
+    }
+    img {
+      width: 100px;
+      height: 100px;
+    }
+    #profileImage {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto;
+      text-align: center;
+      display: block;
+    }
+    .container { width: 40% !important; margin-top: 30px; }
+    .subMenuText { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <!-- main nav바 -->
+  <div th:replace="fragments/nav :: nav"></div>
+  <!-- sub nav바 -->
+  <div th:replace="fragments/subnav :: subnav('mypage','info')"></div>
+
+  <div class="container mb_250">
+
+    <a id="profileLink" href="javascript:void(0);">
+      <div th:if="${#strings.isEmpty(dto.profile)}">
+        <svg id="profileImage" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ddd" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+      </div>
+      <div th:unless="${#strings.isEmpty(dto.profile)}">
+        <img id="profileImage" th:src="@{${dto.profile}}" />
+      </div>
+    </a>
+    <p class="upimgtxt">회원님을 알릴 수 있는 사진을 등록해 주세요.<br>등록된 사진은 회원님의 게시물이나 댓글들에 사용됩니다.</p>
+
+    <form th:action="@{/LoginInfo/Mypage/MyInfoUpdate}" method="post" id="updateForm">
+      <input type="hidden" name="profile" th:value="${dto.profile}"/>
+
+      <div class="mb_15 mt_15">
+        <label class="form-label" for="id">아이디</label>
+        <input class="form-control" type="text" id="id" th:value="${dto.id}" disabled/>
+      </div>
+
+      <div class="mb_15">
+        <label class="form-label" for="email">이메일</label>
+        <input class="form-control" type="text" name="email" id="email" th:value="${dto.email}"/>
+        <div class="invalid-feedback">이메일 형식에 맞게 입력하세요.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="countryCodeSelect" class="form-label">국가 선택</label>
+        <select id="countryCodeSelect" name="countryCode" class="form-select" required>
+          <option value="" disabled selected>국가를 선택하세요</option>
+          <option th:each="c : ${countryCodes}"
+                  th:value="${c.countryCode}"
+                  th:attr="data-dial=${c.dialCode}"
+                  th:selected="${dto.countryCode == c.countryCode}"
+                  th:text="${c.countryName + ' (+' + c.dialCode + ')'}">
+          </option>
+        </select>
+      </div>
+
+      <div class="mb_15">
+        <label class="form-label" for="phone">전화번호</label>
+        <input class="form-control" type="text" name="phone" id="phone" th:value="${dto.phone}" maxlength="11" placeholder="전화번호"/>
+        <div class="invalid-feedback">숫자만 입력해주세요</div>
+      </div>
+
+      <div class="mb-4 mt-4">
+        <div class="row g-2 mb-2">
+          <div class="col-auto">
+            <input class="form-control" type="text" id="postcode" placeholder="우편번호" readonly>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-dark" type="button" onclick="execDaumPostcode()" style="border-radius:0px;">우편번호 찾기</button>
+          </div>
+        </div>
+        <div class="mb-2">
+          <input class="form-control" type="text" id="addr" placeholder="주소" readonly>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-auto">
+            <input class="form-control" type="text" id="detailAddr" placeholder="상세주소" maxlength="25">
+            <div class="invalid-feedback">상세주소를 입력해주세요</div>
+          </div>
+          <div class="col-auto">
+            <input class="form-control" type="text" id="extraAddr" placeholder="참고항목" readonly>
+          </div>
+        </div>
+        <input type="hidden" name="addr" id="totalAddr">
+      </div>
+
+      <button class="lshbtn" type="submit">저장</button>
+    </form>
+
+    <form style="display:none;" th:action="@{/LoginInfo/Mypage/ajax_profile_upload}" method="post" id="imageForm" enctype="multipart/form-data">
+      <input class="form-control" type="file" name="image" id="image" accept=".jpg, .jpeg, .png, .JPG, .JPEG, .gif"/>
+    </form>
+  </div>
+
+  <!-- 푸터는 wrapper 안에서 mt-auto로 고정 -->
+  <div class="mt-auto" th:replace="fragments/footer :: footer"></div>
+</div>
+
+<script th:src="@{/js/gura_util.js}"></script>
+<script th:inline="javascript">
+  //유효성 여부를 저장할 변수를 만들고 초기값 대입
+  let isPhoneValid=false;
+  let isAddrValid01=false;
+  let isAddrValid02=false;
+  let isEmailValid=false;
+
+  document.querySelector("#email").addEventListener("input", function(){
+
+      this.classList.remove("is-valid");
+      this.classList.remove("is-invalid");
+      //입력한 이메일
+      const inputEmail=this.value;
+      //이메일을 검증할 정규 표현식
+      const reg=/@/;
+      if(!reg.test(inputEmail)){
+          this.classList.add("is-invalid");
+          isEmailValid=false;
+      }else{
+          this.classList.add("is-valid");
+          isEmailValid=true;
+      }
+  });
+
+  document.querySelector("#phone").addEventListener("input", function(){
+
+      this.classList.remove("is-valid");
+      this.classList.remove("is-invalid");
+      //입력한 전화번호
+      this.value=this.value.replace(/[^0-9]/g, '');
+      const inputPhone = this.value;
+      //전화번호 검증할 정규 표현식
+      const reg=/^01([0|1|6|7|8|9])([0-9]{3,4})([0-9]{4})/;
+      if (!reg.test(inputPhone)) {
+          this.classList.add("is-invalid");
+          isPhoneValid=false;
+      }else{
+          this.classList.add("is-valid");
+          isPhoneValid=true;
+      }
+  });
+
+  let arr = /*[[${dto.addr}]]*/ "";
+  arr = arr.split("_");
+  console.log(arr);
+  let a1=document.querySelector("#postcode");
+  let a2=document.querySelector("#addr");
+  let a3=document.querySelector("#detailAddr");
+  let a4=document.querySelector("#extraAddr");
+  a1.value=arr[0];
+  a2.value=arr[1];
+  a3.value=arr[2];
+  a4.value=arr[3];
+
+  //Daum 우편번호 서비스
+  function execDaumPostcode() {
+      //아래 코드처럼 테마 객체를 생성합니다.(color값은 #F00, #FF0000 형식으로 입력하세요.)
+      //변경되지 않는 색상의 경우 주석 또는 제거하시거나 값을 공백으로 하시면 됩니다.
+      var themeObj = {
+         bgColor: "#FAFAFA", //바탕 배경색
+         searchBgColor: "#E3F2FD", //검색창 배경색
+         contentBgColor: "#E3F2FD" //본문 배경색(검색결과,결과없음,첫화면,검색서제스트)
+         //pageBgColor: "", //페이지 배경색
+         //textColor: "", //기본 글자색
+         //queryTextColor: "", //검색창 글자색
+         //postcodeTextColor: "", //우편번호 글자색
+         //emphTextColor: "", //강조 글자색
+         //outlineColor: "", //테두리
+      };
+
+      new daum.Postcode({theme: themeObj,
+          oncomplete: function(data) {
+              // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+              // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+              // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+              var addr = ''; // 주소 변수
+              var extraAddr = ''; // 참고항목 변수
+
+              //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+              if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                  addr = data.roadAddress;
+              } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                  addr = data.jibunAddress;
+              }
+
+              // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+              if(data.userSelectedType === 'R'){
+                  // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                  // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                  if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                      extraAddr += data.bname;
+                  }
+                  // 건물명이 있고, 공동주택일 경우 추가한다.
+                  if(data.buildingName !== '' && data.apartment === 'Y'){
+                      extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                  }
+                  // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                  if(extraAddr !== ''){
+                      extraAddr = '(' + extraAddr + ')';
+                  }
+                  // 조합된 참고항목을 해당 필드에 넣는다.
+                  document.getElementById("extraAddr").value = extraAddr;
+
+              } else {
+                  document.getElementById("extraAddr").value = '';
+              }
+
+              // 우편번호와 주소 정보를 해당 필드에 넣는다.
+              document.getElementById('postcode').value = data.zonecode;
+              document.getElementById("addr").value = addr;
+              // 커서를 상세주소 필드로 이동한다.
+              document.getElementById("detailAddr").focus();
+              isAddrValid01=true;
+          }
+      }).open();
+  }
+
+  document.querySelector("#detailAddr").addEventListener("input", function(){
+
+      this.classList.remove("is-valid");
+      this.classList.remove("is-invalid");
+      //입력한 상세주소
+      const inputDtailAddr = this.value;
+      //상세주소를 입력했는지 검증
+      const reg=/.{1,}/;
+      if (!reg.test(inputDtailAddr)) {
+          this.classList.add("is-invalid");
+          isAddrValid02=false;
+      }else{
+          this.classList.add("is-valid");
+          isAddrValid02=true;
+      }
+  });
+
+
+  //폼에 submit 이벤트가 일어 났을때 실행할 함수 등록
+  document.querySelector("#updateForm").addEventListener("submit", function(event){
+
+      if(document.querySelector("#phone").value != ""){
+          isPhoneValid=true;
+      }
+      if(document.querySelector("#email").value != ""){
+          isEmailValid=true;
+      }
+      if(document.querySelector("#postcode").value != ""){
+          isAddrValid01=true;
+      }
+      if(document.querySelector("#detailAddr").value != ""){
+          isAddrValid02=true;
+      }
+
+      //폼 전체의 유효성 여부
+      //and 연상자 이용
+      let isFormValid=isEmailValid && isPhoneValid && isAddrValid01 && isAddrValid02;
+      if(!isFormValid){
+          //폼 제출 막기
+          //기본 동작을 막는 함수
+          event.preventDefault();
+      }
+      let postcode=document.querySelector("#postcode").value;
+      let addr=document.querySelector("#addr").value;
+      let detailAddr=document.querySelector("#detailAddr").value;
+      let extraAddr=document.querySelector("#extraAddr").value;
+      let totalAddr=document.querySelector("#totalAddr");
+      totalAddr.value=postcode+"_"+addr+"_"+detailAddr+"_"+extraAddr;
+  });
+
+  //프로필 이미지 링크를 클릭하면
+  document.querySelector("#profileLink").addEventListener("click", function(){
+      // input type="file" 을 강제 클릭 시킨다.
+      document.querySelector("#image").click();
+  });
+  //이미지를 선택했을때 실행할 함수 등록
+  document.querySelector("#image").addEventListener("change", function(){
+
+      let form=document.querySelector("#imageForm");
+
+      // gura_util.js 에 정의된 함수를 호출하면서 ajax 전송할 폼의 참조값을 전달하면 된다.
+      ajaxFormPromise(form)
+      .then(function(response){
+          return response.json();
+      })
+      .then(function(data){
+          // data 는 {imagePath:"/upload/xxx.jpg"} 형식의 object 이다.
+          console.log(data);
+          // let img='<img id="profileImage" src="${pageContext.request.contextPath}'+data.imagePath+'"/>`
+          let img=`<img id="profileImage" src="${pageContext.request.contextPath}\${data.imagePath}"/>`;
+          // img 변수에 들어있는 문자열을 HTML 로 해석하면서 링크 안에 넣어주세요
+          document.querySelector("#profileLink").innerHTML=img;
+          // input name="profile" 요소의 value 값으로 이미지 경로 넣어주기
+
+          /*
+              document.querySelector(" css 선택자 ") - 오브젝트 1개 리턴(오브젝트)
+              document.querySelectorAll(" css 선택자 ") - 오브젝트 여러개 리턴(배열)
+
+              # => 아이디 선택자
+              . => 클래스 선택자
+              [ ] => 속성 선택자
+
+              ex) [속성명=속성값]
+
+              [id=one] : id 속성의 값이 one 인 요소 선택 : < xxx id = "one" >
+              [class=my-class] : class 속성의 값이 my-class 인 요소 선택 : < xxx class = "my-class" >
+              [name=profile] : < xxx name = "profile" >
+
+              input[name=profile] : input 요소이면서 name 속성의 값이 profile 인 요소 선택
+
+              <input name="profile">
+          */
+          document.querySelector("input[name=profile]").value=data.imagePath;
+      });
+  });
+</script>
+
+</body>
+</html>

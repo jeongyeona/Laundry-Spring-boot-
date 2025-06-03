@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>회원정보</title>
+
+  <link rel="stylesheet" th:href="@{/css/lsh.css}"/>
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+  <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css}" crossorigin="anonymous"/>
+  <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js}" crossorigin="anonymous"></script>
+
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #wrapper { min-height: 100%; display: flex; flex-direction: column; }
+    .content { flex: 1; }
+    img { width: 100px; height: 100px; }
+    #profileImage { width: 100px; height: 100px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+<div id="wrapper">
+  <!-- 네비게이션 -->
+  <div th:replace="fragments/nav :: nav"></div>
+  <div th:replace="fragments/subnav :: subnav('mypage','info')"></div>
+
+  <div class="content container">
+    <table class="n-table">
+      <colgroup>
+        <col style="width:25%">
+        <col style="width:*">
+      </colgroup>
+      <tr style="border-top:1px solid #000;">
+        <th>프로필 이미지</th>
+        <td>
+          <th:block th:if="${#strings.isEmpty(dto.profile)}">
+            <svg id="profileImage" xmlns="http://www.w3.org/2000/svg" fill="#ddd" class="bi bi-person-circle" viewBox="0 0 16 16">
+              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+            </svg>
+          </th:block>
+          <th:block th:unless="${#strings.isEmpty(dto.profile)}">
+            <img id="profileImage" th:src="@{${dto.profile}}" />
+          </th:block>
+          <p class="imgtxt">회원님을 알릴 수 있는 사진을 등록해 주세요.<br/>등록된 사진은 회원님의 게시물이나 댓글들에 사용됩니다.</p>
+        </td>
+      </tr>
+      <tr><th>아이디</th><td th:text="${dto.id}"></td></tr>
+      <tr><th>주소</th><td th:text="${dto.addr}"></td></tr>
+      <tr><th>이메일</th><td th:text="${dto.email}"></td></tr>
+      <tr><th>전화번호</th><td th:text="${dto.phone}"></td></tr>
+      <tr><th>가입일</th><td th:text="${dto.regdate}"></td></tr>
+    </table>
+    <div class="lshbtnbox">
+      <a class="lshbtn" th:href="@{/LoginInfo/Mypage/MyInfoUpdateForm}">개인정보 수정</a>
+      <a class="lshbtn lshbtncenter" th:href="@{/LoginInfo/Mypage/MyInfoUpdateFormPwd}">비밀번호 수정</a>
+      <a class="lshbtn" href="javascript:deleteConfirm()">탈퇴</a>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div th:replace="fragments/footer :: footer"></div>
+  <div id="userInfo" th:data-user-id="${dto.id}" style="display:none;"></div>
+
+</div>
+<script th:if="${message}" th:inline="javascript">
+  alert([[${message}]]);
+</script>
+<script th:inline="javascript">
+  function deleteConfirm() {
+    let userId = document.getElementById("userInfo").dataset.userId;
+    let ctx = /*[[${contextPath}]]*/ '';
+    let isDelete = confirm(userId + " 님 탈퇴 하시겠습니까?");
+    if (isDelete) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = ctx + "/LoginInfo/Mypage/MyInfoDelete";
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+</script>
+</body>
+</html>

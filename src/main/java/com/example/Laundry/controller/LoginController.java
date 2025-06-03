@@ -1,9 +1,12 @@
 package com.example.Laundry.controller;
+import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
 
 import com.example.Laundry.config.JwtTokenProvider;
 import com.example.Laundry.config.JwtUtil;
+import com.example.Laundry.domain.User;
 import com.example.Laundry.dto.CountryPhoneResponseDto;
 import com.example.Laundry.dto.UserCreateDto;
 import com.example.Laundry.dto.UserResponseDto;
@@ -15,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,10 +26,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.example.Laundry.dto.CountryPhoneCreateDto;
 import com.example.Laundry.config.JwtUtil;
@@ -46,15 +53,15 @@ public class LoginController {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
-
-
-    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
         this.countryPhoneService = countryPhoneService;
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     //로그인 화면으로 이동
@@ -187,5 +194,145 @@ public class LoginController {
             result.put("user", null);
         }
         return ResponseEntity.ok(result);
+    }
+
+    //개인정보 수정 반영 요청 처리
+    @RequestMapping("/Mypage/MyInfo")
+    public String userInfoPage(HttpSession session, HttpServletRequest request, Model model) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+
+        if (userId == null) {
+            return "redirect:/login"; // 로그인 안 되어 있으면 로그인 페이지로
+        }
+
+        UserResponseDto dto = userService.findById(userId);
+        model.addAttribute("contextPath", request.getContextPath()); // 추가
+        model.addAttribute("id", userId);
+
+        model.addAttribute("dto", dto);
+        return "LoginInfo/Mypage/Myinfo";
+    }
+
+    @RequestMapping("/Mypage/MyInfoUpdateForm")
+    public String showUpdateForm(HttpSession session, Model model) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+        if (userId == null) return "redirect:/LoginInfo/Login";
+
+        UserResponseDto dto = userService.findById(userId);
+        model.addAttribute("id", userId);
+        model.addAttribute("dto", dto);
+        List<CountryPhoneResponseDto> countryCodes = countryPhoneService.listAll();
+        model.addAttribute("countryCodes", countryCodes);
+
+        return "LoginInfo/Mypage/MyinfoUpdateForm";
+    }
+
+    // 파일 저장 위치는 application.properties 또는 하드코딩 가능
+    @Value("${upload.path:/upload}")
+    private String uploadPath;
+
+    @PostMapping("/Mypage/ajax_profile_upload")
+    public ResponseEntity<Map<String, String>> uploadProfile(
+            @RequestParam("image") MultipartFile imageFile,
+            @RequestParam("userId") String userId) {
+
+        Map<String, String> result = new HashMap<>();
+
+        if (imageFile.isEmpty()) {
+            result.put("error", "파일이 비어 있습니다.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        String originalFilename = StringUtils.cleanPath(imageFile.getOriginalFilename());
+        String savedName = UUID.randomUUID().toString() + "_" + originalFilename;
+
+        try {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            File saveFile = new File(uploadDir, savedName);
+            imageFile.transferTo(saveFile);
+
+            String imagePath = "/upload/" + savedName;
+
+            userService.updateProfileImage(userId, imagePath);
+
+            result.put("imagePath", "/upload/" + savedName);
+            return ResponseEntity.ok(result);
+
+        } catch (IOException e) {
+            result.put("error", "파일 저장 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    @PostMapping("/Mypage/MyInfoUpdate")
+    public String updateUser(@ModelAttribute UserResponseDto dto, HttpSession session, RedirectAttributes ra) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setEmail(dto.email());
+        user.setPhone(dto.phone());
+        user.setAddr(dto.addr());
+        user.setProfile(dto.profile());
+        user.setCountryCode(dto.countryCode());
+
+        userRepository.save(user);
+        ra.addFlashAttribute("message", "회원정보가 수정되었습니다.");
+        return "redirect:/LoginInfo/Mypage/MyInfo";
+    }
+
+    @GetMapping("/Mypage/MyInfoUpdateFormPwd")
+    public String showUpdatePasswordForm() {
+        return "LoginInfo/Mypage/MyInfoUpdateFormPwd";
+    }
+
+    // 비밀번호 변경
+    @PostMapping("/Mypage/MyInfoUpdatePwd")
+    public String myinfoupdatePwd(
+            HttpSession session,
+            @RequestParam String pwd,
+            @RequestParam String newPwd,
+            @RequestParam String newPwd2,
+            RedirectAttributes ra
+    ) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+
+        // 1) 비밀번호 일치 여부 체크
+        if (!newPwd.equals(newPwd2)) {
+            ra.addFlashAttribute("message", "새 비밀번호가 일치하지 않습니다.");
+            return "redirect:/LoginInfo/Mypage/MyInfoUpdateFormPwd";
+        }
+
+        UserResponseDto user = userService.findById(userId);
+        if (user == null || !passwordEncoder.matches(pwd, user.pwd())) {
+            ra.addFlashAttribute("message", "기존 비밀번호가 올바르지 않습니다.");
+            return "redirect:/LoginInfo/Mypage/MyInfoUpdateFormPwd";
+        }
+
+        // 2) 비밀번호 변경 시도
+        boolean ok = userService.updatePassword(userId, newPwd);
+
+        // 3) 성공 시 로그인 폼으로 리다이렉트
+        ra.addFlashAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+        return "redirect:/LoginInfo/Mypage/MyInfo";
+    }
+
+    @PostMapping("/Mypage/MyInfoDelete")
+    public String deleteUser(HttpSession session, RedirectAttributes ra) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+
+        if (userId == null) {
+            ra.addFlashAttribute("message", "로그인이 필요합니다.");
+            return "redirect:/LoginInfo/Login";
+        }
+
+        userService.delete(userId);
+
+        session.invalidate(); // 세션 무효화 (로그아웃 처리)
+        ra.addFlashAttribute("deletemessage", "회원 탈퇴가 완료되었습니다.");
+        return "redirect:/";
     }
 }

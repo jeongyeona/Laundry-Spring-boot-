@@ -162,6 +162,7 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
         return userRepository.findByNameAndEmail(name, email)
                 .map(user -> new UserResponseDto(
                         user.getId(),
+                        user.getPwd(),
                         user.getName(),
                         user.getEmail(),
                         user.getAddr(),
@@ -214,5 +215,18 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
                 user.getId(),
                 List.of("ROLE_USER")
         );
+    }
+
+    /**
+     * 프로필 저장
+     * @param userId 아이디(PK)
+     * @param imagePath 이미지 경로
+     */
+    public void updateProfileImage(String userId, String imagePath) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음: " + userId));
+
+        user.setProfile(imagePath);
+        userRepository.save(user);
     }
 }

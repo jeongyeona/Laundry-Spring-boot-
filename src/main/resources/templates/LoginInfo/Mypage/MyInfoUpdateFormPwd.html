@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 수정</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" th:href="@{/css/lsh.css}"/>
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    .container { width: 40% !important; margin-top:30px; }
+  </style>
+</head>
+<body>
+<!-- main nav바 -->
+<div th:replace="fragments/nav :: nav"></div>
+<!-- sub nav바 -->
+<div th:replace="fragments/subnav :: subnav('mypage','info')"></div>
+
+<div class="container mb_250">
+  <form th:action="@{/LoginInfo/Mypage/MyInfoUpdatePwd}" method="post" id="myForm">
+    <div>
+      <label class="form-label" for="pwd">기존 비밀번호</label>
+      <input class="form-control" type="password" name="pwd" id="pwd"/>
+    </div>
+    <div style="margin:20px 0!important;">
+      <label class="form-label" for="newPwd">새 비밀번호</label>
+      <input class="form-control" type="password" name="newPwd" id="newPwd"/>
+    </div>
+    <div>
+      <label class="form-label" for="newPwd2">새 비밀번호 확인</label>
+      <input class="form-control" type="password" name="newPwd2" id="newPwd2"/>
+    </div>
+    <div class="pwdbtnbox" style="text-align:center !important;">
+      <button class="pwdlshbtn" type="submit">저장</button>
+      <button class="pwdlshbtn" type="reset">초기화</button>
+    </div>
+  </form>
+</div>
+<script th:if="${message}" th:inline="javascript">
+  alert([[${message}]]);
+</script>
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+  const updateForm = document.querySelector("#myForm");
+  let isPwdValid = false;
+
+  function checkPwd() {
+    document.querySelector("#newPwd").classList.remove("is-valid", "is-invalid");
+    document.querySelector("#newPwd2").classList.remove("is-valid", "is-invalid");
+
+    const pwd = document.querySelector("#newPwd").value;
+    const pwd2 = document.querySelector("#newPwd2").value;
+    const reg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^])[A-Za-z\d@$!%*#?&^]{8,13}$/;
+
+    if (!reg.test(pwd)) {
+      document.querySelector("#newPwd").classList.add("is-invalid");
+      isPwdValid = false;
+      return;
+    } else {
+      document.querySelector("#newPwd").classList.add("is-valid");
+    }
+
+    if (pwd !== pwd2) {
+      document.querySelector("#newPwd2").classList.add("is-invalid");
+      isPwdValid = false;
+    } else {
+      document.querySelector("#newPwd2").classList.add("is-valid");
+      isPwdValid = true;
+    }
+  }
+
+  document.querySelector("#newPwd").addEventListener("input", checkPwd);
+  document.querySelector("#newPwd2").addEventListener("input", checkPwd);
+
+  updateForm.addEventListener("submit", function(event) {
+    if (!isPwdValid) {
+      alert("비밀번호를 확인 하세요!");
+      event.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>

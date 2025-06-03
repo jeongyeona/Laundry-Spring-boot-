@@ -66,7 +66,7 @@
             <!-- 마이페이지 서브 네비 -->
             <ul th:case="'mypage'" id="subNavUl">
               <li class="subNavItem" th:classappend="${subPage=='info'} ? ' deco' : ''">
-                <a th:href="@{/mypage/users/info.do}" th:classappend="${subPage=='info'} ? ' active' : ''">회원정보</a>
+                <a th:href="@{/LoginInfo/Mypage/MyInfo}" th:classappend="${subPage=='info'} ? ' active' : ''">회원정보</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='orderlist'} ? ' deco' : ''">
                 <a th:href="@{/mypage/order.do}" th:classappend="${subPage=='orderlist'} ? ' active' : ''">신청내역확인</a>

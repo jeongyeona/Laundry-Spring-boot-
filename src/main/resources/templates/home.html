@@ -138,7 +138,9 @@
         <div th:insert="fragments/footer :: footer"></div>
     </div>
 </div>
-
+<script th:if="${deletemessage}" th:inline="javascript">
+    alert([[${deletemessage}]]);
+</script>
 <!-- fullPage.js 초기화 -->
 <script th:src="@{/js/fullpage.js}"></script>
 <script>
