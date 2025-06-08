@@ -1,11 +1,13 @@
 // Service: com.example.Laundry.service.ServiceOrderService.java
 package com.example.Laundry.service;
 
+import com.example.Laundry.domain.OrderItem;
 import com.example.Laundry.domain.QnaBoard;
 import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.dto.ServiceOrderCreateDto;
 import com.example.Laundry.dto.ServiceOrderResponseDto;
 import com.example.Laundry.mapper.ServiceOrderMapper;
+import com.example.Laundry.repository.OrderItemRepository;
 import com.example.Laundry.repository.ServiceOrderRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,10 +26,12 @@ import java.util.List;
 @Transactional
 public class ServiceOrderService {
     private final ServiceOrderRepository repo;
+    private final OrderItemRepository orderrepo;
     private final ServiceOrderMapper mapper = ServiceOrderMapper.INSTANCE;
 
-    public ServiceOrderService(ServiceOrderRepository repo) {
+    public ServiceOrderService(ServiceOrderRepository repo, OrderItemRepository orderrepo) {
         this.repo = repo;
+        this.orderrepo = orderrepo;
     }
 
     /**
@@ -42,7 +46,7 @@ public class ServiceOrderService {
     /**
      * 주문 저장
      * @param dto 컨트롤러에서 받은 주문 정보 DTO
-     * @return 저장된 엔티티 (필요 없으면 void 로 해도 괜찮습니다)
+     * @return 저장된 엔티티
      */
     public ServiceOrder saveOrder(
             String orderer,
@@ -70,6 +74,9 @@ public class ServiceOrderService {
         return repo.save(o);
     }
 
+    /**
+     * 주문 목록
+     */
     public Page<ServiceOrder> getPagedOrders(String orderer, String keyword, String state, int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         if (state == null || state.trim().isEmpty()) {
@@ -77,5 +84,16 @@ public class ServiceOrderService {
         } else {
             return repo.findByOrdererAndState(orderer, state, pageable);
         }
+    }
+
+    // 주문 상세 조회
+    public ServiceOrder findOrderByCode(Integer code) {
+        return repo.findByCode(code)
+                .orElse(null);
+    }
+
+    // 주문 품목 리스트 조회
+    public List<OrderItem> findOrderItems(Integer orderCode) {
+        return orderrepo.findByCode(orderCode);
     }
 }

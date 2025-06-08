@@ -77,7 +77,7 @@
       <tbody>
       <tr th:each="item : ${list}">
         <td th:text="${item.code}"></td>
-        <td><a th:href="@{/mypage/detail(code=${item.code})}">상세정보보기</a></td>
+        <td><a th:href="@{/LoginInfo/Mypage/OrderDetail(code=${item.code})}">상세정보보기</a></td>
         <td th:text="${#numbers.formatDecimal(item.orderPrice, 0, 'COMMA', 0, 'POINT')} + '원'"></td>
         <td th:text="${item.orderAddr}"></td>
         <td th:text="${item.regdate}"></td>

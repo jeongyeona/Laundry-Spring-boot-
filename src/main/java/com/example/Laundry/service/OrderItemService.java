@@ -56,4 +56,9 @@ public class OrderItemService {
         }
         repo.deleteById(num);
     }
+
+    // 주문 품목 리스트 조회
+    public List<OrderItem> findOrderItems(Integer orderCode) {
+        return repo.findByCode(orderCode);
+    }
 }

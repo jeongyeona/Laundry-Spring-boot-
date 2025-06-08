@@ -7,11 +7,13 @@ import java.util.stream.IntStream;
 
 import com.example.Laundry.config.JwtTokenProvider;
 import com.example.Laundry.config.JwtUtil;
+import com.example.Laundry.domain.OrderItem;
 import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.domain.User;
 import com.example.Laundry.dto.*;
 import com.example.Laundry.repository.UserRepository;
 import com.example.Laundry.service.CountryPhoneService;
+import com.example.Laundry.service.OrderItemService;
 import com.example.Laundry.service.ServiceOrderService;
 import com.example.Laundry.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -56,8 +58,9 @@ public class LoginController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final ServiceOrderService serviceOrderService;
+    private final OrderItemService orderItemService;
 
-    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService) {
+    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService) {
         this.countryPhoneService = countryPhoneService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -65,6 +68,7 @@ public class LoginController {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.serviceOrderService = serviceOrderService;
+        this.orderItemService = orderItemService;
     }
 
     //로그인 화면으로 이동
@@ -388,6 +392,38 @@ public class LoginController {
         model.addAttribute("state", state);
 
         return "LoginInfo/Mypage/OrderList";
+    }
+
+    @GetMapping("/Mypage/OrderDetail")
+    public String getOrderDetail(
+            HttpSession session,
+            @RequestParam("code") Integer orderCode,
+            Model model
+    ) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+        if (userId == null) {
+            return "redirect:/login"; // 로그인 안 되어 있으면 로그인 페이지로 이동
+        }
+
+        // 사용자 정보
+        UserResponseDto user = userService.findById(userId);
+        model.addAttribute("manager", user.manager());
+        model.addAttribute("id", userId);
+
+        // 주문 정보
+        ServiceOrder order = serviceOrderService.findOrderByCode(orderCode);
+        if (order == null || !order.getOrderer().equals(userId)) {
+            return "redirect:/Mypage/OrderList"; // 해당 주문이 없거나 본인 주문이 아닌 경우 목록으로 리다이렉트
+        }
+
+        // 주문 품목
+        List<OrderItem> orderItems = orderItemService.findOrderItems(orderCode);
+
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+        model.addAttribute("orderItems", orderItems);
+
+        return "LoginInfo/Mypage/OrderDetail";
     }
 
 }

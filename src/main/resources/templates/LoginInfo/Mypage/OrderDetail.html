@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>주문 상세</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+  <style>
+    body { margin: 0; padding: 0; height: 100%; }
+
+    #detail_wr {
+      min-height: 100vh;
+      padding-bottom: 120px;
+      display: flex;
+      justify-content: left;
+      font-size: 16px;
+    }
+
+    #body-content {
+      width: 100%;
+    }
+
+    #orderInfo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    #orderInfo > div {
+      flex: 1 1 100%;
+    }
+
+    @media (min-width: 768px) {
+      #orderInfo > div {
+        flex: 1 1 48%;
+      }
+    }
+
+    h3 {
+      margin-left: 5px;
+      margin-bottom: 15px;
+      border-bottom: 0.5px solid black;
+      border-radius: 5px;
+      padding: 5px 5px 8px 5px;
+      width: auto;
+    }
+
+    h3 span {
+      margin-left: 3px;
+      vertical-align: bottom;
+    }
+
+    .sizesm {
+      width: auto;
+      min-width: 100px;
+    }
+
+    .footer-sticky {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      background-color: white;
+      border-top: 1px solid #ccc;
+    }
+
+    table {
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 네비게이션 -->
+<div th:insert="fragments/nav :: nav"></div>
+<div th:replace="fragments/subnav :: subnav('mypage','orderlist')"></div>
+
+<div id="detail_wr" class="container">
+  <div id="body-content">
+    <!-- 고객 정보 -->
+    <h3>
+      <svg ...></svg><span>고객정보</span>
+    </h3>
+    <div style="margin-bottom:70px;">
+      <table class="table">
+        <tbody>
+        <tr><th>아이디</th><td th:text="${order.orderer}">아이디</td></tr>
+        <tr><th>이름</th><td th:text="${user.name}">이름</td></tr>
+        <tr>
+          <th>전화번호</th>
+          <td>
+            <span th:text="${#strings.replace(user.phone, '(\\d{3})(\\d{4})(\\d{4})', '$1-$2-$3')}"></span>
+          </td>
+        </tr>
+        <tr><th>주소</th><td th:text="${order.orderAddr}">주소</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 주문 정보 -->
+    <div id="orderInfo">
+      <div>
+        <h3>
+          <svg ...></svg><span>주문정보</span>
+        </h3>
+        <table class="table" style="width:600px;">
+          <tbody>
+          <tr><th class="sizesm">주문번호</th><td th:text="${order.code}"></td></tr>
+          <tr><th class="sizesm">주문상태</th><td th:text="${order.state != null && !#strings.isEmpty(order.state) ? order.state : '예약완료'}"></td></tr>
+          <tr><th class="sizesm">주문일</th><td th:text="${order.regdate}"></td></tr>
+          <tr><th class="sizesm">수거 요청일</th><td th:text="${order.reservationDate}"></td></tr>
+          <tr><th class="sizesm">배송지</th><td th:text="${order.orderAddr}"></td></tr>
+          <tr><th class="sizesm">요청내용</th><td th:text="${order.request}"></td></tr>
+          <tr>
+            <th class="sizesm">수거용 송장번호</th>
+            <td>
+              <span th:text="${order.getInvoiceNum}"></span>
+<!--              <button th:if="${order.getCourier != null}" type="button"-->
+<!--                      th:onclick="'showPopup2(\'https://tracker.delivery/#/' + ${order.getCourier} + '/' + ${order.getInvoiceNum} + '\')'"-->
+<!--                      class="btn btn-dark" style="border-radius:0px;">배송조회</button>-->
+            </td>
+          </tr>
+          <tr>
+            <th class="sizesm">반환용 송장번호</th>
+            <td>
+              <span th:text="${order.sendInvoiceNum}"></span>
+<!--              <button th:if="${order.sendCourier != null}" type="button"-->
+<!--                      th:onclick="'showPopup2(\'https://tracker.delivery/#/' + ${order.sendCourier} + '/' + ${order.sendInvoiceNum} + '\')'"-->
+<!--                      class="btn btn-dark" style="border-radius:0px;">배송조회</button>-->
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 주문 품목 -->
+      <div>
+        <h3>
+          <svg ...></svg><span>주문품목</span>
+        </h3>
+        <table class="table" style="width:600px;text-align:center;">
+          <thead>
+          <tr>
+            <th>NO</th>
+            <th>품목명</th>
+            <th>가격</th>
+            <th>주문수량</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="item : ${orderItems}">
+            <td th:text="${item.inum}"></td>
+            <td th:text="${item.item}"></td>
+            <td th:text="${#numbers.formatInteger(item.price, '#,###')}"></td>
+            <td th:text="${item.count}"></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4 style="float: right;">총 금액 :
+          <span th:text="${order.orderPrice != null ? #numbers.formatDecimal(order.orderPrice, 0, 'COMMA', 0, 'POINT') : '0'}"></span>원
+        </h4>
+      </div>
+    </div>
+
+    <!-- 목록 버튼 -->
+    <div style="text-align:center; margin-top:30px;">
+      <a href="javascript:window.history.back();" class="btn btn-lg btn-dark" style="border-radius:0px;">목록</a>
+    </div>
+  </div>
+</div>
+
+<!-- 고정 푸터 -->
+<div class="footer-sticky" th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+  function showPopup2(url){
+    PopupCenter(url,"배송조회", 800, 500);
+  }
+  function PopupCenter(url, title, w, h) {
+    const dualScreenLeft = window.screenLeft ?? screen.left;
+    const dualScreenTop = window.screenTop ?? screen.top;
+    const width = window.innerWidth ?? document.documentElement.clientWidth ?? screen.width;
+    const height = window.innerHeight ?? document.documentElement.clientHeight ?? screen.height;
+    const left = ((width / 2) - (w / 2)) + dualScreenLeft;
+    const top = ((height / 2) - (h / 2)) + dualScreenTop;
+    const newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+    if (window.focus) newWindow.focus();
+  }
+</script>
+
+</body>
+</html>
