@@ -3,15 +3,16 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import com.example.Laundry.config.JwtTokenProvider;
 import com.example.Laundry.config.JwtUtil;
+import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.domain.User;
-import com.example.Laundry.dto.CountryPhoneResponseDto;
-import com.example.Laundry.dto.UserCreateDto;
-import com.example.Laundry.dto.UserResponseDto;
+import com.example.Laundry.dto.*;
 import com.example.Laundry.repository.UserRepository;
 import com.example.Laundry.service.CountryPhoneService;
+import com.example.Laundry.service.ServiceOrderService;
 import com.example.Laundry.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,7 +36,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import com.example.Laundry.dto.CountryPhoneCreateDto;
 import com.example.Laundry.config.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -54,14 +55,16 @@ public class LoginController {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final ServiceOrderService serviceOrderService;
 
-    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService) {
         this.countryPhoneService = countryPhoneService;
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.serviceOrderService = serviceOrderService;
     }
 
     //로그인 화면으로 이동
@@ -210,7 +213,7 @@ public class LoginController {
         model.addAttribute("id", userId);
 
         model.addAttribute("dto", dto);
-        return "LoginInfo/Mypage/Myinfo";
+        return "LoginInfo/Mypage/MyInfo";
     }
 
     @RequestMapping("/Mypage/MyInfoUpdateForm")
@@ -224,7 +227,7 @@ public class LoginController {
         List<CountryPhoneResponseDto> countryCodes = countryPhoneService.listAll();
         model.addAttribute("countryCodes", countryCodes);
 
-        return "LoginInfo/Mypage/MyinfoUpdateForm";
+        return "LoginInfo/Mypage/MyInfoUpdateForm";
     }
 
     // 파일 저장 위치는 application.properties 또는 하드코딩 가능
@@ -335,4 +338,56 @@ public class LoginController {
         ra.addFlashAttribute("deletemessage", "회원 탈퇴가 완료되었습니다.");
         return "redirect:/";
     }
+
+    @GetMapping("/Mypage/OrderList")
+    public String getOrderList(
+            HttpSession session,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(defaultValue = "") String condition,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String state,
+            Model model
+    ) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+        if (userId != null) {
+            UserResponseDto user = userService.findById(userId);
+            model.addAttribute("manager", user.manager());
+        } else {
+            model.addAttribute("manager", "N");
+        }
+
+        if (pageSize < 1) {
+            List<ServiceOrder> orders = serviceOrderService
+                    .getPagedOrders(userId, keyword, state, pageNum, pageSize)
+                    .getContent();
+            model.addAttribute("list", orders);
+        } else {
+            Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, keyword, state, pageNum, pageSize);
+
+            int totalPages = page.getTotalPages();
+            int startPageNum = Math.max(1, pageNum - 2);
+            int endPageNum = Math.min(totalPages, pageNum + 2);
+
+            List<Integer> pageNumbers = IntStream
+                    .rangeClosed(startPageNum, endPageNum)
+                    .boxed()
+                    .toList();
+
+            model.addAttribute("list", page.getContent());
+            model.addAttribute("pageNum", pageNum);
+            model.addAttribute("startPageNum", startPageNum);
+            model.addAttribute("endPageNum", endPageNum);
+            model.addAttribute("totalPageCount", totalPages);
+            model.addAttribute("pageNumbers", pageNumbers);
+            model.addAttribute("id", userId);
+        }
+
+        model.addAttribute("condition", condition);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("state", state);
+
+        return "LoginInfo/Mypage/OrderList";
+    }
+
 }

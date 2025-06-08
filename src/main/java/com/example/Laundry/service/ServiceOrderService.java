@@ -7,6 +7,10 @@ import com.example.Laundry.dto.ServiceOrderCreateDto;
 import com.example.Laundry.dto.ServiceOrderResponseDto;
 import com.example.Laundry.mapper.ServiceOrderMapper;
 import com.example.Laundry.repository.ServiceOrderRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,5 +68,14 @@ public class ServiceOrderService {
 
 
         return repo.save(o);
+    }
+
+    public Page<ServiceOrder> getPagedOrders(String orderer, String keyword, String state, int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+        if (state == null || state.trim().isEmpty()) {
+            return repo.findByOrderer(orderer, pageable);
+        } else {
+            return repo.findByOrdererAndState(orderer, state, pageable);
+        }
     }
 }

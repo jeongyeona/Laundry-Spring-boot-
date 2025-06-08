@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class CorporationController {
     @GetMapping("/Brand")
     public String brand() {
-        return "/Corporation/Brand";
+        return "Corporation/Brand";
     }
 
     @GetMapping("/History")
     public String history() {
-        return "/Corporation/History";
+        return "Corporation/History";
     }
 
     @GetMapping("/Startup")
     public String startup() {
-        return "/Corporation/Startup";
+        return "Corporation/Startup";
     }
 }
