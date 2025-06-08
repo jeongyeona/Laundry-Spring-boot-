@@ -155,8 +155,8 @@
           <tbody>
           <tr th:each="item : ${orderItems}">
             <td th:text="${item.inum}"></td>
-            <td th:text="${item.item}"></td>
-            <td th:text="${#numbers.formatInteger(item.price, '#,###')}"></td>
+            <td th:text="${item.code}"></td>
+            <td th:text="${item.price != null ? #numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') : '0'}"></td>
             <td th:text="${item.count}"></td>
           </tr>
           </tbody>

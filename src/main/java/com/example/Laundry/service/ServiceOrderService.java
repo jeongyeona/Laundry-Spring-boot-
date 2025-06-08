@@ -1,12 +1,14 @@
 // Service: com.example.Laundry.service.ServiceOrderService.java
 package com.example.Laundry.service;
 
+import com.example.Laundry.domain.Items;
 import com.example.Laundry.domain.OrderItem;
 import com.example.Laundry.domain.QnaBoard;
 import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.dto.ServiceOrderCreateDto;
 import com.example.Laundry.dto.ServiceOrderResponseDto;
 import com.example.Laundry.mapper.ServiceOrderMapper;
+import com.example.Laundry.repository.ItemsRepository;
 import com.example.Laundry.repository.OrderItemRepository;
 import com.example.Laundry.repository.ServiceOrderRepository;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,11 +30,13 @@ import java.util.List;
 public class ServiceOrderService {
     private final ServiceOrderRepository repo;
     private final OrderItemRepository orderrepo;
+    private final ItemsRepository itemsRepository;
     private final ServiceOrderMapper mapper = ServiceOrderMapper.INSTANCE;
 
-    public ServiceOrderService(ServiceOrderRepository repo, OrderItemRepository orderrepo) {
+    public ServiceOrderService(ServiceOrderRepository repo, OrderItemRepository orderrepo, ItemsRepository itemsRepository) {
         this.repo = repo;
         this.orderrepo = orderrepo;
+        this.itemsRepository = itemsRepository;
     }
 
     /**
@@ -59,6 +64,7 @@ public class ServiceOrderService {
             String payment,
             String email,
             String category,
+            String productcount,
             BigDecimal order_price
     ) {
         ServiceOrder o = new ServiceOrder();
@@ -70,8 +76,31 @@ public class ServiceOrderService {
         o.setRegdate(LocalDate.now());
         o.setReservationDate(reservationDate);
 
+        ServiceOrder savedOrder = repo.save(o);
 
-        return repo.save(o);
+        List<OrderItem> orderItems = new ArrayList<>();
+        String[] itemNames = productcount.split(",");
+        String[] counts = count.split("/");
+
+        for (int i = 0; i < itemNames.length; i++) {
+            if (itemNames[i].isBlank() || counts[i].isBlank()) continue;
+
+            OrderItem item = new OrderItem();
+            item.setCode(savedOrder.getCode());  // 연관관계 주입
+
+            String raw = itemNames[i].trim();
+            String itemName = raw.replaceAll("\\s*\\d+개$", "").trim();
+            Items productItem = itemsRepository.findByItem(itemName)
+                    .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+
+            item.setInum(productItem.getInum());
+            item.setCount(Integer.parseInt(counts[i + 1].trim()));
+
+            orderItems.add(item);
+        }
+        orderrepo.saveAll(orderItems);
+
+        return savedOrder;
     }
 
     /**

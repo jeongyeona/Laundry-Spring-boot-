@@ -48,6 +48,14 @@ public class ItemsService {
     }
 
     /**
+     * 해당 Items 조회
+     */
+    @Transactional(readOnly = true)
+    public List<Items> findByInumList(List<Integer> inumList) {
+        return itemsRepository.findByInumIn(inumList);
+    }
+
+    /**
      * 지정한 category 의 Items 조회
      */
     @Transactional(readOnly = true)

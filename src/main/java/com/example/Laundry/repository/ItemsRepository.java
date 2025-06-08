@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemsRepository extends JpaRepository<Items, Integer> {
@@ -14,5 +15,6 @@ public interface ItemsRepository extends JpaRepository<Items, Integer> {
      * — 엔티티의 'category' 필드와 정확히 매칭되어야 합니다.
      */
     List<Items> findAllByCategory(String category);
-
+    Optional<Items> findByItem(String item);
+    List<Items> findByInumIn(List<Integer> inums);
 }

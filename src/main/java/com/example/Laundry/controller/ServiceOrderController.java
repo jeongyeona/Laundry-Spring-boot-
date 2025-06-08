@@ -89,6 +89,7 @@ public class ServiceOrderController {
             @RequestParam String payment,
             @RequestParam String username,
             @RequestParam String category,
+            @RequestParam String productcount,
             @RequestParam BigDecimal order_price,
             @RequestParam(required = false) Long idx,
             RedirectAttributes ra
@@ -96,7 +97,7 @@ public class ServiceOrderController {
         // ServiceOrderService 의 save 메서드에 필요한 DTO를 만들어 넘김
         service.saveOrder(orderer, product, inum, count,
                 reservation_date, order_addr,
-                request, payment, username, category, order_price);
+                request, payment, username, category, productcount, order_price);
 
         ra.addFlashAttribute("msg", "결제가 완료되었습니다.");
         return "redirect:/";

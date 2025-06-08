@@ -3,19 +3,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.example.Laundry.config.JwtTokenProvider;
 import com.example.Laundry.config.JwtUtil;
+import com.example.Laundry.domain.Items;
 import com.example.Laundry.domain.OrderItem;
 import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.domain.User;
 import com.example.Laundry.dto.*;
 import com.example.Laundry.repository.UserRepository;
-import com.example.Laundry.service.CountryPhoneService;
-import com.example.Laundry.service.OrderItemService;
-import com.example.Laundry.service.ServiceOrderService;
-import com.example.Laundry.service.UserService;
+import com.example.Laundry.service.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,8 +59,9 @@ public class LoginController {
     private final PasswordEncoder passwordEncoder;
     private final ServiceOrderService serviceOrderService;
     private final OrderItemService orderItemService;
+    private final ItemsService itemsService;
 
-    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService) {
+    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService, ItemsService itemsService) {
         this.countryPhoneService = countryPhoneService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -69,6 +70,7 @@ public class LoginController {
         this.passwordEncoder = passwordEncoder;
         this.serviceOrderService = serviceOrderService;
         this.orderItemService = orderItemService;
+        this.itemsService = itemsService;
     }
 
     //로그인 화면으로 이동
@@ -419,9 +421,34 @@ public class LoginController {
         // 주문 품목
         List<OrderItem> orderItems = orderItemService.findOrderItems(orderCode);
 
+        // inum 목록 추출 (String)
+        List<Integer> inumList = orderItems.stream()
+                .map(OrderItem::getInum)
+                .collect(Collectors.toList());
+
+        // Items 목록 조회
+        List<Items> items = itemsService.findByInumList(inumList);
+
+        // Map<inum, Items> 생성
+        Map<Integer, Items> itemsMap = items.stream()
+                .collect(Collectors.toMap(Items::getInum, Function.identity()));
+
+        // DTO로 변환
+        List<OrderItemResponseDto> itemDtos = orderItems.stream().map(item -> {
+            Items product = itemsMap.get(item.getInum());
+            return new OrderItemResponseDto(
+                    item.getNum(),             // 주문 항목 번호 (OrderItem의 PK)
+                    item.getCode(),            // 주문 코드
+                    item.getInum(),            // 상품 번호
+                    item.getCount(),           // 수량
+                    product.getItem(),         // 상품 이름
+                    product.getPrice()         // 가격
+            );
+        }).toList();
+
         model.addAttribute("order", order);
         model.addAttribute("user", user);
-        model.addAttribute("orderItems", orderItems);
+        model.addAttribute("orderItems", itemDtos);
 
         return "LoginInfo/Mypage/OrderDetail";
     }
