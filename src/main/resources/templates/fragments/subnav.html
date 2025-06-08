@@ -44,8 +44,8 @@
             </ul>
             <!-- 예약안내 서브 네비 -->
             <ul th:case="'reserve'" id="subNavUl">
-              <li class="subNavItem">
-                <a th:href="@{/Reserve/ReserveSelect}" class="active"></a>
+              <li class="subNavItem" th:classappend="${subpage=='reserve'} ? ' deco' : ''">
+                <a th:href="@{/Reserve/ReserveSelect}" th:classappend="${subpage=='reserve'} ? ' active' : ''">예약안내</a>
               </li>
             </ul>
             <!-- 고객지원 서브 네비 -->
