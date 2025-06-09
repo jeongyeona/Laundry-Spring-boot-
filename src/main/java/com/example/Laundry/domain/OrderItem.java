@@ -1,12 +1,7 @@
 // Domain: com.example.Laundry.domain.OrderItem.java
 package com.example.Laundry.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "order_items")
@@ -37,4 +32,12 @@ public class OrderItem {
 
     public Integer getCount() { return count; }
     public void setCount(Integer count) { this.count = count; }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inum", insertable = false, updatable = false)
+    private Items item;
+
+    public Items getItem() {
+        return item;
+    }
 }

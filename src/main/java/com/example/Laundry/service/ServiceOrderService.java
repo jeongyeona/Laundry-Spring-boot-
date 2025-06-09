@@ -50,8 +50,6 @@ public class ServiceOrderService {
 
     /**
      * 주문 저장
-     * @param dto 컨트롤러에서 받은 주문 정보 DTO
-     * @return 저장된 엔티티
      */
     public ServiceOrder saveOrder(
             String orderer,

@@ -47,6 +47,10 @@ public class Items {
         return inum;
     }
 
+    public String getItemName() {
+        return this.item;
+    }
+
     public String getCategory() {
         return category;
     }

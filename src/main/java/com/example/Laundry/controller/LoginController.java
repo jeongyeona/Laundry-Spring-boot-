@@ -14,6 +14,7 @@ import com.example.Laundry.domain.OrderItem;
 import com.example.Laundry.domain.ServiceOrder;
 import com.example.Laundry.domain.User;
 import com.example.Laundry.dto.*;
+import com.example.Laundry.repository.OrderItemRepository;
 import com.example.Laundry.repository.UserRepository;
 import com.example.Laundry.service.*;
 import jakarta.servlet.http.Cookie;
@@ -60,8 +61,9 @@ public class LoginController {
     private final ServiceOrderService serviceOrderService;
     private final OrderItemService orderItemService;
     private final ItemsService itemsService;
+    private final OrderItemRepository orderItemRepository;
 
-    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService, ItemsService itemsService) {
+    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService, ItemsService itemsService, OrderItemRepository orderItemRepository) {
         this.countryPhoneService = countryPhoneService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -71,6 +73,7 @@ public class LoginController {
         this.serviceOrderService = serviceOrderService;
         this.orderItemService = orderItemService;
         this.itemsService = itemsService;
+        this.orderItemRepository = orderItemRepository;
     }
 
     //로그인 화면으로 이동
@@ -419,29 +422,22 @@ public class LoginController {
         }
 
         // 주문 품목
-        List<OrderItem> orderItems = orderItemService.findOrderItems(orderCode);
+        List<OrderItem> orderItems = orderItemRepository.findWithItemsByOrderCode(orderCode);
 
         // inum 목록 추출 (String)
         List<Integer> inumList = orderItems.stream()
                 .map(OrderItem::getInum)
                 .collect(Collectors.toList());
 
-        // Items 목록 조회
-        List<Items> items = itemsService.findByInumList(inumList);
-
-        // Map<inum, Items> 생성
-        Map<Integer, Items> itemsMap = items.stream()
-                .collect(Collectors.toMap(Items::getInum, Function.identity()));
-
         // DTO로 변환
         List<OrderItemResponseDto> itemDtos = orderItems.stream().map(item -> {
-            Items product = itemsMap.get(item.getInum());
+            Items product = item.getItem();
             return new OrderItemResponseDto(
-                    item.getNum(),             // 주문 항목 번호 (OrderItem의 PK)
+                    item.getNum(),             // 주문 항목 번호
                     item.getCode(),            // 주문 코드
-                    item.getInum(),            // 상품 번호
+                    product.getInum(),         // 상품 번호
                     item.getCount(),           // 수량
-                    product.getItem(),         // 상품 이름
+                    product.getItemName(),     // 상품 이름
                     product.getPrice()         // 가격
             );
         }).toList();

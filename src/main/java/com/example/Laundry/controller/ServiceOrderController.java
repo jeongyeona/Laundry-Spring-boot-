@@ -100,6 +100,6 @@ public class ServiceOrderController {
                 request, payment, username, category, productcount, order_price);
 
         ra.addFlashAttribute("msg", "결제가 완료되었습니다.");
-        return "redirect:/";
+        return "redirect:/LoginInfo/Mypage/OrderList";
     }
 }
