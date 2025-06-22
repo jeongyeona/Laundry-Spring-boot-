@@ -43,6 +43,7 @@
 <div th:replace="fragments/subnav :: subnav('reserve','reserve')"></div>
 
 <form th:action="@{/Reserve/Insert}" method="post" id="insertForm">
+  <input type="hidden" name="merchant_uid" id="merchant_uid"/>
   <div class="container">
 
     <!-- Step03 결제창 -->
@@ -127,47 +128,18 @@
       </div>
     </div>
 
+    <div class="mb-3 mt-4">
+      <label class="form-label" for="creditEmail">결제 정보 이메일</label>
+      <input type="email" class="form-control" id="creditEmail"
+             name="username" placeholder="Laundry@naver.com"/>
+    </div>
+
     <!-- 결제 수단 -->
     <div class="creditForm">
       <p>결제수단</p>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="payment"
-               id="payment1" value="현장결제" checked/>
-        <label class="form-check-label" for="payment1">현장결제</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="payment"
-               id="payment2" value="무통장입금"/>
-        <label class="form-check-label" for="payment2">무통장입금</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="payment"
-               id="payment3" value="QR코드결제"/>
-        <label class="form-check-label" for="payment3">QR코드결제</label>
-      </div>
-
-      <div id="selectPay_current" class="mt-3">
-        <p class="datein"></p>
-      </div>
-      <div id="selectPay_noBank" class="mt-3" style="display:none;">
-        <p>가상 계좌 : 12345678-876-123456 (농협은행)</p>
-      </div>
-      <div id="selectPay_transpay" class="mt-3" style="display:none;">
-        <p>QR코드</p>
-        <img th:src="@{/images/kakaoQR.png}" alt="카카오QR" width="10%"/>
-      </div>
-
-      <div class="mb-3 mt-4">
-        <label class="form-label" for="creditEmail">결제 정보 이메일</label>
-        <input type="email" class="form-control" id="creditEmail"
-               name="username" placeholder="Laundry@naver.com"/>
-      </div>
-
-      <div class="creditBtn">
-        <button class="btn btn-dark" type="button"
-                onclick="creditComplete()"
-                style="border-radius:0;">결제하기</button>
-      </div>
+      <button class="btn btn-dark" type="button" onclick="requestPay()" style="border-radius:0;">
+        카드결제
+      </button>
 
       <!-- 숨겨진 파라미터들 -->
       <input type="hidden" name="count"   th:value="${param.count}"/>
@@ -185,11 +157,6 @@
      th:data-date="${paramDate}"
      th:data-number="${paramNumber}">
 </div>
-<script th:inline="javascript">
-  function creditComplete() {
-    alert('아직 개발 중입니다.');
-  }
-</script>
 <!-- 푸터 -->
 <div th:replace="fragments/footer :: footer"></div>
 
@@ -214,15 +181,6 @@
         $('#selectAddr_curAddr').hide();
         $('#selectAddr_newAddr').show();
       }
-    });
-
-    // 결제수단 선택
-    $('#selectPay_noBank, #selectPay_transpay').hide();
-    $("input[name='payment']").change(function(){
-      let v = $(this).val();
-      $('#selectPay_current').toggle(v==='현장결제');
-      $('#selectPay_noBank').toggle(v==='무통장입금');
-      $('#selectPay_transpay').toggle(v==='QR코드결제');
     });
 
     // 주문정보 화면 채우기
@@ -272,32 +230,77 @@
         }
       }).open();
     };
-
-    // 결제 버튼 유효성
-    window.creditComplete = function() {
-      if (!oldAddrSelect) {
-        if (!$('#postcode').val() || !$('#address').val() || !$('#detailAddress').val()) {
-          alert('배송지를 입력해주세요');
-          return;
-        } else {
-          $('input[name="order_addr"]').val(
-            $('#postcode').val() + '_' +
-            $('#address').val() + '_' +
-            $('#detailAddress').val() + '_' +
-            $('#extraAddress').val()
-          );
-        }
-      }
-      if (!$('#creditEmail').val()) {
-        alert('이메일을 입력해주세요');
-        return;
-      }
-
-      // submit form (추가)
-      $('#insertForm').submit();
-    };
   });
   /*]]>*/
+</script>
+
+<script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<script>
+  function requestPay() {
+    const IMP = window.IMP;
+    IMP.init("imp57455816");
+
+    let isOldAddr = $('#order_addr_old').is(":checked");
+
+    if (!isOldAddr) {
+      if (!$('#postcode').val() || !$('#address').val() || !$('#detailAddress').val()) {
+        alert('배송지를 입력해주세요');
+        return;
+      }
+      $('input[name="order_addr"]').val(
+        $('#postcode').val() + '_' +
+        $('#address').val() + '_' +
+        $('#detailAddress').val() + '_' +
+        $('#extraAddress').val()
+      );
+    }
+
+    if (!$('#creditEmail').val()) {
+      alert('이메일을 입력해주세요');
+      return;
+    }
+
+    const merchantUid = 'order_' + new Date().getTime();
+
+    IMP.request_pay({
+      pg: "html5_inicis",
+      pay_method: "card",
+      merchant_uid: merchantUid,
+      name: $('#product').val(),
+      amount: $('#order_price').val(),
+      buyer_email: $('#creditEmail').val(),
+      buyer_name: $('#orderer').val(),
+      buyer_addr: isOldAddr ? $('#order_addr').val() : $('#address').val(),
+      buyer_postcode: isOldAddr ? "" : $('#postcode').val()
+    }, function (rsp) {
+      if (rsp.success) {
+        $('#merchant_uid').val(merchantUid);
+
+        $.ajax({
+          url: "/Reserve/cardPayment",
+          method: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({
+            impUid: rsp.imp_uid,
+            merchantUid: rsp.merchant_uid
+          }),
+          success: function (res) {
+            if (res.status === 'success') {
+              $.post("/Reserve/Insert", $('#insertForm').serialize(), function(res) {
+                if (res.status === 'success') {
+                  window.location.href = "/LoginInfo/Mypage/OrderList";
+                }
+              });
+            } else {
+              alert('결제 검증 실패: ' + res.message);
+            }
+          }
+        });
+      } else {
+        alert("결제 실패: " + rsp.error_msg);
+      }
+    });
+  }
 </script>
 </body>
 </html>

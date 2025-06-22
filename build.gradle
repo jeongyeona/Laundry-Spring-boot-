@@ -13,15 +13,21 @@ java {
 	}
 }
 
+
 // 컴파일 대상 Java 버전을 21로 맞춥니다.
 sourceCompatibility = '21'
 targetCompatibility = '21'
 
 repositories {
 	mavenCentral()
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+
 	// Spring Data / Web / Thymeleaf / Validation / Security 등
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

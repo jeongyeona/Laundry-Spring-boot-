@@ -59,11 +59,11 @@ public class ServiceOrderService {
             String reservationDate,  // "yyyy-MM-dd" 형식
             String orderAddr,
             String request,
-            String payment,
             String email,
             String category,
             String productcount,
-            BigDecimal order_price
+            BigDecimal order_price,
+            String merchant_uid
     ) {
         ServiceOrder o = new ServiceOrder();
         o.setOrderer(orderer);
@@ -73,6 +73,8 @@ public class ServiceOrderService {
         o.setOrderPrice(order_price);
         o.setRegdate(LocalDate.now());
         o.setReservationDate(reservationDate);
+        o.setMerchantUid(merchant_uid);
+
 
         ServiceOrder savedOrder = repo.save(o);
 

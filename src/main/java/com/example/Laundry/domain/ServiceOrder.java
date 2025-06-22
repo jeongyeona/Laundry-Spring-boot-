@@ -1,4 +1,3 @@
-// Domain: com.example.Laundry.domain.ServiceOrder.java
 package com.example.Laundry.domain;
 
 import jakarta.persistence.*;
@@ -6,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "service_order")
@@ -46,6 +44,9 @@ public class ServiceOrder {
     @Column(name = "send_invoice_num")
     private Integer sendInvoiceNum;
 
+    @Column(name = "merchant_uid", length = 100)
+    private String merchantUid;
+
     // Getters and Setters
     public Integer getCode() { return code; }
     public void setCode(Integer code) { this.code = code; }
@@ -80,6 +81,9 @@ public class ServiceOrder {
     public Integer getSendInvoiceNum() { return sendInvoiceNum; }
     public void setSendInvoiceNum(Integer sendInvoiceNum) { this.sendInvoiceNum = sendInvoiceNum; }
 
-    public interface ServiceOrderRepository extends JpaRepository<ServiceOrder,Long> {
+    public String getMerchantUid() { return merchantUid; }
+    public void setMerchantUid(String merchantUid) { this.merchantUid = merchantUid; }
+
+    public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long> {
     }
 }

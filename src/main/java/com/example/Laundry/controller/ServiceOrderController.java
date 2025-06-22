@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -77,29 +78,29 @@ public class ServiceOrderController {
         return "Reserve/Payment";
     }
 
-    @PostMapping("/Insert")
-    public String insertOrder(
-            @RequestParam String orderer,
-            @RequestParam String product,
-            @RequestParam String inum,
-            @RequestParam String count,
-            @RequestParam String reservation_date,
-            @RequestParam String order_addr,
-            @RequestParam String request,
-            @RequestParam String payment,
-            @RequestParam String username,
-            @RequestParam String category,
-            @RequestParam String productcount,
-            @RequestParam BigDecimal order_price,
-            @RequestParam(required = false) Long idx,
-            RedirectAttributes ra
-    ) {
-        // ServiceOrderService 의 save 메서드에 필요한 DTO를 만들어 넘김
-        service.saveOrder(orderer, product, inum, count,
-                reservation_date, order_addr,
-                request, payment, username, category, productcount, order_price);
-
-        ra.addFlashAttribute("msg", "결제가 완료되었습니다.");
-        return "redirect:/LoginInfo/Mypage/OrderList";
-    }
+//    @PostMapping("/Insert")
+//    public String insertOrder(
+//            @RequestParam String orderer,
+//            @RequestParam String product,
+//            @RequestParam String inum,
+//            @RequestParam String count,
+//            @RequestParam String reservation_date,
+//            @RequestParam String order_addr,
+//            @RequestParam String request,
+//            @RequestParam String payment,
+//            @RequestParam String username,
+//            @RequestParam String category,
+//            @RequestParam String productcount,
+//            @RequestParam BigDecimal order_price,
+//            @RequestParam(required = false) Long idx,
+//            RedirectAttributes ra
+//    ) {
+//        // ServiceOrderService 의 save 메서드에 필요한 DTO를 만들어 넘김
+//        service.saveOrder(orderer, product, inum, count,
+//                reservation_date, order_addr,
+//                request, payment, username, category, productcount, order_price);
+//
+//        ra.addFlashAttribute("msg", "결제가 완료되었습니다.");
+//        return "redirect:/LoginInfo/Mypage/OrderList";
+//    }
 }
