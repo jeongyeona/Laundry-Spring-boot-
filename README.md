@@ -20,7 +20,7 @@ Laundry365는 사용자가 손쉽게 세탁 서비스를 예약하고 관리할 
 | Frontend   | Thymeleaf, HTML/CSS, JavaScript                           |
 | DB         | MySQL (AWS RDS), JPA                                      |
 | 인증       | JWT (JSON Web Token)                                      |
-| 배포       | AWS EC2, Nginx, Docker Compose                            |
+| 배포       | AWS EC2, Docker Compose                            |
 | 기타       | Git, GitHub, Lombok, Gradle, Iamport(아임포트)             |
 
 ## 🌐 서비스 아키텍처
