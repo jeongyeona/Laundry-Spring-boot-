@@ -24,7 +24,7 @@ Spring Boot와 JPA 기반으로 구축되었으며, JWT 인증 및 AWS EC2 배�
 |------------|-----------------------------------------------------------|
 | Backend    | Java 17, Spring Boot, Spring Data JPA, QueryDSL           |
 | Frontend   | Thymeleaf, HTML/CSS, JavaScript                           |
-| DB         | MySQL (AWS RDS), JPA                                      |
+| DB         | MySQL (Docker Volume), JPA                                      |
 | 인증       | JWT (JSON Web Token)                                      |
 | 배포       | AWS EC2, Docker Compose                                   |
 | 기타       | Git, GitHub, Lombok, Gradle, Iamport(아임포트)             |
@@ -39,7 +39,7 @@ Spring Boot와 JPA 기반으로 구축되었으며, JWT 인증 및 AWS EC2 배�
 ↓
 [JWT 인증 처리]
 ↓
-[MySQL RDS]
+[MySQL (Docker Volume)]
 ↓
 [AWS EC2 (Docker 배포)]
 
