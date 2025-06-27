@@ -34,13 +34,21 @@ Spring Boot와 JPA 기반으로 구축되었으며, JWT 인증 및 AWS EC2 배�
 ## 🌐 서비스 아키텍처
 
 [Client]
+
 ↓
+
 [Spring Boot API]
+
 ↓
+
 [JWT 인증 처리]
+
 ↓
+
 [MySQL (Docker Volume)]
+
 ↓
+
 [AWS EC2 (Docker 배포)]
 
 ---
