@@ -1,15 +1,13 @@
 // Service: com.example.Laundry.service.ServiceOrderService.java
 package com.example.Laundry.service;
 
-import com.example.Laundry.domain.Items;
-import com.example.Laundry.domain.OrderItem;
-import com.example.Laundry.domain.QnaBoard;
-import com.example.Laundry.domain.ServiceOrder;
+import com.example.Laundry.domain.*;
 import com.example.Laundry.dto.ServiceOrderCreateDto;
 import com.example.Laundry.dto.ServiceOrderResponseDto;
 import com.example.Laundry.mapper.ServiceOrderMapper;
 import com.example.Laundry.repository.ItemsRepository;
 import com.example.Laundry.repository.OrderItemRepository;
+import com.example.Laundry.repository.PaymentLogRepository;
 import com.example.Laundry.repository.ServiceOrderRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -32,11 +32,16 @@ public class ServiceOrderService {
     private final OrderItemRepository orderrepo;
     private final ItemsRepository itemsRepository;
     private final ServiceOrderMapper mapper = ServiceOrderMapper.INSTANCE;
+    private final IamportService iamportService;
+    private final PaymentLogRepository paymentLogRepository;
 
-    public ServiceOrderService(ServiceOrderRepository repo, OrderItemRepository orderrepo, ItemsRepository itemsRepository) {
+
+    public ServiceOrderService(ServiceOrderRepository repo, OrderItemRepository orderrepo, ItemsRepository itemsRepository, IamportService iamportService, PaymentLogRepository paymentLogRepository) {
         this.repo = repo;
         this.orderrepo = orderrepo;
         this.itemsRepository = itemsRepository;
+        this.iamportService = iamportService;
+        this.paymentLogRepository = paymentLogRepository;
     }
 
     /**
@@ -63,7 +68,8 @@ public class ServiceOrderService {
             String category,
             String productcount,
             BigDecimal order_price,
-            String merchant_uid
+            String merchant_uid,
+            String imp_uid
     ) {
         ServiceOrder o = new ServiceOrder();
         o.setOrderer(orderer);
@@ -71,9 +77,11 @@ public class ServiceOrderService {
         o.setRequest(request);
         o.setCategory(category);
         o.setOrderPrice(order_price);
+        o.setState("결제완료");
         o.setRegdate(LocalDate.now());
         o.setReservationDate(reservationDate);
         o.setMerchantUid(merchant_uid);
+        o.setImpUid(imp_uid);
 
 
         ServiceOrder savedOrder = repo.save(o);
@@ -98,6 +106,7 @@ public class ServiceOrderService {
 
             orderItems.add(item);
         }
+
         orderrepo.saveAll(orderItems);
 
         return savedOrder;
@@ -125,4 +134,35 @@ public class ServiceOrderService {
     public List<OrderItem> findOrderItems(Integer orderCode) {
         return orderrepo.findByCode(orderCode);
     }
+
+    /**
+     * 환불
+     */
+    public boolean refundOrder(String merchantUid, String impUid) {
+        Optional<ServiceOrder> optionalOrder = repo.findByMerchantUid(merchantUid);
+        if (optionalOrder.isPresent()) {
+            ServiceOrder order = optionalOrder.get();
+
+            if ("결제완료".equals(order.getState())) {
+                boolean cancelSuccess = iamportService.cancelPayment(impUid, "사용자 환불 요청");
+                if (cancelSuccess) {
+                    order.setState("환불완료");
+                    repo.save(order);
+
+                    // 로그 남기기
+                    PaymentLog log = new PaymentLog();
+                    log.setMerchantUid(merchantUid);
+                    log.setImpUid(impUid);
+                    log.setStatus("cancelled");
+                    log.setMessage("사용자 환불 요청으로 취소됨");
+                    log.setCreatedAt(LocalDateTime.now());
+                    paymentLogRepository.save(log);
+
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

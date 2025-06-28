@@ -19,4 +19,5 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Inte
             String orderer, Pageable pageable
     );
     Optional<ServiceOrder> findByCode(Integer code);
+    Optional<ServiceOrder> findByMerchantUid(String merchantUid);
 }

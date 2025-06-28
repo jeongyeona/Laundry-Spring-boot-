@@ -44,30 +44,4 @@ public class ReserveController {
             return ResponseEntity.status(500).body(failResponse);
         }
     }
-
-    @PostMapping("/Insert")
-    public Map<String, String> insertOrder(
-            @RequestParam String orderer,
-            @RequestParam String product,
-            @RequestParam String inum,
-            @RequestParam String count,
-            @RequestParam String reservation_date,
-            @RequestParam String order_addr,
-            @RequestParam String request,
-            @RequestParam String username,
-            @RequestParam String category,
-            @RequestParam String productcount,
-            @RequestParam BigDecimal order_price,
-            @RequestParam(required = false) Long idx,
-            @RequestParam String merchant_uid,
-            RedirectAttributes ra
-    ) {
-        // ServiceOrderService 의 save 메서드에 필요한 DTO를 만들어 넘김
-        service.saveOrder(orderer, product, inum, count,
-                reservation_date, order_addr,
-                request, username, category, productcount, order_price, merchant_uid);
-
-        ra.addFlashAttribute("msg", "결제가 완료되었습니다.");
-        return Map.of("status", "success");
-    }
 }

@@ -44,6 +44,7 @@
 
 <form th:action="@{/Reserve/Insert}" method="post" id="insertForm">
   <input type="hidden" name="merchant_uid" id="merchant_uid"/>
+  <input type="hidden" name="imp_uid" id="imp_uid"/>
   <div class="container">
 
     <!-- Step03 결제창 -->
@@ -275,6 +276,7 @@
     }, function (rsp) {
       if (rsp.success) {
         $('#merchant_uid').val(merchantUid);
+        $('#imp_uid').val(rsp.imp_uid);
 
         $.ajax({
           url: "/Reserve/cardPayment",
@@ -286,11 +288,7 @@
           }),
           success: function (res) {
             if (res.status === 'success') {
-              $.post("/Reserve/Insert", $('#insertForm').serialize(), function(res) {
-                if (res.status === 'success') {
-                  window.location.href = "/LoginInfo/Mypage/OrderList";
-                }
-              });
+              document.getElementById('insertForm').submit();
             } else {
               alert('결제 검증 실패: ' + res.message);
             }

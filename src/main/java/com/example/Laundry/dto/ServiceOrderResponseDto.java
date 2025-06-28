@@ -18,7 +18,8 @@ public record ServiceOrderResponseDto(
         String state,
         Integer getInvoiceNum,
         Integer sendInvoiceNum,
-        String merchantUid
+        String merchantUid,
+        String impUid
 ) {
     /** ServiceOrder 엔티티를 DTO로 변환하는 생성자 */
     public ServiceOrderResponseDto(ServiceOrder order) {
@@ -34,7 +35,8 @@ public record ServiceOrderResponseDto(
                 order.getState(),
                 order.getGetInvoiceNum(),
                 order.getSendInvoiceNum(),
-                order.getMerchantUid()
+                order.getMerchantUid(),
+                order.getImpUid()
         );
     }
 }

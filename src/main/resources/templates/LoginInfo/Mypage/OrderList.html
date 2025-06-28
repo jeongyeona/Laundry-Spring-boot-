@@ -98,6 +98,9 @@
 <script th:if="${msg}" th:inline="javascript">
   alert([[${msg}]]);
 </script>
+<script th:if="${refundMessage}" th:inline="javascript">
+  alert([[${refundMessage}]]);
+</script>
 <!-- 푸터는 wrapper 밖에서 절대 고정 -->
 <div class="footer-sticky" th:replace="~{fragments/footer :: footer}"></div>
 

@@ -168,6 +168,22 @@
       </div>
     </div>
 
+    <!-- 환불 버튼 -->
+    <div class="d-flex justify-content-end mt-4">
+      <form th:action="@{/Reserve/Refund}" method="post"
+            th:if="${order.state == '결제완료'}"
+            onsubmit="return confirm('정말 환불 요청하시겠습니까?');">
+
+        <!-- hidden inputs for both UIDs -->
+        <input type="hidden" name="merchantUid" th:value="${order.merchantUid}">
+        <input type="hidden" name="impUid" th:value="${order.impUid}">
+
+        <button type="submit" class="btn btn-outline-danger btn-lg shadow rounded px-4">
+          <i class="bi bi-arrow-counterclockwise me-2"></i>환불 요청
+        </button>
+      </form>
+    </div>
+
     <!-- 목록 버튼 -->
     <div style="text-align:center; margin-top:30px;">
       <a href="javascript:window.history.back();" class="btn btn-lg btn-dark" style="border-radius:0px;">목록</a>
@@ -177,7 +193,6 @@
 
 <!-- 고정 푸터 -->
 <div class="footer-sticky" th:replace="~{fragments/footer :: footer}"></div>
-
 <script>
   function showPopup2(url){
     PopupCenter(url,"배송조회", 800, 500);

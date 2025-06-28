@@ -47,6 +47,9 @@ public class ServiceOrder {
     @Column(name = "merchant_uid", length = 100)
     private String merchantUid;
 
+    @Column(name = "imp_uid", length = 100)
+    private String impUid;
+
     // Getters and Setters
     public Integer getCode() { return code; }
     public void setCode(Integer code) { this.code = code; }
@@ -83,6 +86,9 @@ public class ServiceOrder {
 
     public String getMerchantUid() { return merchantUid; }
     public void setMerchantUid(String merchantUid) { this.merchantUid = merchantUid; }
+
+    public String getImpUid() { return impUid; }
+    public void setImpUid(String impUid) { this.impUid = impUid; }
 
     public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long> {
     }

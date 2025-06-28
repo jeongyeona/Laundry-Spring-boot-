@@ -15,5 +15,6 @@ public record ServiceOrderCreateDto(
         String state,
         Integer getInvoiceNum,
         Integer sendInvoiceNum,
-        String merchantUid
+        String merchantUid,
+        String impUid
 ) {}
