@@ -94,6 +94,33 @@
       </tbody>
     </table>
   </div>
+
+  <!-- 페이지네이션 -->
+  <div class="page-ui my-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:if="${startPageNum > 1}">
+        <a class="page-link"
+           th:href="@{/LoginInfo/Mypage/OrderList(pageNum=${startPageNum - 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}">
+          Prev
+        </a>
+      </li>
+
+      <li class="page-item" th:each="i : ${pageNumbers}">
+        <a class="page-link"
+           th:classappend="${i == pageNum} ? ' active'"
+           th:href="@{/LoginInfo/Mypage/OrderList(pageNum=${i}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}"
+           th:text="${i}">1</a>
+      </li>
+
+      <li class="page-item" th:if="${endPageNum < totalPageCount}">
+        <a class="page-link"
+           th:href="@{/LoginInfo/Mypage/OrderList(pageNum=${endPageNum + 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}">
+          Next
+        </a>
+      </li>
+    </ul>
+  </div>
+
 </div>
 <script th:if="${msg}" th:inline="javascript">
   alert([[${msg}]]);
