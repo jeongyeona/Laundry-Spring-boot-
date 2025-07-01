@@ -145,75 +145,88 @@
         </th:block>
       </tbody>
     </table>
+
+    <button class="btn btn-outline-dark" style="float:right" th:if="${manager} == 'Y'"
+            th:onclick="|location.href='@{/Faq/FaqInsertForm}'|">글쓰기</button>
+
+    <div class="page-ui clearfix" style="display:flex; justify-content:center;">
+      <ul class="pagination">
+        <li class="page-item" th:if="${startPageNum > 1}">
+          <a class="page-link"
+             th:href="@{/Faq/List(pageNum=${startPageNum - 1}, condition=${condition}, keyword=${encodedK}, category=${selectedCategory})}">Prev</a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(startPageNum, endPageNum)}">
+          <a class="page-link" th:classappend="${pageNum == i} ? ' active'"
+             th:href="@{/Faq/List(pageNum=${i}, condition=${condition}, keyword=${encodedK}, category=${selectedCategory})}"
+             th:text="${i}"></a>
+        </li>
+        <li class="page-item" th:if="${endPageNum < totalPageCount}">
+          <a class="page-link"
+             th:href="@{/Faq/List(pageNum=${endPageNum + 1}, condition=${condition}, keyword=${encodedK}, category=${selectedCategory})}">Next</a>
+        </li>
+      </ul>
+    </div>
   </div>
 
-  <button class="btn btn-outline-dark" style="float:right" th:if="${manager} == 'Y'"
-          th:onclick="|location.href='@{/Faq/FaqInsertForm}'|">글쓰기</button>
-
-  <div class="page-ui clearfix" style="display:flex; justify-content:center;">
-    <ul class="pagination">
-      <li class="page-item" th:if="${startPageNum > 1}">
-        <a class="page-link"
-           th:href="@{/Faq/List(pageNum=${startPageNum - 1}, condition=${condition}, keyword=${encodedK})}">Prev</a>
-      </li>
-      <li class="page-item" th:each="i : ${#numbers.sequence(startPageNum, endPageNum)}">
-        <a class="page-link" th:classappend="${pageNum == i} ? ' active'"
-           th:href="@{/Faq/List(pageNum=${i}, condition=${condition}, keyword=${encodedK})}"
-           th:text="${i}"></a>
-      </li>
-      <li class="page-item" th:if="${endPageNum < totalPageCount}">
-        <a class="page-link"
-           th:href="@{/Faq/List(pageNum=${endPageNum + 1}, condition=${condition}, keyword=${encodedK})}">Next</a>
-      </li>
-    </ul>
-  </div>
 </div>
 
 <script th:src="@{/js/gura_util.js}"></script>
 <script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js}"></script>
 <script th:inline="javascript">
   /*<![CDATA[*/
-  // Thymeleaf 변수를 JS 변수로 받기
-  let ajaxUrl       = /*[[@{/Faq/Ajax}]]*/ '/Faq/Ajax';
-  let pageSize      = /*[[${pageSize}]]*/ 5;
-  let currentPage   = /*[[${pageNum}]]*/ 1;
+    let ajaxUrl = /*[[@{/Faq/Ajax}]]*/ '/Faq/Ajax';
+    let pageSize = /*[[${pageSize}]]*/ 5;
+    let currentPage = /*[[${pageNum}]]*/ 1;
+    let selectedCategory = '';
 
-  // DOM 요소 가져오기
-  let faqRows = document.getElementById('faqRows');
-  let conditionInput = document.getElementById('condition');
-  let keywordInput = document.getElementById('keyword');
+    const conditionInput = document.getElementById('condition');
+    const keywordInput = document.getElementById('keyword');
 
-  // 카테고리 버튼 클릭 시
-  document.querySelectorAll('.btn1').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentPage = 1;
-      let category = btn.value;
-      let cond = conditionInput.value;
-      let kw = keywordInput.value;
-
-      fetch(
-        `${ajaxUrl}` +
-        `?category=${encodeURIComponent(category)}` +
-        `&pageNum=${currentPage}` +
-        `&pageSize=${pageSize}` +
-        `&condition=${encodeURIComponent(cond)}` +
-        `&keyword=${encodeURIComponent(kw)}`
-      )
-      .then(res => res.text())
-      .then(html => {
-        faqRows.innerHTML = html;
+    // 카테고리 버튼 클릭 시
+    document.querySelectorAll('.btn1').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedCategory = btn.value;
+        currentPage = 1;
+        fetchFaqData(selectedCategory, currentPage);
       });
     });
-  });
 
-  // 질문 클릭 토글
-  faqRows.addEventListener('click', e => {
-    let q = e.target.closest('tr.question');
-    if (!q) return;
-    let num = q.dataset.num;
-    let ans = document.getElementById(`answer${num}`);
-    if (ans) ans.classList.toggle('d-none');
-  });
+    function fetchFaqData(category, pageNum) {
+      const cond = conditionInput.value;
+      const kw = keywordInput.value;
+
+      fetch(`${ajaxUrl}?category=${encodeURIComponent(category)}&pageNum=${pageNum}&pageSize=${pageSize}&condition=${encodeURIComponent(cond)}&keyword=${encodeURIComponent(kw)}`)
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById('faqTableDiv').innerHTML = html;
+
+          bindPaginationEvents();
+          bindQuestionToggle();
+        });
+    }
+
+    function bindPaginationEvents() {
+      document.querySelectorAll('.page-link').forEach(link => {
+        const nextPage = link.getAttribute('data-page');
+        if (nextPage) {
+          link.addEventListener('click', () => {
+            fetchFaqData(selectedCategory, nextPage);
+          });
+        }
+      });
+    }
+
+    function bindQuestionToggle() {
+      document.querySelectorAll('tr.question').forEach(q => {
+        q.addEventListener('click', () => {
+          const num = q.dataset.num;
+          const ans = document.getElementById(`answer${num}`);
+          if (ans) ans.classList.toggle('d-none');
+        });
+      });
+    }
+
+    bindQuestionToggle();
   /*]]>*/
 </script>
 <th:block th:if="${updateSuccess}">

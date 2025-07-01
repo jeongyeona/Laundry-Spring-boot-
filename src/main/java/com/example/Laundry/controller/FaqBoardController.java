@@ -40,7 +40,7 @@ public class FaqBoardController {
         String userId = (String) session.getAttribute("LOGIN_USER");
         if (userId != null) {
             UserResponseDto user = userService.findById(userId);
-            model.addAttribute("manager", user.manager());  // e.g. "Y" or "N"
+            model.addAttribute("manager", user.manager());
         } else {
             model.addAttribute("manager", "N");
         }
@@ -87,10 +87,18 @@ public class FaqBoardController {
             @RequestParam(defaultValue = "") String keyword,
             Model model
     ) {
+        String userId = (String) session.getAttribute("LOGIN_USER");
+        if (userId != null) {
+            UserResponseDto user = userService.findById(userId);
+            model.addAttribute("manager", user.manager());
+        } else {
+            model.addAttribute("manager", "N");
+        }
+
         Page<FaqBoardResponseDto> page = faqBoardService.findByCategory(category, pageNum, pageSize, condition, keyword);
         int total = page.getTotalPages();
+        if (total == 0) total = 1;
         int[] range = faqBoardService.calcPageRange(pageNum, total);
-        String userId = (String) session.getAttribute("LOGIN_USER");
 
         List<Integer> pageNumbers =
                 IntStream.rangeClosed(range[0], range[1])
@@ -109,7 +117,7 @@ public class FaqBoardController {
         model.addAttribute("keyword", keyword);
 
         // fragment 조각만 반환
-        return "fragments/faqTable :: faqRows";
+        return "fragments/faqTable :: faqContent";
     }
 
     @GetMapping("/FaqInsertForm")
