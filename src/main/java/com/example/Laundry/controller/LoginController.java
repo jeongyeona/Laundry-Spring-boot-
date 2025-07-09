@@ -62,8 +62,9 @@ public class LoginController {
     private final OrderItemService orderItemService;
     private final ItemsService itemsService;
     private final OrderItemRepository orderItemRepository;
+    private final CourierService  courierService;
 
-    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService, ItemsService itemsService, OrderItemRepository orderItemRepository) {
+    public LoginController(CountryPhoneService countryPhoneService, UserService userService, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceOrderService serviceOrderService, OrderItemService orderItemService, ItemsService itemsService, OrderItemRepository orderItemRepository, CourierService  courierService) {
         this.countryPhoneService = countryPhoneService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -74,6 +75,7 @@ public class LoginController {
         this.orderItemService = orderItemService;
         this.itemsService = itemsService;
         this.orderItemRepository = orderItemRepository;
+        this.courierService = courierService;
     }
 
     //로그인 화면으로 이동
@@ -348,63 +350,6 @@ public class LoginController {
         return "redirect:/";
     }
 
-//    @GetMapping("/Mypage/OrderList")
-//    public String getOrderList(
-//            HttpSession session,
-//            @RequestParam(defaultValue = "1") int pageNum,
-//            @RequestParam(defaultValue = "5") int pageSize,
-//            @RequestParam(defaultValue = "") String condition,
-//            @RequestParam(defaultValue = "") String keyword,
-//            @RequestParam(defaultValue = "") String state,
-//            Model model
-//    ) {
-//        String userId = (String) session.getAttribute("LOGIN_USER");
-//        if (userId != null) {
-//            UserResponseDto user = userService.findById(userId);
-//
-//            // ✅ manager가 Y면 관리자 페이지로 리다이렉트
-//            if ("Y".equalsIgnoreCase(user.manager())) {
-//                return "LoginInfo/Mypage/admin/OrderList";
-//            }
-//
-//            model.addAttribute("manager", user.manager());
-//        } else {
-//            model.addAttribute("manager", "N");
-//        }
-//
-//        if (pageSize < 1) {
-//            List<ServiceOrder> orders = serviceOrderService
-//                    .getPagedOrders(userId, keyword, state, pageNum, pageSize)
-//                    .getContent();
-//            model.addAttribute("list", orders);
-//        } else {
-//            Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, keyword, state, pageNum, pageSize);
-//
-//            int totalPages = page.getTotalPages();
-//            int startPageNum = Math.max(1, pageNum - 2);
-//            int endPageNum = Math.min(totalPages, pageNum + 2);
-//
-//            List<Integer> pageNumbers = IntStream
-//                    .rangeClosed(startPageNum, endPageNum)
-//                    .boxed()
-//                    .toList();
-//
-//            model.addAttribute("list", page.getContent());
-//            model.addAttribute("pageNum", pageNum);
-//            model.addAttribute("startPageNum", startPageNum);
-//            model.addAttribute("endPageNum", endPageNum);
-//            model.addAttribute("totalPageCount", totalPages);
-//            model.addAttribute("pageNumbers", pageNumbers);
-//            model.addAttribute("id", userId);
-//        }
-//
-//        model.addAttribute("condition", condition);
-//        model.addAttribute("keyword", keyword);
-//        model.addAttribute("state", state);
-//
-//        return "LoginInfo/Mypage/OrderList";
-//    }
-
     @GetMapping("/Mypage/OrderList")
     public String getOrderList(
             HttpSession session,
@@ -424,6 +369,10 @@ public class LoginController {
             boolean isManager = "Y".equalsIgnoreCase(user.manager());
 
             model.addAttribute("manager", user.manager());
+
+            if (isManager) {
+                model.addAttribute("courierList", courierService.getAllCouriers());
+            }
 
             return getOrderListView(
                     isManager ? null : userId,

@@ -85,7 +85,7 @@
 
                 <div class="d-flex align-items-center gap-2">
                     <select name="courier" id="courier" class="form-select" style="width:200px;">
-                        <option th:each="c : ${courierList}" th:value="${c.value}" th:text="${c.name}" th:selected="${c.value == 'kr.epost'}"></option>
+                        <option th:each="c : ${courierList}" th:value="${c.courierCode}" th:text="${c.courierName}" th:selected="${c.courierCode == 'kr.epost'}"></option>
                     </select>
                     <button type="button" id="getBtn" class="btn btn-dark">수거용 송장번호 발급</button>
                     <button type="button" id="sendBtn" class="btn btn-dark">반환용 송장번호 발급</button>
@@ -214,10 +214,10 @@
     });
 
 
-    const updateBtn=document.querySelector("#updateBtn");
-    const changeBtn=document.querySelector("#changeBtn");
-    const cancleBtn=document.querySelector("#cancleBtn");
-    const updateState=document.querySelector("#updateState");
+    let updateBtn=document.querySelector("#updateBtn");
+    let changeBtn=document.querySelector("#changeBtn");
+    let cancleBtn=document.querySelector("#cancleBtn");
+    let updateState=document.querySelector("#updateState");
 
     updateBtn.addEventListener("click",function(){
         this.style.display="none";
@@ -248,7 +248,6 @@
                 return;
             } else {
                 let form=document.querySelector("#orderForm");
-                //form.setAttribute('action','admin_user_delete.do');
                 ajaxFormPromise(form)
                 .then(function(res){
                     return res.json();
@@ -273,12 +272,13 @@
             return;
         }else{
             for(let i=0;i<updateUsers.length;i++){
-                if(updateUsers[0].dataset.state != '예약완료'){
-                    alert('예약완료인 주문만 발급가능합니다.');
+                if(updateUsers[i].dataset.state !== '결제완료'){
+                    alert('결제완료인 주문만 발급가능합니다.');
                     return;
                 }
 
-                if(updateUsers[0].dataset.courier1 != ''){
+                const courier = updateUsers[i].dataset.courier1 ?? '';
+                if (courier.trim() !== '') {
                     alert('발급은 한번만 가능합니다.');
                     return;
                 }
@@ -287,7 +287,7 @@
                 return;
             } else {
                 let form=document.querySelector("#orderForm");
-                form.setAttribute('action','admin_insert_courier.do');
+                form.setAttribute('action','AdminInsertCourier');
                 ajaxFormPromise(form)
                 .then(function(res){
                     return res.json();
@@ -295,7 +295,7 @@
                 .then(function(data){
                     if(data.isSuccess == true){
                         alert(data.count+'명의 회원의 송장번호를 발급했습니다');
-                        location.href="${pageContext.request.contextPath}/mypage/order.do";
+                        location.href="${pageContext.request.contextPath}/Mypage/admin/OrderList";
                     }else{
                         alert('송장번호 발급이 실패했습니다.');
                     }
