@@ -50,6 +50,12 @@ public class ServiceOrder {
     @Column(name = "imp_uid", length = 100)
     private String impUid;
 
+    @Column(name = "get_courier", length = 100)
+    private String getCourier;
+
+    @Column(name = "send_courier", length = 100)
+    private String sendCourier;
+
     // Getters and Setters
     public Integer getCode() { return code; }
     public void setCode(Integer code) { this.code = code; }
@@ -89,6 +95,12 @@ public class ServiceOrder {
 
     public String getImpUid() { return impUid; }
     public void setImpUid(String impUid) { this.impUid = impUid; }
+
+    public String getGetCourier() { return getCourier; }
+    public void setGetCourier(String getCourier) { this.getCourier = getCourier; }
+
+    public String getSendCourier() { return sendCourier; }
+    public void setSendCourier(String sendCourier) { this.sendCourier = sendCourier; }
 
     public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long> {
     }

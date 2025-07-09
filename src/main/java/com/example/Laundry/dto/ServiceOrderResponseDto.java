@@ -19,8 +19,9 @@ public record ServiceOrderResponseDto(
         Integer getInvoiceNum,
         Integer sendInvoiceNum,
         String merchantUid,
-        String impUid
-) {
+        String impUid,
+        String getCourier,
+        String sendCourier) {
     /** ServiceOrder 엔티티를 DTO로 변환하는 생성자 */
     public ServiceOrderResponseDto(ServiceOrder order) {
         this(
@@ -36,7 +37,9 @@ public record ServiceOrderResponseDto(
                 order.getGetInvoiceNum(),
                 order.getSendInvoiceNum(),
                 order.getMerchantUid(),
-                order.getImpUid()
+                order.getImpUid(),
+                order.getGetCourier(),
+                order.getSendCourier()
         );
     }
 }

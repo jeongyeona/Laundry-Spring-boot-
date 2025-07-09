@@ -348,6 +348,63 @@ public class LoginController {
         return "redirect:/";
     }
 
+//    @GetMapping("/Mypage/OrderList")
+//    public String getOrderList(
+//            HttpSession session,
+//            @RequestParam(defaultValue = "1") int pageNum,
+//            @RequestParam(defaultValue = "5") int pageSize,
+//            @RequestParam(defaultValue = "") String condition,
+//            @RequestParam(defaultValue = "") String keyword,
+//            @RequestParam(defaultValue = "") String state,
+//            Model model
+//    ) {
+//        String userId = (String) session.getAttribute("LOGIN_USER");
+//        if (userId != null) {
+//            UserResponseDto user = userService.findById(userId);
+//
+//            // ✅ manager가 Y면 관리자 페이지로 리다이렉트
+//            if ("Y".equalsIgnoreCase(user.manager())) {
+//                return "LoginInfo/Mypage/admin/OrderList";
+//            }
+//
+//            model.addAttribute("manager", user.manager());
+//        } else {
+//            model.addAttribute("manager", "N");
+//        }
+//
+//        if (pageSize < 1) {
+//            List<ServiceOrder> orders = serviceOrderService
+//                    .getPagedOrders(userId, keyword, state, pageNum, pageSize)
+//                    .getContent();
+//            model.addAttribute("list", orders);
+//        } else {
+//            Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, keyword, state, pageNum, pageSize);
+//
+//            int totalPages = page.getTotalPages();
+//            int startPageNum = Math.max(1, pageNum - 2);
+//            int endPageNum = Math.min(totalPages, pageNum + 2);
+//
+//            List<Integer> pageNumbers = IntStream
+//                    .rangeClosed(startPageNum, endPageNum)
+//                    .boxed()
+//                    .toList();
+//
+//            model.addAttribute("list", page.getContent());
+//            model.addAttribute("pageNum", pageNum);
+//            model.addAttribute("startPageNum", startPageNum);
+//            model.addAttribute("endPageNum", endPageNum);
+//            model.addAttribute("totalPageCount", totalPages);
+//            model.addAttribute("pageNumbers", pageNumbers);
+//            model.addAttribute("id", userId);
+//        }
+//
+//        model.addAttribute("condition", condition);
+//        model.addAttribute("keyword", keyword);
+//        model.addAttribute("state", state);
+//
+//        return "LoginInfo/Mypage/OrderList";
+//    }
+
     @GetMapping("/Mypage/OrderList")
     public String getOrderList(
             HttpSession session,
@@ -358,46 +415,62 @@ public class LoginController {
             @RequestParam(defaultValue = "") String state,
             Model model
     ) {
+        pageNum = Math.max(pageNum, 1);
+
         String userId = (String) session.getAttribute("LOGIN_USER");
+
         if (userId != null) {
             UserResponseDto user = userService.findById(userId);
+            boolean isManager = "Y".equalsIgnoreCase(user.manager());
+
             model.addAttribute("manager", user.manager());
-        } else {
-            model.addAttribute("manager", "N");
+
+            return getOrderListView(
+                    isManager ? null : userId,
+                    pageNum, pageSize, condition, keyword, state,
+                    isManager ? "LoginInfo/Mypage/admin/OrderList" : "LoginInfo/Mypage/OrderList",
+                    model
+            );
         }
 
-        if (pageSize < 1) {
-            List<ServiceOrder> orders = serviceOrderService
-                    .getPagedOrders(userId, keyword, state, pageNum, pageSize)
-                    .getContent();
-            model.addAttribute("list", orders);
-        } else {
-            Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, keyword, state, pageNum, pageSize);
+        model.addAttribute("manager", "N");
 
-            int totalPages = page.getTotalPages();
-            int startPageNum = Math.max(1, pageNum - 2);
-            int endPageNum = Math.min(totalPages, pageNum + 2);
+        return getOrderListView(
+                null, pageNum, pageSize, condition, keyword, state,
+                "LoginInfo/Mypage/OrderList", model
+        );
+    }
 
-            List<Integer> pageNumbers = IntStream
-                    .rangeClosed(startPageNum, endPageNum)
-                    .boxed()
-                    .toList();
+    private String getOrderListView(
+            String userId,
+            int pageNum, int pageSize,
+            String condition, String keyword, String state,
+            String viewName,
+            Model model
+    ) {
+        Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, keyword, state, pageNum, pageSize);
 
-            model.addAttribute("list", page.getContent());
-            model.addAttribute("pageNum", pageNum);
-            model.addAttribute("startPageNum", startPageNum);
-            model.addAttribute("endPageNum", endPageNum);
-            model.addAttribute("totalPageCount", totalPages);
-            model.addAttribute("pageNumbers", pageNumbers);
-            model.addAttribute("id", userId);
-        }
+        int totalPages = page.getTotalPages();
+        int startPageNum = Math.max(1, pageNum - 2);
+        int endPageNum = Math.min(totalPages, pageNum + 2);
 
+        List<Integer> pageNumbers = IntStream.rangeClosed(startPageNum, endPageNum).boxed().toList();
+
+        model.addAttribute("list", page.getContent());
+        model.addAttribute("pageNum", pageNum);
+        model.addAttribute("startPageNum", startPageNum);
+        model.addAttribute("endPageNum", endPageNum);
+        model.addAttribute("totalPageCount", totalPages);
+        model.addAttribute("pageNumbers", pageNumbers);
+        model.addAttribute("id", userId);
         model.addAttribute("condition", condition);
         model.addAttribute("keyword", keyword);
         model.addAttribute("state", state);
 
-        return "LoginInfo/Mypage/OrderList";
+        return viewName;
     }
+
+
 
     @GetMapping("/Mypage/OrderDetail")
     public String getOrderDetail(

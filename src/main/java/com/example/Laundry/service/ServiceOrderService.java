@@ -115,12 +115,32 @@ public class ServiceOrderService {
     /**
      * 주문 목록
      */
+//    public Page<ServiceOrder> getPagedOrders(String orderer, String keyword, String state, int pageNum, int pageSize) {
+//        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+//        if (state == null || state.trim().isEmpty()) {
+//            return repo.findByOrderer(orderer, pageable);
+//        } else {
+//            return repo.findByOrdererAndState(orderer, state, pageable);
+//        }
+//    }
+
     public Page<ServiceOrder> getPagedOrders(String orderer, String keyword, String state, int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-        if (state == null || state.trim().isEmpty()) {
-            return repo.findByOrderer(orderer, pageable);
+
+        if (orderer == null || orderer.trim().isEmpty()) {
+            // 관리자: 전체 조회
+            if (state == null || state.trim().isEmpty()) {
+                return repo.findAll(pageable);
+            } else {
+                return repo.findByState(state, pageable);
+            }
         } else {
-            return repo.findByOrdererAndState(orderer, state, pageable);
+            // 일반 사용자: 본인 것만 조회
+            if (state == null || state.trim().isEmpty()) {
+                return repo.findByOrderer(orderer, pageable);
+            } else {
+                return repo.findByOrdererAndState(orderer, state, pageable);
+            }
         }
     }
 

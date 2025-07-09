@@ -9,48 +9,53 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
   <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
-
   <style>
     html, body {
       height: 100%;
       margin: 0;
     }
-
     body {
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
     }
-
     .wrapper {
-      box-sizing: border-box;
-      height: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-
     .footer-sticky {
-        height: 100px;
-        background-color: #f8f9fa;
-        border-top: 1px solid #ccc;
+      height: 100px;
+      background-color: #f8f9fa;
+      border-top: 1px solid #ccc;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      margin-top: auto;
     }
-
-    .container {
-      margin-top: 30px;
+    .btn {
+      border-radius: 0;
     }
-
-    table > th {
-      color: #000000;
-      font-size: 17px;
-      font-weight: 400;
-    }
-
-    table > td {
-      color: #999999;
-      font-size: 17px;
-    }
-
-    td > a {
-      text-align: center;
-      text-decoration: none;
-      color: inherit;
+    @media (max-width: 768px) {
+      #order_wr {
+        flex-direction: column;
+        padding: 1rem;
+        overflow-x: auto;
+      }
+      #keyword {
+        width: 100% !important;
+        margin-top: 0.5rem;
+      }
+      #condition {
+        width: 100% !important;
+        margin-top: 0.5rem;
+      }
+      .form-select-lg {
+        font-size: 1rem;
+      }
+      .table-responsive {
+        overflow-x: auto;
+      }
     }
   </style>
 </head>
