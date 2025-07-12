@@ -64,6 +64,17 @@
           overflow-x: auto;
         }
       }
+      @media (max-width: 768px) {
+        .form-select,
+        .form-control,
+        .btn {
+          width: 100% !important;
+        }
+      .d-flex.flex-wrap.gap-2 {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+  }
     </style>
 </head>
 <body>
@@ -72,33 +83,44 @@
     <div th:replace="~{fragments/subnav :: subnav('mypage','orderlist')}"></div>
     <div id="order_wr" class="container my-4">
         <div id="body_content" class="w-100">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                <form th:action="@{/order}" method="get" id="searchForm" class="d-flex flex-wrap gap-2">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-3 align-items-center">
+                <!-- 검색 영역: 왼쪽 -->
+                <form th:action="@{/LoginInfo/Mypage/OrderList}" method="get" id="searchForm"
+                      class="d-flex flex-wrap align-items-center gap-2">
                     <input type="hidden" name="state" th:value="${state}" />
                     <select name="condition" id="condition" class="form-select form-select-lg" style="width: 150px;">
-                        <option th:selected="${condition} == 'code'">주문번호</option>
+                        <option value="code" th:selected="${condition} == 'code'">주문번호</option>
                         <option value="orderer_name" th:selected="${condition} == 'orderer_name'">아이디/이름</option>
                     </select>
-                    <input type="text" class="form-control form-control-lg" id="keyword" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" style="width: 300px;"/>
+
+                    <input type="text" class="form-control form-control-lg" id="keyword" name="keyword"
+                           placeholder="검색어를 입력해주세요" th:value="${keyword}" style="width: 300px;" />
+
                     <button type="submit" class="btn btn-dark btn-lg">검색</button>
                 </form>
 
-                <div class="d-flex align-items-center gap-2">
-                    <select name="courier" id="courier" class="form-select" style="width:200px;">
-                        <option th:each="c : ${courierList}" th:value="${c.courierCode}" th:text="${c.courierName}" th:selected="${c.courierCode == 'kr.epost'}"></option>
+                <!-- 택배사 및 버튼: 오른쪽 -->
+                <form id="courierForm" method="post"
+                      class="d-flex align-items-center gap-2">
+                    <select name="courier" id="courier" class="form-select form-select-lg" style="width:200px;">
+                        <option th:each="c : ${courierList}" th:value="${c.courierCode}"
+                                th:text="${c.courierName}" th:selected="${c.courierCode == 'kr.epost'}">
+                        </option>
                     </select>
-                    <button type="button" id="getBtn" class="btn btn-dark">수거용 송장번호 발급</button>
-                    <button type="button" id="sendBtn" class="btn btn-dark">반환용 송장번호 발급</button>
-                </div>
+
+                    <button type="button" id="getBtn" class="btn btn-dark btn-lg">수거용 송장번호 발급</button>
+                    <button type="button" id="sendBtn" class="btn btn-dark btn-lg">반환용 송장번호 발급</button>
+                </form>
             </div>
 
-            <form th:action="@{/admin_order_update}" id="orderForm" method="post">
+            <form th:action="@{/LoginInfo/Mypage/AdminOrderUpdate}" id="orderForm" method="post">
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <button type="button" id="updateBtn" class="btn btn-dark">수정</button>
                     <button type="button" id="changeBtn" class="btn btn-info" style="display:none;">확인</button>
                     <button type="button" id="cancleBtn" class="btn btn-secondary" style="display:none;">취소</button>
                     <select id="updateState" name="state" class="form-select" style="width:150px;" disabled>
                         <option>상태</option>
+                        <option>결제완료</option>
                         <option>수거중</option>
                         <option>수거완료</option>
                         <option>세탁중</option>
@@ -131,7 +153,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="tmp : ${list}" class="selectRow">
-                            <td><input type="checkbox" class="form-check-input" name="codes" th:value="${tmp.code}" th:data-state="${tmp.state}" th:data-courier1="${tmp.getCourier}" th:data-courier2="${tmp.sendCourier}"/></td>
+                            <td><input type="checkbox" class="form-check-input" name="codes" th:value="${tmp.code}" th:data-state="${tmp.state}" th:data-courier1="${tmp.getCourier}" th:data-invoice1="${tmp.getInvoiceNum}" th:data-courier2="${tmp.sendCourier}" th:data-invoice2="${tmp.sendInvoiceNum}"/></td>
                             <td th:text="${tmp.code}"></td>
                             <td th:text="${tmp.orderer}"></td>
                             <td th:text="${#numbers.formatInteger(tmp.orderPrice, 3, 'COMMA')}"></td>
@@ -153,7 +175,7 @@
                     <!-- Prev -->
                     <li class="page-item" th:if="${startPageNum > 1}">
                         <a class="page-link"
-                           th:href="@{/Admin/OrderList(pageNum=${startPageNum - 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}">
+                           th:href="@{/LoginInfo/Mypage/OrderList(pageNum=${startPageNum - 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}">
                             Prev
                         </a>
                     </li>
@@ -161,14 +183,14 @@
                     <!-- 페이지 번호 -->
                     <li class="page-item" th:each="i : ${pageNumbers}">
                         <a class="page-link"
-                           th:href="@{/Admin/OrderList(pageNum=${i}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}"
+                           th:href="@{/LoginInfo/Mypage/OrderList(pageNum=${i}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}"
                            th:classappend="${i == pageNum} ? ' active'" th:text="${i}"></a>
                     </li>
 
                     <!-- Next -->
                     <li class="page-item" th:if="${endPageNum < totalPageCount}">
                         <a class="page-link"
-                           th:href="@{/Admin/OrderList(pageNum=${endPageNum + 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}">
+                           th:href="@{/LoginInfo/Mypage/OrderList(pageNum=${endPageNum + 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword}, state=${state})}">
                             Next
                         </a>
                     </li>
@@ -180,9 +202,15 @@
 </div>
 <script th:src="@{/js/gura_util.js}"></script>
 <script>
-    document.querySelector("#state").addEventListener("change",function(){
-        let val=this.value;
-        location.href="order.do?state="+val+"&condition=${condition }&keyword=${encodedK }";
+    document.querySelector("#state").addEventListener("change", function () {
+        let val = this.value;
+        let condition = /*[[${condition}]]*/ '';
+        let keyword = /*[[${keyword}]]*/ '';
+
+        let url = /*[[@{/LoginInfo/Mypage/OrderList}]]*/ '';
+        location.href = url + "?state=" + encodeURIComponent(val)
+            + "&condition=" + encodeURIComponent(condition)
+            + "&keyword=" + encodeURIComponent(keyword);
     });
 
     let selectRows=document.querySelectorAll(".selectRow");
@@ -255,7 +283,7 @@
                 .then(function(data){
                     if(data.isSuccess == true){
                         alert(data.count+'명의 회원을 수정했습니다');
-                        location.href="${pageContext.request.contextPath}/mypage/order.do";
+                        location.reload();
                     }else{
                         alert('회원 수정에 실패했습니다.');
                     }
@@ -264,84 +292,115 @@
         }
     });
 
-    document.querySelector("#getBtn").addEventListener("click",function(){
-        let updateUsers=document.querySelectorAll('.selectRow input[type=checkbox]:checked');
+    document.querySelector("#getBtn").addEventListener("click", function () {
+        let updateUsers = document.querySelectorAll('.selectRow input[type=checkbox]:checked');
 
-        if(updateUsers.length==0){
-            alert("회원을 선택해주세요.");
+        if (updateUsers.length === 0) {
+            alert("주문을 선택해주세요.");
             return;
-        }else{
-            for(let i=0;i<updateUsers.length;i++){
-                if(updateUsers[i].dataset.state !== '결제완료'){
-                    alert('결제완료인 주문만 발급가능합니다.');
-                    return;
-                }
-
-                const courier = updateUsers[i].dataset.courier1 ?? '';
-                if (courier.trim() !== '') {
-                    alert('발급은 한번만 가능합니다.');
-                    return;
-                }
-            }
-            if (!confirm("택배사를 '"+$('#courier option:checked').text()+"' 로 선택하시겠습니까?")) {
-                return;
-            } else {
-                let form=document.querySelector("#orderForm");
-                form.setAttribute('action','AdminInsertCourier');
-                ajaxFormPromise(form)
-                .then(function(res){
-                    return res.json();
-                })
-                .then(function(data){
-                    if(data.isSuccess == true){
-                        alert(data.count+'명의 회원의 송장번호를 발급했습니다');
-                        location.href="${pageContext.request.contextPath}/Mypage/admin/OrderList";
-                    }else{
-                        alert('송장번호 발급이 실패했습니다.');
-                    }
-                });
-            }
-
         }
+
+        for (let i = 0; i < updateUsers.length; i++) {
+            if (updateUsers[i].dataset.state !== '결제완료') {
+                alert('결제완료인 주문만 수거용 송장번호 발급이 가능합니다.');
+                return;
+            }
+
+            let invoice = updateUsers[i].dataset.invoice1  ?? '';
+            if (invoice.trim() !== '') {
+                alert('수거용 송장번호 발급은 한번만 가능합니다.');
+                return;
+            }
+        }
+
+        let courierCode = document.querySelector("#courier").value;
+        let courierName = $('#courier option:checked').text();
+
+        if (!courierCode) {
+            alert("택배사를 선택해주세요.");
+            return;
+        }
+
+        if (!confirm("택배사를 '" + courierName + "' 로 선택하시겠습니까?")) {
+            return;
+        }
+
+        let oldHidden = document.querySelector('#orderForm input[name="courier"]');
+        if (oldHidden) oldHidden.remove();
+
+        let hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "courier";
+        hidden.value = courierCode;
+        document.querySelector("#orderForm").appendChild(hidden);
+
+        // action 설정 후 전송
+        let form = document.querySelector("#orderForm");
+        form.setAttribute('action', '/LoginInfo/Mypage/AdminInsertCourier');
+
+        ajaxFormPromise(form)
+            .then(res => res.json())
+            .then(data => {
+                if (data.isSuccess) {
+                    alert(data.count + "건 수거용 송장번호가 발급되었습니다.");
+                    location.reload();
+                } else {
+                    alert("수거용 송장번호 발급에 실패했습니다.");
+                }
+            });
     });
 
-    document.querySelector("#sendBtn").addEventListener("click",function(){
-        let updateUsers=document.querySelectorAll('.selectRow input[type=checkbox]:checked');
 
-        if(updateUsers.length==0){
-            alert("회원을 선택해주세요.");
+    document.querySelector("#sendBtn").addEventListener("click", function () {
+        let updateUsers = document.querySelectorAll('.selectRow input[type=checkbox]:checked');
+
+        if (updateUsers.length === 0) {
+            alert("주문을 선택해주세요.");
             return;
-        }else{
-            for(let i=0;i<updateUsers.length;i++){
-                if(updateUsers[0].dataset.state != '세탁완료'){
-                    alert('세탁완료인 주문만 발급가능합니다.');
-                    return;
-                }
+        }
 
-                if(updateUsers[0].dataset.courier2 != ''){
-                    alert('발급은 한번만 가능합니다.');
-                    return;
-                }
-            }
-            if (!confirm("택배사를 '"+$('#courier option:checked').text()+"' 로 선택하시겠습니까?")) {
+        for (let i = 0; i < updateUsers.length; i++) {
+            if (updateUsers[i].dataset.state !== '세탁완료') {
+                alert('세탁완료인 주문만 반환용 송장번호 발급이 가능합니다.');
                 return;
-            } else {
-                let form=document.querySelector("#orderForm");
-                form.setAttribute('action','admin_insert_courier2.do');
-                ajaxFormPromise(form)
-                .then(function(res){
-                    return res.json();
-                })
-                .then(function(data){
-                    if(data.isSuccess == true){
-                        alert(data.count+'명의 회원의 송장번호를 발급했습니다');
-                        location.href="${pageContext.request.contextPath}/mypage/order.do";
-                    }else{
-                        alert('송장번호 발급이 실패했습니다.');
-                    }
-                });
+            }
+
+            let invoice = updateUsers[i].dataset.invoice2 ?? '';
+            if (invoice.trim() !== '') {
+                alert('반환용 송장번호 발급은 한번만 가능합니다.');
+                return;
             }
         }
+
+        let courierCode = document.querySelector("#courier").value;
+        let courierName = $('#courier option:checked').text();
+
+        if (!confirm("택배사를 '" + courierName + "' 로 선택하시겠습니까?")) {
+            return;
+        }
+
+        let oldHidden = document.querySelector('#orderForm input[name="courier"]');
+        if (oldHidden) oldHidden.remove();
+
+        let hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "courier";
+        hidden.value = courierCode;
+        document.querySelector("#orderForm").appendChild(hidden);
+
+        let form = document.querySelector("#orderForm");
+        form.setAttribute('action', '/LoginInfo/Mypage/AdminInsertCourier2');
+
+        ajaxFormPromise(form)
+            .then(res => res.json())
+            .then(data => {
+                if (data.isSuccess === true) {
+                    alert(data.count + '명의 회원의 반환용 송장번호를 발급했습니다');
+                    location.reload();
+                } else {
+                    alert('반환용 송장번호 발급이 실패했습니다.');
+                }
+            });
     });
 </script>
 </body>

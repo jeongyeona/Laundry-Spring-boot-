@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -115,24 +116,22 @@ public class ServiceOrderService {
     /**
      * 주문 목록
      */
-//    public Page<ServiceOrder> getPagedOrders(String orderer, String keyword, String state, int pageNum, int pageSize) {
-//        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-//        if (state == null || state.trim().isEmpty()) {
-//            return repo.findByOrderer(orderer, pageable);
-//        } else {
-//            return repo.findByOrdererAndState(orderer, state, pageable);
-//        }
-//    }
-
-    public Page<ServiceOrder> getPagedOrders(String orderer, String keyword, String state, int pageNum, int pageSize) {
+    public Page<ServiceOrder> getPagedOrders(String orderer, String condition, String keyword, String state, int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasState = state != null && !state.trim().isEmpty();
+
         if (orderer == null || orderer.trim().isEmpty()) {
-            // 관리자: 전체 조회
-            if (state == null || state.trim().isEmpty()) {
-                return repo.findAll(pageable);
-            } else {
+            // 관리자 조회
+            if (hasKeyword && hasState) {
+                return repo.findByConditionAndState(condition, keyword, state, pageable);
+            } else if (hasKeyword) {
+                return repo.findByCondition(condition, keyword, pageable);
+            } else if (hasState) {
                 return repo.findByState(state, pageable);
+            } else {
+                return repo.findAll(pageable);
             }
         } else {
             // 일반 사용자: 본인 것만 조회
@@ -185,4 +184,68 @@ public class ServiceOrderService {
         return false;
     }
 
+    /**
+     * 송장번호 발급 및 택배사 저장
+     */
+    @Transactional
+    public int insertCourierAndInvoice(List<Integer> codes, String courier) {
+        int count = 0;
+
+        for (Integer code : codes) {
+            ServiceOrder order = repo.findById(code)
+                    .orElseThrow(() -> new IllegalArgumentException("주문 없음: " + code));
+
+            String invoice = generateRandomInvoice();
+
+            order.setGetCourier(courier);
+            order.setGetInvoiceNum(invoice);
+
+            count++;
+        }
+
+        return count;
+    }
+
+    private String generateRandomInvoice() {
+        Random rand = new Random();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 11; i++) {
+            sb.append(rand.nextInt(10)); // 0~9 무작위 숫자
+        }
+
+        return sb.toString();
+    }
+
+    @Transactional
+    public int insertReturnCourierAndInvoice(List<Integer> codes, String courier) {
+        int count = 0;
+
+        for (Integer code : codes) {
+            ServiceOrder order = repo.findById(code)
+                    .orElseThrow(() -> new IllegalArgumentException("주문 없음: " + code));
+
+            String invoice = generateRandomInvoice();
+
+            order.setSendCourier(courier);
+            order.setSendInvoiceNum(invoice);
+
+            count++;
+        }
+
+        return count;
+    }
+
+    /**
+     * 주문상태 변경
+     */
+    @Transactional
+    public int updateOrderStates(List<Integer> codes, String newState) {
+        List<ServiceOrder> orders = repo.findAllById(codes);
+        for (ServiceOrder order : orders) {
+            order.setState(newState);
+        }
+        repo.saveAll(orders);
+        return orders.size();
+    }
 }

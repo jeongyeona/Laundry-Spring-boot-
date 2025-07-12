@@ -39,10 +39,10 @@ public class ServiceOrder {
     private String state;
 
     @Column(name = "get_invoice_num")
-    private Integer getInvoiceNum;
+    private String getInvoiceNum;
 
     @Column(name = "send_invoice_num")
-    private Integer sendInvoiceNum;
+    private String sendInvoiceNum;
 
     @Column(name = "merchant_uid", length = 100)
     private String merchantUid;
@@ -84,11 +84,11 @@ public class ServiceOrder {
     public String getState() { return state; }
     public void setState(String state) { this.state = state; }
 
-    public Integer getGetInvoiceNum() { return getInvoiceNum; }
-    public void setGetInvoiceNum(Integer getInvoiceNum) { this.getInvoiceNum = getInvoiceNum; }
+    public String getGetInvoiceNum() { return getInvoiceNum; }
+    public void setGetInvoiceNum(String getInvoiceNum) { this.getInvoiceNum = getInvoiceNum; }
 
-    public Integer getSendInvoiceNum() { return sendInvoiceNum; }
-    public void setSendInvoiceNum(Integer sendInvoiceNum) { this.sendInvoiceNum = sendInvoiceNum; }
+    public String getSendInvoiceNum() { return sendInvoiceNum; }
+    public void setSendInvoiceNum(String sendInvoiceNum) { this.sendInvoiceNum = sendInvoiceNum; }
 
     public String getMerchantUid() { return merchantUid; }
     public void setMerchantUid(String merchantUid) { this.merchantUid = merchantUid; }

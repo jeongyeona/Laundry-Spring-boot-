@@ -120,18 +120,22 @@
             <th class="sizesm">수거용 송장번호</th>
             <td>
               <span th:text="${order.getInvoiceNum}"></span>
-<!--              <button th:if="${order.getCourier != null}" type="button"-->
-<!--                      th:onclick="'showPopup2(\'https://tracker.delivery/#/' + ${order.getCourier} + '/' + ${order.getInvoiceNum} + '\')'"-->
-<!--                      class="btn btn-dark" style="border-radius:0px;">배송조회</button>-->
+              <button th:if="${order.getCourier != null}"
+                      type="button"
+                      th:attr="data-courier=${order.getCourier}, data-invoice=${order.getInvoiceNum}"
+                      onclick="trackDelivery(this)"
+                      class="btn btn-dark" style="border-radius:0px;">배송조회</button>
             </td>
           </tr>
           <tr>
             <th class="sizesm">반환용 송장번호</th>
             <td>
               <span th:text="${order.sendInvoiceNum}"></span>
-<!--              <button th:if="${order.sendCourier != null}" type="button"-->
-<!--                      th:onclick="'showPopup2(\'https://tracker.delivery/#/' + ${order.sendCourier} + '/' + ${order.sendInvoiceNum} + '\')'"-->
-<!--                      class="btn btn-dark" style="border-radius:0px;">배송조회</button>-->
+              <button th:if="${order.sendCourier != null}"
+                      type="button"
+                      th:attr="data-courier=${order.sendCourier}, data-invoice=${order.sendInvoiceNum}"
+                      onclick="trackDelivery(this)"
+                      class="btn btn-dark" style="border-radius:0px;">배송조회</button>
             </td>
           </tr>
           </tbody>
@@ -206,6 +210,13 @@
     const top = ((height / 2) - (h / 2)) + dualScreenTop;
     const newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
     if (window.focus) newWindow.focus();
+  }
+
+  function trackDelivery(btn) {
+    const courier = btn.dataset.courier;
+    const invoice = btn.dataset.invoice;
+    const url = `https://tracker.delivery/#/${courier}/${invoice}`;
+    showPopup2(url);
   }
 </script>
 

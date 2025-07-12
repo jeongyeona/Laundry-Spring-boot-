@@ -397,13 +397,15 @@ public class LoginController {
             String viewName,
             Model model
     ) {
-        Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, keyword, state, pageNum, pageSize);
+        Page<ServiceOrder> page = serviceOrderService.getPagedOrders(userId, condition, keyword, state, pageNum, pageSize);
 
         int totalPages = page.getTotalPages();
         int startPageNum = Math.max(1, pageNum - 2);
         int endPageNum = Math.min(totalPages, pageNum + 2);
 
         List<Integer> pageNumbers = IntStream.rangeClosed(startPageNum, endPageNum).boxed().toList();
+
+        List<String> states = Arrays.asList("결제완료", "환불완료", "수거중", "수거완료", "세탁중", "세탁완료", "반환중", "반환완료");
 
         model.addAttribute("list", page.getContent());
         model.addAttribute("pageNum", pageNum);
@@ -415,6 +417,7 @@ public class LoginController {
         model.addAttribute("condition", condition);
         model.addAttribute("keyword", keyword);
         model.addAttribute("state", state);
+        model.addAttribute("states", states);
 
         return viewName;
     }
