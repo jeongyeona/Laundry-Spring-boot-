@@ -75,10 +75,10 @@
             <!-- 관리자 서브 네비 -->
             <ul th:case="'manager'" id="subNavUl">
               <li class="subNavItem" th:classappend="${subPage=='user'} ? ' deco' : ''">
-                <a th:href="@{/mypage/user.do}" th:classappend="${subPage=='user'} ? ' active' : ''">고객관리</a>
+                <a th:href="@{/LoginInfo/Mypage/MyInfo}" th:classappend="${subPage=='user'} ? ' active' : ''">고객관리</a>
               </li>
               <li class="subNavItem" th:classappend="${subPage=='order'} ? ' deco' : ''">
-                <a th:href="@{/mypage/order.do}" th:classappend="${subPage=='order'} ? ' active' : ''">주문관리</a>
+                <a th:href="@{/LoginInfo/Mypage/OrderList}" th:classappend="${subPage=='order'} ? ' active' : ''">주문관리</a>
               </li>
             </ul>
           </div>

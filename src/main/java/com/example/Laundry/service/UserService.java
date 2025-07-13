@@ -6,6 +6,10 @@ import com.example.Laundry.dto.UserCreateDto;
 import com.example.Laundry.dto.UserResponseDto;
 import com.example.Laundry.mapper.UserMapper;
 import com.example.Laundry.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;    // 추가
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -228,5 +232,43 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
 
         user.setProfile(imagePath);
         userRepository.save(user);
+    }
+
+    /**
+     * 관리자 고객관리
+     */
+    public Page<User> getUserList(String condition, String keyword, String manager, int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize, Sort.by("regdate").descending());
+
+        boolean hasKeyword = (keyword != null && !keyword.trim().isEmpty());
+        boolean isFilteringManager = (manager != null && !"all".equals(manager));
+
+        if (!hasKeyword && !isFilteringManager) {
+            return userRepository.findAll(pageable);
+        }
+
+        if (hasKeyword) {
+            if ("usdrId".equals(condition)) {
+                return isFilteringManager
+                        ? userRepository.findByIdContainingAndManager(keyword, manager, pageable)
+                        : userRepository.findByIdContaining(keyword, pageable);
+            } else if ("usdrName".equals(condition)) {
+                return isFilteringManager
+                        ? userRepository.findByNameContainingAndManager(keyword, manager, pageable)
+                        : userRepository.findByNameContaining(keyword, pageable);
+            }
+        }
+
+        // 키워드는 없고 manager 조건만 있는 경우
+        return userRepository.findByManager(manager, pageable);
+    }
+    
+    /**
+     * 관리자 고객 삭제
+     */
+    public int deleteUsersByIds(List<String> ids) {
+        List<User> usersToDelete = userRepository.findAllById(ids);
+        userRepository.deleteAll(usersToDelete);
+        return usersToDelete.size();
     }
 }

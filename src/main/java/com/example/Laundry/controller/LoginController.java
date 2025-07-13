@@ -2,6 +2,7 @@ package com.example.Laundry.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -212,20 +213,51 @@ public class LoginController {
 
     //개인정보 수정 반영 요청 처리
     @RequestMapping("/Mypage/MyInfo")
-    public String userInfoPage(HttpSession session, HttpServletRequest request, Model model) {
+    public String userInfoPage(
+            HttpSession session,
+            HttpServletRequest request,
+            Model model,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "all") String manager
+    ) {
         String userId = (String) session.getAttribute("LOGIN_USER");
 
         if (userId == null) {
-            return "redirect:/login"; // 로그인 안 되어 있으면 로그인 페이지로
+            return "redirect:/login";
         }
 
         UserResponseDto dto = userService.findById(userId);
-        model.addAttribute("contextPath", request.getContextPath()); // 추가
-        model.addAttribute("id", userId);
 
+        // 관리자일 경우 → 사용자 목록 페이지 보여주기
+        if ("Y".equals(dto.manager())) {
+            Page<User> page = userService.getUserList(condition, keyword, manager, pageNum, pageSize);
+
+            model.addAttribute("userList", page.getContent());
+            model.addAttribute("pageNum", pageNum);
+            model.addAttribute("totalPageCount", page.getTotalPages());
+            model.addAttribute("totalRow", page.getTotalElements());
+            model.addAttribute("condition", condition);
+            model.addAttribute("keyword", keyword);
+            model.addAttribute("manager", manager);
+            model.addAttribute("encodedK", URLEncoder.encode(keyword == null ? "" : keyword, StandardCharsets.UTF_8));
+            model.addAttribute("thisPage", "mypage");
+            model.addAttribute("subPage", "user");
+
+            return "LoginInfo/Mypage/admin/UserList"; // ✅ 관리자용 목록 뷰
+        }
+
+        // 일반 사용자일 경우 → 내 정보 화면
         model.addAttribute("dto", dto);
-        return "LoginInfo/Mypage/MyInfo";
+        model.addAttribute("id", userId);
+        model.addAttribute("thisPage", "mypage");
+        model.addAttribute("subPage", "info");
+
+        return "LoginInfo/Mypage/MyInfo"; // ✅ 사용자용 마이페이지 뷰
     }
+
 
     @RequestMapping("/Mypage/MyInfoUpdateForm")
     public String showUpdateForm(HttpSession session, Model model) {
@@ -474,4 +506,21 @@ public class LoginController {
         return "LoginInfo/Mypage/OrderDetail";
     }
 
+
+    @PostMapping("/Mypage/AdminDeleteUser")
+    @ResponseBody
+    public Map<String, Object> deleteUsers(@RequestParam("users") List<String> ids) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            int deletedCount = userService.deleteUsersByIds(ids);
+            result.put("isSuccess", true);
+            result.put("count", deletedCount);
+        } catch (Exception e) {
+            result.put("isSuccess", false);
+            result.put("message", e.getMessage());
+        }
+
+        return result;
+    }
 }

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>고객관리</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/nav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subnav.css}"/>
+  <link rel="stylesheet" th:href="@{/css/subFooter.css}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+      html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+      }
+      #subMenuText{
+          height: 80px;
+          position:relative;
+      }
+      #user_wr{
+          flex: 1;
+          display:flex;
+          justify-content: center;
+          font-size:16px;
+      }
+      #body_content{
+          display:flex;
+          flex-direction: column;
+          align-items: center;
+      }
+      #user_table{
+          text-align:center;
+      }
+      #user_table table{
+          width: 1000px;
+      }
+      #body_content thead th{
+          padding-bottom: 15px;
+          border-bottom: 3px solid black;
+      }
+      #body_content tbody tr:hover{
+          color : rgba(0, 0, 0, 0.6) !important;
+      }
+      .footer-sticky {
+          margin-top: auto;
+      }
+      #condition{
+          width:120px;
+          display:inline-block;
+      }
+      #keyword{
+          width:700px;
+          display:inline-block;
+      }
+      #searchForm{
+          display:inline-block
+      }
+      .btn{
+          border-radius:0px;
+      }
+      /*page css*/
+      .page-ui{margin: 30px auto;}
+      .page-ui a{
+          text-decoration: none;
+          color :black;
+      }
+
+      .page-ui a:hover{
+          text-decoration: underline;
+      }
+
+      .page-ui a.active{
+          color: black;
+          text-decoration: underline;
+      }
+      .page-ui ul{
+          list-style-type: none;
+          padding: 0;
+      }
+
+      .page-ui ul > li{
+          float: left;
+      }
+  </style>
+</head>
+<body>
+<div th:replace="fragments/nav :: nav"></div>
+<div th:replace="fragments/subnav :: subnav('manager','user')"></div>
+
+<div id="user_wr" class="container">
+  <div id="body_content">
+    <div style="width:100%;" class="mb-3">
+      <form th:action="@{/LoginInfo/Mypage/MyInfo}" method="get" id="searchForm">
+        <select name="condition" id="condition" class="form-select form-select-lg">
+          <option value="usdrId" th:selected="${condition == 'usdrId'}">아이디</option>
+          <option value="usdrName" th:selected="${condition == 'usdrName'}">이름</option>
+        </select>
+        <input type="text" class="form-control form-control-lg" id="keyword" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" />
+        <button type="submit" class="btn btn-dark btn-lg">검색</button>
+      </form>
+      <button id="deleteBtn" class="btn btn-dark btn-lg">삭제</button>
+    </div>
+
+    <div id="user_table">
+      <form th:action="@{/LoginInfo/Mypage/AdminDeleteUser}" method="post" id="userForm">
+        <table class="table">
+          <thead>
+          <tr>
+            <th><input type="checkbox" id="allCheck" class="form-check-input" /></th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>전화번호</th>
+            <th>가입일</th>
+            <th>
+              <select id="manager" class="form-select" style="width: 100px;text-align:center;">
+                <option value="all" th:selected="${manager == 'all'}">전체</option>
+                <option value="N" th:selected="${manager == 'N'}">고객</option>
+                <option value="Y" th:selected="${manager == 'Y'}">관리자</option>
+              </select>
+            </th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="selectRow" th:each="user : ${userList}">
+            <td><input type="checkbox" name="users" th:value="${user.id}" class="form-check-input" /></td>
+            <td th:text="${user.id}">아이디</td>
+            <td th:text="${user.name}">이름</td>
+            <td th:text="${user.email}">이메일</td>
+            <td th:text="${user.phone}">전화</td>
+            <td th:text="${#temporals.format(user.regdate, 'yyyy-MM-dd HH:mm:ss')}">가입일</td>
+            <td th:text="${user.manager == 'Y' ? '관리자' : '고객'}"></td>
+            <td><button type="button" class="btn btn-dark" th:onclick="'updateManger(\'' + [[${user.id}]] + '\', \'' + [[${user.manager}]] + '\')'">변경</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div class="page-ui clearfix" style="display:flex; justify-content:center;">
+      <ul class="pagination">
+        <li class="page-item" th:if="${startPageNum != null and startPageNum > 1}">
+          <a class="page-link" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${startPageNum != null ? startPageNum - 1 : 1}, condition=${condition}, keyword=${encodedK})}">Prev</a>
+        </li>
+
+        <li class="page-item" th:each="i : ${#numbers.sequence(startPageNum != null ? startPageNum : 1, endPageNum != null ? endPageNum : 1)}">
+          <a class="page-link" th:classappend="${pageNum == i} ? 'active'" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${i}, condition=${condition}, keyword=${encodedK})}" th:text="${i}">1</a>
+        </li>
+
+        <li class="page-item" th:if="${endPageNum != null and totalPageCount != null and endPageNum < totalPageCount}">
+          <a class="page-link" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${endPageNum != null ? endPageNum + 1 : 1}, condition=${condition}, keyword=${encodedK})}">Next</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div style="clear:both;"></div>
+
+<!-- footer -->
+<div class="footer-sticky" th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/gura_util.js}"></script>
+<script>
+  /* document.querySelector("#check_${tmp.id }").addEventListener("change",function(evnet){
+      alert('test');
+  }) */
+
+  //행 선택시 체크박스가 체크/해지되도록 설정
+  let selectRows=document.querySelectorAll(".selectRow");
+  let checks=document.querySelectorAll('.selectRow input[type=checkbox]');
+  for(let i=0;i<selectRows.length;i++){
+      selectRows[i].addEventListener("click", function(){
+          if(checks[i].checked==false){
+              checks[i].checked =true;
+          }else{
+              checks[i].checked =false;
+          }
+
+      });
+  }
+  for(let i=0;i<checks.length;i++){
+      checks[i].addEventListener("click", function(event){
+          event.stopPropagation(); //부모객체에 전파되는걸 막는 함수
+      });
+  }
+
+  document.querySelector("#allCheck").addEventListener("click",function(){
+      for(let i=0;i<selectRows.length;i++){
+          if(this.checked==true){
+              checks[i].checked =true;
+          }else{
+              checks[i].checked =false;
+          }
+      }
+  });
+
+  //삭제버튼을 누르면 체크된 행들의 id를 모아 삭제하기
+  document.querySelector("#deleteBtn").addEventListener("click", function(){
+      let deleteUsers=document.querySelectorAll('.selectRow input[type=checkbox]:checked');
+
+      if(deleteUsers.length==0){
+          alert("삭제할 회원을 선택해주세요.");
+          return;
+      }else{
+          if (!confirm("회원을 삭제하시겠습니까?")) {
+              return;
+          } else {
+              let form=document.querySelector("#userForm");
+              ajaxFormPromise(form)
+              .then(function(res){
+                  return res.json();
+              })
+              .then(function(data){
+                  if(data.isSuccess == true){
+                      alert(data.count+'명의 회원을 삭제했습니다');
+                      location.reload();
+                  }else{
+                      alert('회원 삭제에 실패했습니다.');
+                  }
+              });
+          }
+      }
+  });
+
+  function updateManger(id,manager){
+      let msg="";
+      if(manager=='Y'){
+          msg="고객으로 변경하겠습니까?";
+      }else{
+          msg="관리자로 변경하겠습니까?";
+      }
+
+      if (!confirm(msg)) {
+          return;
+      } else{
+          ajaxPromise('admin_user_update.do', 'get', "id="+id+"&manager="+ manager)
+          .then(function(res){
+              return res.json();
+          })
+          .then(function(data){
+              if(data.isSuccess == true){
+                  alert('수정을 완료했습니다');
+                  location.reload();
+              }else{
+                  alert('수정에 실패했습니다.');
+              }
+          });
+      }
+  }
+
+  document.querySelector("#manager").addEventListener("change", function () {
+      let val = this.value;
+      let condition = /*[[${condition}]]*/ '';
+      let encodedK = /*[[${encodedK}]]*/ '';
+      location.href = "/LoginInfo/Mypage/MyInfo?manager=" + val + "&condition=" + condition + "&keyword=" + encodedK;
+  });
+</script>
+</body>
+</html>
