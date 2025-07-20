@@ -474,8 +474,12 @@ public class LoginController {
 
         // 주문 정보
         ServiceOrder order = serviceOrderService.findOrderByCode(orderCode);
-        if (order == null || !order.getOrderer().equals(userId)) {
-            return "redirect:/Mypage/OrderList"; // 해당 주문이 없거나 본인 주문이 아닌 경우 목록으로 리다이렉트
+        if (order == null) {
+            return "redirect:/Mypage/OrderList";
+        }
+
+        if (!"Y".equals(user.manager()) && !order.getOrderer().equals(userId)) {
+            return "redirect:/Mypage/OrderList";
         }
 
         // 주문 품목
@@ -522,5 +526,23 @@ public class LoginController {
         }
 
         return result;
+    }
+
+    @PostMapping("/Mypage/AdminUserUpdate")
+    public ResponseEntity<Map<String, Object>> updateUserManager(@RequestBody Map<String, String> payload) {
+        String id = payload.get("id");
+        String manager = payload.get("manager");
+
+        Map<String, Object> result = new HashMap<>();
+        String outcome = userService.updateManagerRole(id, manager);
+
+        if ("success".equals(outcome)) {
+            result.put("isSuccess", true);
+        } else {
+            result.put("isSuccess", false);
+            result.put("reason", outcome);
+        }
+
+        return ResponseEntity.ok(result);
     }
 }

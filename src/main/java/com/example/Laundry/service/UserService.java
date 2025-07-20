@@ -6,6 +6,7 @@ import com.example.Laundry.dto.UserCreateDto;
 import com.example.Laundry.dto.UserResponseDto;
 import com.example.Laundry.mapper.UserMapper;
 import com.example.Laundry.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -271,4 +272,23 @@ public class UserService implements UserDetailsService {    // ← 여기에 imp
         userRepository.deleteAll(usersToDelete);
         return usersToDelete.size();
     }
+
+    /**
+     * 관리자 변경
+     */
+    public String updateManagerRole(String id, String manager) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) return "not_found";
+
+        // 이미 원하는 상태인 경우
+        if (user.getManager().equals("N")) {
+            user.setManager("Y");
+        } else {
+            user.setManager("N");
+        }
+
+        userRepository.save(user);
+        return "success";
+    }
+
 }

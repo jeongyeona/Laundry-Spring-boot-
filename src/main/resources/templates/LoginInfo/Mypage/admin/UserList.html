@@ -128,14 +128,18 @@
           </thead>
           <tbody>
           <tr class="selectRow" th:each="user : ${userList}">
-            <td><input type="checkbox" name="users" th:value="${user.id}" class="form-check-input" /></td>
+            <td><input type="radio" name="users" th:value="${user.id}" class="form-check-input" /></td>
             <td th:text="${user.id}">아이디</td>
             <td th:text="${user.name}">이름</td>
             <td th:text="${user.email}">이메일</td>
             <td th:text="${user.phone}">전화</td>
             <td th:text="${#temporals.format(user.regdate, 'yyyy-MM-dd HH:mm:ss')}">가입일</td>
             <td th:text="${user.manager == 'Y' ? '관리자' : '고객'}"></td>
-            <td><button type="button" class="btn btn-dark" th:onclick="'updateManger(\'' + [[${user.id}]] + '\', \'' + [[${user.manager}]] + '\')'">변경</button></td>
+            <td>
+              <button type="button" class="btn btn-dark"
+                      th:attr="data-id=${user.id}, data-manager=${user.manager}"
+                      onclick="event.stopPropagation(); updateManger(this)">변경</button>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -146,15 +150,15 @@
     <div class="page-ui clearfix" style="display:flex; justify-content:center;">
       <ul class="pagination">
         <li class="page-item" th:if="${startPageNum != null and startPageNum > 1}">
-          <a class="page-link" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${startPageNum != null ? startPageNum - 1 : 1}, condition=${condition}, keyword=${encodedK})}">Prev</a>
+          <a class="page-link" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${startPageNum != null ? startPageNum - 1 : 1}, condition=${condition}, keyword=${keyword}, manager=${manager})}">Prev</a>
         </li>
 
         <li class="page-item" th:each="i : ${#numbers.sequence(startPageNum != null ? startPageNum : 1, endPageNum != null ? endPageNum : 1)}">
-          <a class="page-link" th:classappend="${pageNum == i} ? 'active'" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${i}, condition=${condition}, keyword=${encodedK})}" th:text="${i}">1</a>
+          <a class="page-link" th:classappend="${pageNum == i} ? 'active'" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${i}, condition=${condition}, keyword=${keyword}, manager=${manager})}" th:text="${i}">1</a>
         </li>
 
         <li class="page-item" th:if="${endPageNum != null and totalPageCount != null and endPageNum < totalPageCount}">
-          <a class="page-link" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${endPageNum != null ? endPageNum + 1 : 1}, condition=${condition}, keyword=${encodedK})}">Next</a>
+          <a class="page-link" th:href="@{'/LoginInfo/Mypage/MyInfo'(pageNum=${endPageNum != null ? endPageNum + 1 : 1}, condition=${condition}, keyword=${keyword}, manager=${manager})}">Next</a>
         </li>
       </ul>
     </div>
@@ -227,30 +231,44 @@
       }
   });
 
-  function updateManger(id,manager){
-      let msg="";
-      if(manager=='Y'){
-          msg="고객으로 변경하겠습니까?";
-      }else{
-          msg="관리자로 변경하겠습니까?";
+  function updateManger(button) {
+      let row = button.closest('tr');
+      let checkbox = row.querySelector('input[type="radio"]');
+
+      if (!checkbox || !checkbox.checked) {
+          alert('변경하려면 먼저 해당 항목을 체크하세요.');
+          return;
       }
 
-      if (!confirm(msg)) {
-          return;
-      } else{
-          ajaxPromise('admin_user_update.do', 'get', "id="+id+"&manager="+ manager)
-          .then(function(res){
-              return res.json();
-          })
-          .then(function(data){
-              if(data.isSuccess == true){
-                  alert('수정을 완료했습니다');
-                  location.reload();
-              }else{
-                  alert('수정에 실패했습니다.');
-              }
-          });
-      }
+      let id = button.dataset.id;
+      let manager = button.dataset.manager;
+
+      let msg = (manager === 'Y')
+          ? "고객으로 변경하겠습니까?"
+          : "관리자로 변경하겠습니까?";
+
+      if (!confirm(msg)) return;
+
+      fetch('/LoginInfo/Mypage/AdminUserUpdate', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id, manager })
+      })
+      .then(res => res.json())
+      .then(data => {
+          if (data.isSuccess) {
+              alert('수정을 완료했습니다');
+              location.reload();
+          } else {
+              alert('수정에 실패했습니다.');
+          }
+      })
+      .catch(err => {
+          console.error(err);
+          alert('오류가 발생했습니다.');
+      });
   }
 
   document.querySelector("#manager").addEventListener("change", function () {
