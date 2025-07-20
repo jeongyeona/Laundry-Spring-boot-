@@ -120,7 +120,7 @@ public class ServiceOrderService {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
-        boolean hasState = state != null && !state.trim().isEmpty();
+        boolean hasState = state != null && !state.trim().isEmpty() && !"상태".equals(state);
 
         if (orderer == null || orderer.trim().isEmpty()) {
             // 관리자 조회
