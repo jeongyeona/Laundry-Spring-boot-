@@ -273,8 +273,7 @@ public class LoginController {
         return "LoginInfo/Mypage/MyInfoUpdateForm";
     }
 
-    // 파일 저장 위치는 application.properties 또는 하드코딩 가능
-    @Value("${upload.path:/upload}")
+    @Value("${file.upload.path}")
     private String uploadPath;
 
     @PostMapping("/Mypage/ajax_profile_upload")
@@ -290,7 +289,7 @@ public class LoginController {
         }
 
         String originalFilename = StringUtils.cleanPath(imageFile.getOriginalFilename());
-        String savedName = UUID.randomUUID().toString() + "_" + originalFilename;
+        String savedName = UUID.randomUUID() + "_" + originalFilename;
 
         try {
             File uploadDir = new File(uploadPath);
@@ -304,8 +303,8 @@ public class LoginController {
             String imagePath = "/upload/" + savedName;
 
             userService.updateProfileImage(userId, imagePath);
+            result.put("imagePath", imagePath);
 
-            result.put("imagePath", "/upload/" + savedName);
             return ResponseEntity.ok(result);
 
         } catch (IOException e) {
@@ -313,6 +312,7 @@ public class LoginController {
             return ResponseEntity.internalServerError().body(result);
         }
     }
+
 
     @PostMapping("/Mypage/MyInfoUpdate")
     public String updateUser(@ModelAttribute UserResponseDto dto, HttpSession session, RedirectAttributes ra) {
