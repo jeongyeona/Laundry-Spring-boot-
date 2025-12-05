@@ -89,8 +89,7 @@
         <td th:text="${item.reservationDate}"></td>
         <td th:text="${item.state != null && !#strings.isEmpty(item.state) ? item.state : '예약완료'}"></td>
         <td th:if="${item.orderer == id and item.state == '반환완료'}">
-          <a th:href="@{/review/insertform(code=${item.code})}">
-            <!-- SVG 아이콘 생략 가능 -->
+          <a th:href="@{/Review/ReviewDetail(code=${item.code})}">
             작성하기
           </a>
         </td>

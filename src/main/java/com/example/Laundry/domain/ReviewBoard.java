@@ -32,6 +32,9 @@ public class ReviewBoard {
 
     private Integer star;
 
+    @Column(name = "ref_order_code", nullable = false /*, unique = true*/)
+    private Integer refOrderCode;
+
     // Getters and Setters
     public Integer getNum() { return num; }
     public void setNum(Integer num) { this.num = num; }
@@ -53,4 +56,7 @@ public class ReviewBoard {
 
     public Integer getStar() { return star; }
     public void setStar(Integer star) { this.star = star; }
+
+    public Integer getRefOrderCode() { return refOrderCode; }
+    public void setRefOrderCode(Integer refOrderCode) { this.refOrderCode = refOrderCode; }
 }

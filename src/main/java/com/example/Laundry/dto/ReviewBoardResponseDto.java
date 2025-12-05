@@ -10,5 +10,6 @@ public record ReviewBoardResponseDto(
         String content,
         Integer viewCount,
         LocalDate regdate,
-        Integer star
+        Integer star,
+        Integer refOrderCode
 ) {}

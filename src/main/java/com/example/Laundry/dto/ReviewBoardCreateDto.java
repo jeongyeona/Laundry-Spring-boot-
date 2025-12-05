@@ -9,5 +9,6 @@ public record ReviewBoardCreateDto(
         String content,
         Integer viewCount,
         LocalDate regdate,
-        Integer star
+        Integer star,
+        Integer refOrderCode
 ) {}

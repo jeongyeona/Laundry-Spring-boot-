@@ -116,7 +116,7 @@
         <tr th:each="tmp : ${list}"
             class="tr_hover"
             style="cursor:pointer"
-            th:onclick="|window.location='@{/Review/ReviewDetail(num=${tmp.num}, condition=${condition}, keyword=${encodedK})}'|">
+            th:onclick="|window.location='@{/Review/ReviewDetail(code=${tmp.refOrderCode})}'|">
             <td th:text="${tmp.num}">1</td>
             <td th:text="${tmp.writer}">작성자</td>
             <td th:text="${tmp.title}">제목</td>
@@ -170,4 +170,8 @@
 <!-- 푸터 (고정) -->
 <div class="footer-fixed" th:replace="fragments/footer :: footer"></div>
 </body>
+
+<script th:if="${msg}" th:inline="javascript">
+    alert([[${msg}]]);
+</script>
 </html>
