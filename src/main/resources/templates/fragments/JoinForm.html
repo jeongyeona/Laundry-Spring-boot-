@@ -161,11 +161,15 @@
 
     // 아이디 중복검사
     document.getElementById('id').addEventListener('input', function(){
+      isIdValid = false;
+
       let el = this;
       let v  = el.value;
 
+      var idReg = /^[A-Za-z][A-Za-z0-9]{4,14}$/;
+
       el.classList.remove('is-valid','is-invalid');
-      if (!/^[a-z].{4,9}$/.test(v)) {
+      if (!idReg.test(v)) {
         isIdValid = false;
         el.classList.add('is-invalid');
         return;
@@ -243,7 +247,7 @@
       // 1) 입력할 때마다 형식 검사
       email.addEventListener('input', function() {
         let ok = reg.test(this.value);
-        isEmailValid = ok;
+        isEmailValid = false;
 
         this.classList.toggle('is-valid',   ok);
         this.classList.toggle('is-invalid', !ok);
@@ -300,13 +304,6 @@
       }
     });
 
-    // 상세주소 입력 확인
-    document.getElementById('detailAddr').addEventListener('input', function(){
-      isAddrValid02 = this.value.trim().length>0;
-      this.classList.toggle('is-valid', isAddrValid02);
-      this.classList.toggle('is-invalid', !isAddrValid02);
-    });
-
     // 전화번호
     document.addEventListener('DOMContentLoaded', () => {
       let phone = document.getElementById('phone');
@@ -328,30 +325,72 @@
     });
 
     // 폼 제출 전 최종 검증
-   document.getElementById('signupForm').addEventListener('submit', function(e){
-      console.log({
-        isNameValid,
-        isIdValid,
-        isPwdValid,
-        isEmailValid,
-        isPhoneValid,
-        isAddrValid01,
-        isAddrValid02
-      });
-      let valid = isNameValid && isIdValid && isPwdValid
-                  && isEmailValid && isPhoneValid
-                  && isAddrValid01 && isAddrValid02;
+    document.getElementById('signupForm').addEventListener('submit', function(e){
+
+      // 1) submit 시점에 값 기준으로 재검증 (플래그 재계산)
+      var nameVal = document.getElementById('name').value.trim();
+      var idVal   = document.getElementById('id').value.trim();
+      var emailVal= document.getElementById('email').value.trim();
+      var pwdVal  = document.getElementById('pwd').value;
+      var pwd2Val = document.getElementById('pwd2').value;
+      var phoneVal= document.getElementById('phone').value.trim();
+
+      var postcodeVal = document.getElementById('postcode').value.trim();
+      var addrVal     = document.getElementById('addr').value.trim();
+      var detailVal   = document.getElementById('detailAddr').value.trim();
+
+      var regName  = /^[가-힣]+$/;
+      var regId    = /^[A-Za-z][A-Za-z0-9]{4,14}$/;
+      var regEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var regPwd   = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^]).{8,}$/;
+      var regPhone = /^01[016789]\d{7,8}$/;
+
+      isNameValid = regName.test(nameVal);
+      // isIdValid / isEmailValid 는 "중복체크 결과"가 필요하니 여기서 강제 true로 만들면 안 됨.
+      // 다만, 최소한 형식이 맞는지는 submit에서 보장할 수 있음.
+      var isIdFormatOk    = regId.test(idVal);
+      var isEmailFormatOk = regEmail.test(emailVal);
+
+      isPwdValid   = regPwd.test(pwdVal) && pwdVal === pwd2Val && pwd2Val.length > 0;
+      isPhoneValid = regPhone.test(phoneVal);
+
+      // 주소: 팝업을 안 열었더라도 값이 채워졌으면 통과시키는 정책으로 변경
+      isAddrValid01 = postcodeVal.length > 0 && addrVal.length > 0;
+      isAddrValid02 = detailVal.length > 0;
+
+      // country 선택 여부도 submit에서 확인
+      var countryOk = document.getElementById('countryCodeSelect').value.trim() !== "";
+
+      var valid = isNameValid
+                  && isIdFormatOk && isIdValid       // isIdValid는 기존 중복체크 결과 존중
+                  && isPwdValid
+                  && isEmailFormatOk && isEmailValid // isEmailValid도 기존 중복체크 결과 존중
+                  && isPhoneValid
+                  && isAddrValid01 && isAddrValid02
+                  && countryOk;
+
+      if (isIdFormatOk && !isIdValid) {
+        e.preventDefault();
+        alert('아이디 중복확인을 완료해주세요.');
+        return;
+      }
+      if (isEmailFormatOk && !isEmailValid) {
+        e.preventDefault();
+        alert('이메일 중복확인을 완료해주세요.');
+        return;
+      }
+
+      // 2) 나머지 포함 전체 검증
       if (!valid) {
         e.preventDefault();
         alert('입력하신 정보를 다시 확인해주세요.');
-      } else {
-        document.getElementById('totalAddr').value =
-          [document.getElementById('postcode').value,
-           document.getElementById('addr').value,
-           document.getElementById('detailAddr').value,
-           document.getElementById('extraAddr').value].join('_');
+        return;
       }
-  });
+
+      // 3) 통과 시 hidden 값 세팅
+      document.getElementById('totalAddr').value =
+        [postcodeVal, addrVal, detailVal, document.getElementById('extraAddr').value].join('_');
+    });
 
   document.addEventListener('DOMContentLoaded', function() {
     let select = document.getElementById('countryCodeSelect');
