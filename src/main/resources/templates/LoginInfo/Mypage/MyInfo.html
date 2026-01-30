@@ -70,16 +70,15 @@
 </script>
 <script th:inline="javascript">
   function deleteConfirm() {
-    let userId = document.getElementById("userInfo").dataset.userId;
-    let ctx = /*[[${contextPath}]]*/ '';
-    let isDelete = confirm(userId + " 님 탈퇴 하시겠습니까?");
-    if (isDelete) {
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = ctx + "/LoginInfo/Mypage/MyInfoDelete";
-      document.body.appendChild(form);
-      form.submit();
-    }
+    var userId = document.getElementById("userInfo").dataset.userId;
+    var isDelete = confirm(userId + " 님 탈퇴 하시겠습니까?");
+    if (!isDelete) return;
+
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/LoginInfo/Mypage/MyInfoDelete"; // 절대경로 고정
+    document.body.appendChild(form);
+    form.submit();
   }
 </script>
 </body>
