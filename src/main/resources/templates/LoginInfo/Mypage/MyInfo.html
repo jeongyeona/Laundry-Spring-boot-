@@ -14,10 +14,29 @@
 
   <style>
     html, body { height: 100%; margin: 0; }
-    #wrapper { min-height: 100%; display: flex; flex-direction: column; }
-    .content { flex: 1; }
+
+    #wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content {
+      flex: 1;
+      padding-top: 20px;
+      padding-bottom: 40px;
+    }
+
     img { width: 100px; height: 100px; }
     #profileImage { width: 100px; height: 100px; border-radius: 50%; }
+
+    .n-table { margin-bottom: 0; }
+    .lshbtnbox { margin-top: 16px; margin-bottom: 0; } /* 버튼과 아래 영역 여유 */
+
+    .footer, footer, .subFooter {
+      margin-top: 0;
+      padding-top: 16px;
+    }
   </style>
 </head>
 <body>
