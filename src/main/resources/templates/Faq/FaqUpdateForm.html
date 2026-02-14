@@ -40,7 +40,7 @@
       <label for="category" class="form-label">카테고리</label>
       <select id="category" name="category" class="form-select">
         <option value="" disabled>카테고리 선택</option>
-        <option value="service" th:selected="${dto.category == 'service'}">서비스이용</option>
+        <option value="service" th:selected="${dto.category == 'service'}">서비스 이용</option>
         <option value="order"   th:selected="${dto.category == 'order'}">주문·결제·배송</option>
         <option value="member"  th:selected="${dto.category == 'member'}">회원정보</option>
         <option value="etc"     th:selected="${dto.category == 'etc'}">기타</option>
@@ -91,39 +91,61 @@
       fCreator: "createSEditor2"
     });
 
-	function pasteHTML() {
-		var sHTML = "<span style='color:#FF0000;'>이미지도 같은 방식으로 삽입합니다.<\/span>";
-		oEditors.getById["content"].exec("PASTE_HTML", [sHTML]);
-	}
+    // (옵션) 기존 함수들 유지해도 됨
+    function pasteHTML() {
+      var sHTML = "<span style='color:#FF0000;'>이미지도 같은 방식으로 삽입합니다.<\/span>";
+      oEditors.getById["content"].exec("PASTE_HTML", [sHTML]);
+    }
+    function showHTML() {
+      var sHTML = oEditors.getById["content"].getIR();
+      alert(sHTML);
+    }
+    function setDefaultFont() {
+      var sDefaultFont = '궁서';
+      var nFontSize = 24;
+      oEditors.getById["content"].setDefaultFont(sDefaultFont, nFontSize);
+    }
 
-	function showHTML() {
-		var sHTML = oEditors.getById["content"].getIR();
-		alert(sHTML);
-	}
+    // ✅ 이 함수만 남기기 (기존 submitContents 두 개는 삭제)
+    function submitContents(elClickedObj) {
+      oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
 
-   	function setDefaultFont() {
-		var sDefaultFont = '궁서';
-		var nFontSize = 24;
-		oEditors.getById["content"].setDefaultFont(sDefaultFont, nFontSize);
-	}
+      var category = document.querySelector("#category").value;
+      var title = document.querySelector("#title").value.trim();
+      var content = document.querySelector("#content").value;
 
-		function submitContents(elClickedObj) {
-		oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+      var contentText = content
+        .replace(/<br\s*\/?>/gi, "")
+        .replace(/&nbsp;/gi, "")
+        .replace(/<\/?p[^>]*>/gi, "")
+        .replace(/\s/g, "")
+        .trim();
 
-		try {
-			elClickedObj.form.submit();
-		} catch(e) {}
-	}
-
-	function submitContents(elClickedObj) {
-      if (!confirm('정말 수정하시겠습니까?')) {
+      // 1) 검증
+      if (!category) {
+        alert("카테고리를 선택해주세요.");
+        document.querySelector("#category").focus();
         return;
       }
 
-      // 2) 에디터 내용 textarea에 업데이트
-      oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+      if (!title) {
+        alert("질문을 입력해주세요.");
+        document.querySelector("#title").focus();
+        return;
+      }
 
-      // 3) 폼 제출
+      if (!contentText) {
+        alert("답변 내용을 입력해주세요.");
+        try { oEditors.getById["content"].exec("FOCUS"); } catch (e) {}
+        return;
+      }
+
+      // 2) 최종 확인
+      if (!confirm("정말 수정하시겠습니까?")) {
+        return;
+      }
+
+      // 3) 제출
       try {
         elClickedObj.form.submit();
       } catch (e) {}

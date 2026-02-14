@@ -87,12 +87,49 @@
       fCreator: "createSEditor2"
     });
 
-    document.querySelector("#insertForm")
-    .addEventListener("submit", function(e){
-      if (!confirm('저장하시겠습니까?')) {
+    document.querySelector("#insertForm").addEventListener("submit", function(e){
+      oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+
+      var category = document.querySelector("#category").value;
+      var title = document.querySelector("#title").value.trim();
+      var content = document.querySelector("#content").value;
+
+      var contentText = content
+        .replace(/<br\s*\/?>/gi, "")
+        .replace(/&nbsp;/gi, "")
+        .replace(/<\/?p[^>]*>/gi, "")
+        .replace(/\s/g, "")
+        .trim();
+
+      // 2) 검증
+      if (!category) {
+        alert("카테고리를 선택해주세요.");
+        document.querySelector("#category").focus();
         e.preventDefault();
         return;
       }
+
+      if (!title) {
+        alert("질문을 입력해주세요.");
+        document.querySelector("#title").focus();
+        e.preventDefault();
+        return;
+      }
+
+      if (!contentText) {
+        alert("답변 내용을 입력해주세요.");
+        // 에디터 포커스(가능하면)
+        try { oEditors.getById["content"].exec("FOCUS"); } catch (err) {}
+        e.preventDefault();
+        return;
+      }
+
+      // 3) 최종 확인
+      if (!confirm("저장하시겠습니까?")) {
+        e.preventDefault();
+        return;
+      }
+
       oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
       alert('저장되었습니다.');
     });
