@@ -99,7 +99,7 @@
           <dd>
             <select id="product" class="form-select">
               <optgroup label="상품선택">
-                <option value="">선택해주세요</option>
+                <option value="" disabled selected>선택해주세요</option>
                 <option th:each="item : ${list}"
                         th:attr="data-inum=${item.inum}"
                         th:value="${item.price}"
@@ -217,10 +217,45 @@
 
 <script th:inline="javascript">
   /*<![CDATA[*/
-    $(function(){
+    $(function () {
       $.datetimepicker.setLocale("ko");
-      $("#one").datetimepicker({ minDate: 0 });
+
+      var tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+
+      if ($("#one").data("xdsoft_datetimepicker")) {
+        $("#one").datetimepicker("destroy");
+      }
+
+      // ✅ 과거 입력도 못 하게
+      $("#one").prop("readonly", true);
+
+      $("#one").datetimepicker({
+        format: "Y-m-d H:i",
+        step: 30,
+
+        // ✅ 내일부터
+        minDate: tomorrow,
+
+        minTime: "00:00",
+        maxTime: "23:30",
+
+        // ✅ 기본값 내일 00:00
+        value: tomorrow,
+
+        onShow: function () {
+          this.setOptions({
+            minDate: tomorrow,
+            minTime: "00:00",
+            maxTime: "23:30"
+          });
+        }
+      });
     });
+
+
+
 
     let idNum = 0;
     let inums = "";
@@ -277,12 +312,10 @@
       let sum2 = '가격';
       let sum3 = '수량';
       let sum4 = '예약날짜';
+      let sum5 = '번호';   // ✅ number도 같은 포맷으로
 
       let dateVal = $("#one").val();
-      if (!dateVal) {
-        alert('예약 날짜를 선택해주세요');
-        return;
-      }
+      if (!dateVal) { alert('예약 날짜를 선택해주세요'); return; }
 
       if (!$(".order_list .order_row").length) {
         alert('상품을 선택해 주세요');
@@ -291,11 +324,20 @@
 
       $(".order_list .order_row").each(function(){
         let nameText = $(this).find(".name").text();
-        let qtyVal = $(this).find("input.product").val();
-        let priceText = $(this).find(".in").text(); // 현재는 (수량*단가)로 바뀐 값
+        let qtyVal   = $(this).find("input.product").val();
+
+        // ✅ 표시용 텍스트에서 숫자만 추출
+        let priceText = $(this).find(".in").text();     // "1,800원" 등
+        let priceVal  = (priceText || '').replace(/[^\d]/g, '');
+        if (!priceVal) priceVal = "0";
+
+        // ✅ row에 inum이 있다면 여기서 가져와 누적 (예: data-inum)
+        let inumVal = $(this).data("inum") || $(this).find("input.inum").val() || "";
+
         sum  += '/' + nameText;
-        sum2 += '/' + priceText;
+        sum2 += '/' + priceVal;
         sum3 += '/' + qtyVal;
+        sum5 += '/' + inumVal;
       });
 
       sum4 += '/' + dateVal;
@@ -307,7 +349,7 @@
                  + `&price=${encodeURIComponent(sum2)}`
                  + `&count=${encodeURIComponent(sum3)}`
                  + `&date=${encodeURIComponent(sum4)}`
-                 + `&number=${encodeURIComponent(inums)}`
+                 + `&number=${encodeURIComponent(sum5)}`
                  + `&category=${encodeURIComponent(category)}`;
 
       location.href = text;

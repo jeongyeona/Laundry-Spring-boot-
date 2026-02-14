@@ -187,26 +187,50 @@
     });
 
     // 주문정보 화면 채우기
-    let el = document.getElementById('paramData');
-    let n = el.dataset.name.split('/').filter(Boolean);
-    let p = el.dataset.price.split('/').filter(Boolean);
-    let c = el.dataset.count.split('/').filter(Boolean);
-    let d = el.dataset.date.split('/').filter(Boolean);
-    let e = el.dataset.number.split('/').filter(Boolean);
+    var el = document.getElementById('paramData');
 
-    let tot = 0;
-    let productName='', inumList='', countList='';
-    let year = d[1], month = d[2], day = d[3].substring(0,2);
-    let productDate = `${year}년 ${month}월 ${day}일`;
-    for(let i=1; i<n.length; i++){
-      tot += parseInt(p[i],10);
-      productName += (i>1?', ':'') + n[i]+' '+c[i]+'개';
-      inumList     += (i>1?', ':'') + e[i];
-      countList    += (i>1?', ':'') + c[i];
+    var n = (el.dataset.name   || '').split('/').filter(Boolean);
+    var p = (el.dataset.price  || '').split('/').filter(Boolean);
+    var c = (el.dataset.count  || '').split('/').filter(Boolean);
+    var d = (el.dataset.date   || '').split('/').filter(Boolean);
+    var e = (el.dataset.number || '').split('/').filter(Boolean);
+
+    // 헤더("이름","가격","수량","예약날짜","번호") 제거
+    if (n[0] === '이름') n.shift();
+    if (p[0] === '가격') p.shift();
+    if (c[0] === '수량') c.shift();
+    if (d[0] === '예약날짜') d.shift();
+    if (e[0] === '번호') e.shift();
+
+    // date는 이제 d[0] 하나("2026-02-15 00:00")로 옴
+    var dateRaw = d[0] || '';
+    var productDate = '';
+    if (dateRaw) {
+      // "YYYY-MM-DD HH:mm" -> "YYYY년 MM월 DD일"
+      var datePart = dateRaw.split(' ')[0]; // "2026-02-15"
+      var yy = datePart.substring(0, 4);
+      var mm = datePart.substring(5, 7);
+      var dd = datePart.substring(8, 10);
+      productDate = yy + '년 ' + mm + '월 ' + dd + '일';
     }
+
+    var tot = 0;
+    var productName = '', inumList = '', countList = '';
+
+    for (var i = 0; i < n.length; i++) {
+      var priceVal = parseInt((p[i] || '0').toString().replace(/[^\d]/g, ''), 10) || 0;
+      var qtyVal   = parseInt((c[i] || '0').toString().replace(/[^\d]/g, ''), 10) || 0;
+
+      tot += priceVal;
+      productName += (i > 0 ? ', ' : '') + n[i] + ' ' + qtyVal + '개';
+      inumList    += (i > 0 ? ', ' : '') + (e[i] || '');
+      countList   += (i > 0 ? ', ' : '') + qtyVal;
+    }
+
     $('#productcount').val(productName);
     $('#order_price').val(tot);
     $('#reservation_date').val(productDate);
+
     $('#count').val(countList);
     $('#product').val(productName);
     $('#inum').val(inumList);
