@@ -21,6 +21,48 @@
         rel="stylesheet"
         integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
         crossorigin="anonymous"/>
+
+  <style>
+    .number{
+      width: 100%;
+    }
+
+    .order_list{
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .order_row{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .order_row .name{
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .order_row input.product{
+      width: 70px;
+      flex: 0 0 auto;
+    }
+
+    .order_row .price{
+      width: 90px;
+      text-align: right;
+      flex: 0 0 auto;
+    }
+  </style>
 </head>
 <body>
 <!-- 네비게이션 -->
@@ -77,9 +119,7 @@
         </dl>
 
         <div class="number">
-          <ul class="order_name"></ul>
-          <div class="order_number"
-               style="text-align:left; width:100px;"></div>
+          <div class="order_list"></div>
         </div>
 
         <div class="total_price">
@@ -184,35 +224,49 @@
 
     let idNum = 0;
     let inums = "";
+    let selectedInumSet = {}; // {inum: true}
 
-    $("#product").on("change", function(){
+    $("#product").on("change", function () {
+      let $opt = $("#product option:selected");
+      let inum = $opt.data("inum");
+      let price = parseInt($opt.val(), 10);
+      let name = $opt.text();
+
+      if (!inum || isNaN(price)) return;
+
+      if (selectedInumSet[inum]) {
+        alert("이미 선택한 상품입니다.");
+        $("#product").val("");
+        return;
+      }
+
+      selectedInumSet[inum] = true;
+
       idNum++;
-      inums += $("#product option:selected").data("inum") + "/";
+      inums += inum + "/";
 
-      const msg2 = parseInt($("#product option:selected").val());
-      const msg  = $("#product option:selected").text();
+      $(".order_list").append(
+        `<div class="order_row" data-inum="${inum}">
+           <div class="name">${name}</div>
+           <input type="number" class="product" min="1" max="30" value="1"
+                  onchange="history(this.value,${price},'num${idNum}');" id="num${idNum}">
+           <div class="price in num${idNum}" data-inum="${inum}">${price}</div>
+         </div>`
+      );
 
-      $(".order_number").append(
-        `<input type="number" class="product" name="num" id="num${idNum}"
-                min="1" max="30" value="1"
-                onchange="history(this.value,${msg2},'num${idNum}');">`
-      );
-      $(".order_number").append(
-        `<span class="num${idNum} in">${msg2}</span>`
-      );
-      $(`<li class="productName"></li>`).text(msg).appendTo(".order_name");
+      $("#product").val("");
       ttt();
     });
 
     function history(countNum, countPrice, getId) {
-      const total = countNum * countPrice;
+      let total = parseInt(countNum, 10) * parseInt(countPrice, 10);
       $("." + getId).text(total);
       ttt();
     }
 
     function ttt() {
       let sum = 0;
-      $(".in").each(function(){
+      $(".order_list .in").each(function(){
         sum += parseInt($(this).text(), 10);
       });
       $(".result_price").text(sum);
@@ -224,21 +278,31 @@
       let sum3 = '수량';
       let sum4 = '예약날짜';
 
-      $(".productName").each(function(){
-        sum  += '/' + $(this).text();
+      let dateVal = $("#one").val();
+      if (!dateVal) {
+        alert('예약 날짜를 선택해주세요');
+        return;
+      }
+
+      if (!$(".order_list .order_row").length) {
+        alert('상품을 선택해 주세요');
+        return;
+      }
+
+      $(".order_list .order_row").each(function(){
+        let nameText = $(this).find(".name").text();
+        let qtyVal = $(this).find("input.product").val();
+        let priceText = $(this).find(".in").text(); // 현재는 (수량*단가)로 바뀐 값
+        sum  += '/' + nameText;
+        sum2 += '/' + priceText;
+        sum3 += '/' + qtyVal;
       });
-      $(".in").each(function(){
-        sum2 += '/' + $(this).text();
-      });
-      $(".product").each(function(){
-        sum3 += '/' + $(this).val();
-      });
-      $(".date").each(function(){
-        sum4 += '/' + $(this).val();
-      });
+
+      sum4 += '/' + dateVal;
 
       const baseUrl  = /*[[@{/Reserve/Payment}]]*/ '';
       const category = /*[[${param.category}]]*/ '';
+
       const text = `${baseUrl}?name=${encodeURIComponent(sum)}`
                  + `&price=${encodeURIComponent(sum2)}`
                  + `&count=${encodeURIComponent(sum3)}`
@@ -246,16 +310,11 @@
                  + `&number=${encodeURIComponent(inums)}`
                  + `&category=${encodeURIComponent(category)}`;
 
-      if (sum4 === "예약날짜/") {
-        alert('예약 날짜를 선택해주세요');
-      } else if (!inums) {
-        alert('상품을 선택해 주세요');
-      } else {
-        location.href = text;
-      }
+      location.href = text;
     }
   /*]]>*/
 </script>
+
 
 <!-- 푸터 -->
 <div th:replace="fragments/footer :: footer"></div>
