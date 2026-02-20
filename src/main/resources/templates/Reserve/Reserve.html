@@ -36,6 +36,10 @@
       box-sizing: border-box;
     }
 
+    .order_list .product{
+      text-align: center;
+    }
+
     .order_row{
       display: flex;
       align-items: center;
@@ -62,6 +66,22 @@
       text-align: right;
       flex: 0 0 auto;
     }
+
+    .order_row .btn_remove{
+      border: 0;
+      background: transparent;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 6px;
+      opacity: .6;
+    }
+
+    .order_row .btn_remove:hover{
+      opacity: 1;
+    }
+
+    .order_row .btn_remove { margin-left: auto; }
   </style>
 </head>
 <body>
@@ -254,12 +274,22 @@
       });
     });
 
-
-
-
     let idNum = 0;
-    let inums = "";
     let selectedInumSet = {}; // {inum: true}
+
+    $(document).on('click', '.order_list .btn_remove', function(){
+      var $row = $(this).closest('.order_row');
+      var inum = $row.data('inum');
+
+      // 선택 해제
+      if (inum) delete selectedInumSet[inum];
+
+      // 화면 제거
+      $row.remove();
+
+      // 합계 재계산
+      ttt();
+    });
 
     $("#product").on("change", function () {
       let $opt = $("#product option:selected");
@@ -278,7 +308,6 @@
       selectedInumSet[inum] = true;
 
       idNum++;
-      inums += inum + "/";
 
       $(".order_list").append(
         `<div class="order_row" data-inum="${inum}">
@@ -286,6 +315,7 @@
            <input type="number" class="product" min="1" max="30" value="1"
                   onchange="history(this.value,${price},'num${idNum}');" id="num${idNum}">
            <div class="price in num${idNum}" data-inum="${inum}">${price}</div>
+           <button type="button" class="btn_remove" aria-label="삭제">×</button>
          </div>`
       );
 
@@ -302,7 +332,8 @@
     function ttt() {
       let sum = 0;
       $(".order_list .in").each(function(){
-        sum += parseInt($(this).text(), 10);
+        var v = ($(this).text() || '').replace(/[^\d]/g, '');
+        sum += parseInt(v || '0', 10);
       });
       $(".result_price").text(sum);
     }
