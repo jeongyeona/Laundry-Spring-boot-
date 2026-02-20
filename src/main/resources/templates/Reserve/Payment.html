@@ -187,13 +187,13 @@
     });
 
     // 주문정보 화면 채우기
-    var el = document.getElementById('paramData');
+    let el = document.getElementById('paramData');
 
-    var n = (el.dataset.name   || '').split('/').filter(Boolean);
-    var p = (el.dataset.price  || '').split('/').filter(Boolean);
-    var c = (el.dataset.count  || '').split('/').filter(Boolean);
-    var d = (el.dataset.date   || '').split('/').filter(Boolean);
-    var e = (el.dataset.number || '').split('/').filter(Boolean);
+    let n = (el.dataset.name   || '').split('/').filter(Boolean);
+    let p = (el.dataset.price  || '').split('/').filter(Boolean);
+    let c = (el.dataset.count  || '').split('/').filter(Boolean);
+    let d = (el.dataset.date   || '').split('/').filter(Boolean);
+    let e = (el.dataset.number || '').split('/').filter(Boolean);
 
     // 헤더("이름","가격","수량","예약날짜","번호") 제거
     if (n[0] === '이름') n.shift();
@@ -203,23 +203,23 @@
     if (e[0] === '번호') e.shift();
 
     // date는 이제 d[0] 하나("2026-02-15 00:00")로 옴
-    var dateRaw = d[0] || '';
-    var productDate = '';
+    let dateRaw = d[0] || '';
+    let productDate = '';
     if (dateRaw) {
       // "YYYY-MM-DD HH:mm" -> "YYYY년 MM월 DD일"
-      var datePart = dateRaw.split(' ')[0]; // "2026-02-15"
-      var yy = datePart.substring(0, 4);
-      var mm = datePart.substring(5, 7);
-      var dd = datePart.substring(8, 10);
+      let datePart = dateRaw.split(' ')[0]; // "2026-02-15"
+      let yy = datePart.substring(0, 4);
+      let mm = datePart.substring(5, 7);
+      let dd = datePart.substring(8, 10);
       productDate = yy + '년 ' + mm + '월 ' + dd + '일';
     }
 
-    var tot = 0;
-    var productName = '', inumList = '', countList = '';
+    let tot = 0;
+    let productName = '', inumList = '', countList = '';
 
-    for (var i = 0; i < n.length; i++) {
-      var priceVal = parseInt((p[i] || '0').toString().replace(/[^\d]/g, ''), 10) || 0;
-      var qtyVal   = parseInt((c[i] || '0').toString().replace(/[^\d]/g, ''), 10) || 0;
+    for (let i = 0; i < n.length; i++) {
+      let priceVal = parseInt((p[i] || '0').toString().replace(/[^\d]/g, ''), 10) || 0;
+      let qtyVal   = parseInt((c[i] || '0').toString().replace(/[^\d]/g, ''), 10) || 0;
 
       tot += priceVal;
       productName += (i > 0 ? ', ' : '') + n[i] + ' ' + qtyVal + '개';
@@ -263,6 +263,31 @@
 
 <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 <script>
+  function isValidEmail(email) {
+    if (!email) return false;
+
+    email = email.trim();
+
+    // 공백 포함 불가
+    if (email.indexOf(' ') >= 0) return false;
+
+    // 너무 긴 이메일 방지
+    if (email.length > 254) return false;
+
+    // 기본 이메일 패턴
+    // - 로컬파트: 영문/숫자/._%+- 허용, 점 연속/앞뒤 점 방지
+    // - 도메인: 점으로 구분된 라벨, 마지막 TLD 2자 이상
+    let re = /^[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/;
+
+    if (!re.test(email)) return false;
+
+    // 로컬 파트 점 연속 방지
+    let parts = email.split('@');
+    if (parts[0].indexOf('..') >= 0) return false;
+
+    return true;
+  }
+
   function requestPay() {
     const IMP = window.IMP;
     IMP.init("imp57455816");
@@ -282,10 +307,20 @@
       );
     }
 
-    if (!$('#creditEmail').val()) {
+    let email = ($('#creditEmail').val() || '').trim();
+
+    if (!email) {
       alert('이메일을 입력해주세요');
+      $('#creditEmail').focus();
       return;
     }
+    if (!isValidEmail(email)) {
+      alert('이메일 형식이 올바르지 않습니다. 예) Laundry@naver.com');
+      $('#creditEmail').focus();
+      return;
+    }
+
+    $('#creditEmail').val(email); // trim 반영
 
     const merchantUid = 'order_' + new Date().getTime();
 
@@ -295,7 +330,7 @@
       merchant_uid: merchantUid,
       name: $('#product').val(),
       amount: $('#order_price').val(),
-      buyer_email: $('#creditEmail').val(),
+      buyer_email: email,
       buyer_name: $('#orderer').val(),
       buyer_addr: isOldAddr ? $('#order_addr').val() : $('#address').val(),
       buyer_postcode: isOldAddr ? "" : $('#postcode').val()

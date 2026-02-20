@@ -240,7 +240,7 @@
       let email = document.getElementById('email');
       let fb    = email.nextElementSibling;
       let fb2   = fb.nextElementSibling;
-      let reg   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      let reg   = /^[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/;
 
       isEmailValid = false;
 
@@ -341,7 +341,7 @@
 
       var regName  = /^[가-힣]+$/;
       var regId    = /^[A-Za-z][A-Za-z0-9]{4,14}$/;
-      var regEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var regEmail = /^[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/;
       var regPwd   = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^]).{8,}$/;
       var regPhone = /^01[016789]\d{7,8}$/;
 
