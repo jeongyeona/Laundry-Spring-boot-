@@ -103,8 +103,8 @@
     <input type="hidden" name="dialCode" id="dialCode" />
     <!-- 전화번호 -->
     <div class="mb-3">
-      <input name="phone" id="phone" class="form-control" type="text" maxlength="11"
-             placeholder="전화번호 (숫자만)" required />
+      <input name="phone" id="phone" class="form-control" type="text" maxlength="15"
+             placeholder="전화번호 (숫자만, 국가코드 제외))" required />
       <div class="invalid-feedback">올바른 전화번호를 입력하세요.</div>
     </div>
     <!-- 가입 버튼 -->
@@ -310,7 +310,7 @@
 
       phone.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '');
-        let ok = /^01[016789]\d{7,8}$/.test(this.value);
+        let ok = /^\d{7,15}$/.test(this.value);
 
         isPhoneValid = ok;
 
@@ -343,7 +343,7 @@
       var regId    = /^[A-Za-z][A-Za-z0-9]{4,14}$/;
       var regEmail = /^[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/;
       var regPwd   = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^]).{8,}$/;
-      var regPhone = /^01[016789]\d{7,8}$/;
+      var regPhone = /^\d{7,15}$/;
 
       isNameValid = regName.test(nameVal);
       // isIdValid / isEmailValid 는 "중복체크 결과"가 필요하니 여기서 강제 true로 만들면 안 됨.
@@ -352,7 +352,8 @@
       var isEmailFormatOk = regEmail.test(emailVal);
 
       isPwdValid   = regPwd.test(pwdVal) && pwdVal === pwd2Val && pwd2Val.length > 0;
-      isPhoneValid = regPhone.test(phoneVal);
+      var phoneDigitsOnly = document.getElementById('phone').value.replace(/[^0-9]/g, '');
+      isPhoneValid = regPhone.test(phoneDigitsOnly);
 
       // 주소: 팝업을 안 열었더라도 값이 채워졌으면 통과시키는 정책으로 변경
       isAddrValid01 = postcodeVal.length > 0 && addrVal.length > 0;
@@ -388,20 +389,42 @@
       }
 
       // 3) 통과 시 hidden 값 세팅
-      document.getElementById('totalAddr').value =
-        [postcodeVal, addrVal, detailVal, document.getElementById('extraAddr').value].join('_');
-    });
+      document.getElementById('totalAddr').value = [postcodeVal, addrVal, detailVal, document.getElementById('extraAddr').value].join('_');
 
-  document.addEventListener('DOMContentLoaded', function() {
-    let select = document.getElementById('countryCodeSelect');
-    let dialIn = document.getElementById('dialCode');
+      // dial 먼저 읽기
+      var dial = document.getElementById('dialCode').value.trim();
+      if (!dial) {
+        e.preventDefault();
+        alert('국가를 다시 선택해주세요.');
+        return;
+      }
 
-    select.addEventListener('change', function() {
-      // 선택된 <option> 의 data-dial 속성 값을 hidden input 에 복사
-      let dial = this.selectedOptions[0].dataset.dial;
-      dialIn.value = dial;
+      var phoneEl = document.getElementById('phone');
+      var phoneDigits = phoneEl.value.replace(/[^0-9]/g, '');
+      if (!phoneDigits) {
+        e.preventDefault();
+        alert('전화번호를 입력해주세요.');
+        return;
+      }
+
+      // KR이면 앞 0 제거
+      if (dial === "82") {
+        phoneDigits = phoneDigits.replace(/^0+/, '');
+      }
+
+      // 최종 전송 값: +82XXXXXXXXXX
+      phoneEl.value = `+${dial}${phoneDigits}`;
+    }); // ✅ submit 리스너 닫기 (이거 꼭 필요)
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var select = document.getElementById('countryCodeSelect');
+      var dialIn = document.getElementById('dialCode');
+
+      select.addEventListener('change', function() {
+        var dial = this.selectedOptions[0].dataset.dial;
+        dialIn.value = dial;
+      });
     });
-  });
 
   /*]]>*/
 </script>
