@@ -149,20 +149,22 @@
     <button class="btn btn-outline-dark" style="float:right" th:if="${manager} == 'Y'"
             th:onclick="|location.href='@{/Faq/FaqInsertForm}'|">글쓰기</button>
 
-    <div class="page-ui clearfix" style="display:flex; justify-content:center;">
+    <div class="page-ui clearfix" style="display:flex; justify-content:center;" th:if="${hasResult}">
       <ul class="pagination">
         <li class="page-item" th:if="${startPageNum > 1}">
           <a class="page-link"
-             th:href="@{/Faq/List(pageNum=${startPageNum - 1}, condition=${condition}, keyword=${encodedK}, category=${selectedCategory})}">Prev</a>
+             th:href="@{/Faq/List(pageNum=${startPageNum - 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword})}">Prev</a>
         </li>
-        <li class="page-item" th:each="i : ${#numbers.sequence(startPageNum, endPageNum)}">
+
+        <li class="page-item" th:each="i : ${pageNumbers}">
           <a class="page-link" th:classappend="${pageNum == i} ? ' active'"
-             th:href="@{/Faq/List(pageNum=${i}, condition=${condition}, keyword=${encodedK}, category=${selectedCategory})}"
+             th:href="@{/Faq/List(pageNum=${i}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword})}"
              th:text="${i}"></a>
         </li>
+
         <li class="page-item" th:if="${endPageNum < totalPageCount}">
           <a class="page-link"
-             th:href="@{/Faq/List(pageNum=${endPageNum + 1}, condition=${condition}, keyword=${encodedK}, category=${selectedCategory})}">Next</a>
+             th:href="@{/Faq/List(pageNum=${endPageNum + 1}, pageSize=${pageSize}, condition=${condition}, keyword=${keyword})}">Next</a>
         </li>
       </ul>
     </div>
@@ -207,12 +209,12 @@
 
     function bindPaginationEvents() {
       document.querySelectorAll('.page-link').forEach(link => {
-        const nextPage = link.getAttribute('data-page');
-        if (nextPage) {
-          link.addEventListener('click', () => {
-            fetchFaqData(selectedCategory, nextPage);
-          });
-        }
+        link.addEventListener('click', function(e) {
+          var nextPage = this.getAttribute('data-page');
+          if (!nextPage) return;
+          e.preventDefault();
+          fetchFaqData(selectedCategory, nextPage);
+        });
       });
     }
 

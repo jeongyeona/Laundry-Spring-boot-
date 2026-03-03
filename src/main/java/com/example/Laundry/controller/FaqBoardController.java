@@ -11,7 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -52,15 +54,23 @@ public class FaqBoardController {
             Page<FaqBoardResponseDto> page =
                     faqBoardService.findFaq(condition, keyword, pageNum, pageSize);
 
+            boolean hasResult = page.getTotalElements() > 0; // 0건 체크
+            model.addAttribute("hasResult", hasResult);
+
             int totalPages = page.getTotalPages();
             int startPageNum = Math.max(1, pageNum - 2);
             int endPageNum = Math.min(totalPages, pageNum + 2);
+
+            if (startPageNum > endPageNum) startPageNum = endPageNum;
 
             List<Integer> pageNumbers = IntStream
                     .rangeClosed(startPageNum, endPageNum)
                     .boxed()
                     .toList();
 
+            String encodedK = UriUtils.encode(keyword, StandardCharsets.UTF_8);
+            model.addAttribute("encodedK", encodedK);
+            model.addAttribute("hasResult", page.getTotalElements() > 0);
             model.addAttribute("list", page.getContent());
             model.addAttribute("id", userId);
             model.addAttribute("pageNum", pageNum);
@@ -95,10 +105,22 @@ public class FaqBoardController {
             model.addAttribute("manager", "N");
         }
 
+        // pageNum 최소 1 보정
+        if (pageNum < 1) pageNum = 1;
+
         Page<FaqBoardResponseDto> page = faqBoardService.findByCategory(category, pageNum, pageSize, condition, keyword);
+        boolean hasResult = page.getTotalElements() > 0;
+        model.addAttribute("hasResult", hasResult);
+
         int total = page.getTotalPages();
         if (total == 0) total = 1;
         int[] range = faqBoardService.calcPageRange(pageNum, total);
+
+        // range가 0을 내릴 경우 방어
+        int startPageNum = Math.max(1, range[0]);
+        int endPageNum = Math.max(1, range[1]);
+        if (endPageNum > total) endPageNum = total;
+        if (startPageNum > endPageNum) startPageNum = endPageNum;
 
         List<Integer> pageNumbers =
                 IntStream.rangeClosed(range[0], range[1])
