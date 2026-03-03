@@ -88,7 +88,7 @@
                 <form th:action="@{/LoginInfo/Mypage/OrderList}" method="get" id="searchForm"
                       class="d-flex flex-wrap align-items-center gap-2">
                     <input type="hidden" name="state" th:value="${state}" />
-                    <select name="condition" id="condition" class="form-select form-select-lg" style="width: 150px;">
+                    <select name="condition" id="condition" class="form-select form-select-lg" style="width: 160px;">
                         <option value="code" th:selected="${condition} == 'code'">주문번호</option>
                         <option value="orderer_name" th:selected="${condition} == 'orderer_name'">아이디/이름</option>
                     </select>
