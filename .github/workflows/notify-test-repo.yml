@@ -13,5 +13,5 @@ jobs:
         with:
           token: ${{ secrets.MY_GITHUB_TOKEN }}
           repository: heoik93/selenium-java-automation
-          event-type: dev-repo-push
+          event-type: dev-push-event
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
