@@ -1,0 +1,17 @@
+name: Notify Test Repo
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          repository: heoik93/selenium-java-automation
+          event-type: dev-repo-push
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
