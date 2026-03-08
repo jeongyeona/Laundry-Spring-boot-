@@ -28,7 +28,7 @@
 <!-- 네비게이션 -->
 <div th:insert="fragments/nav :: nav"></div>
 <!-- 서브 네비게이션 -->
-<div th:insert="fragments/subnav :: subnav(thisPage='support', subPage='faq')"></div>
+<div th:insert="fragments/subnav :: subnav(thisPage='support', subPage='qna')"></div>
 
 <div class="container mt-4">
     <h1 style="font-size:30px; font-weight:bold;">1:1 문의 작성</h1>
@@ -68,6 +68,25 @@
       });
 
       document.getElementById('insertForm').addEventListener('submit', function(e) {
+        var title = document.getElementById('title').value.trim();
+        oEditors.getById['content'].exec('UPDATE_CONTENTS_FIELD', []);
+        var content = document.getElementById('content').value.trim();
+
+        // 제목 체크
+        if (title === '') {
+          alert('제목을 입력해주세요.');
+          document.getElementById('title').focus();
+          e.preventDefault();
+          return;
+        }
+
+        // 내용 체크
+        if (content === '' || content === '<p>&nbsp;</p>' || content === '&nbsp;') {
+          alert('내용을 입력해주세요.');
+          e.preventDefault();
+          return;
+        }
+
         // 저장 확인
         if (!confirm('저장하시겠습니까?')) {
           e.preventDefault();
