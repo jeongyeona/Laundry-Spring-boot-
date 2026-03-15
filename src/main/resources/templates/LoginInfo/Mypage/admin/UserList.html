@@ -205,7 +205,7 @@
 
   //삭제버튼을 누르면 체크된 행들의 id를 모아 삭제하기
   document.querySelector("#deleteBtn").addEventListener("click", function(){
-      let deleteUsers=document.querySelectorAll('.selectRow input[type=checkbox]:checked');
+      let deleteUsers=document.querySelectorAll('.selectRow input[type=radio]:checked');
 
       if(deleteUsers.length==0){
           alert("삭제할 회원을 선택해주세요.");

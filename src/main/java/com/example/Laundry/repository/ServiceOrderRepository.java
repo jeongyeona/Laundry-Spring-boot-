@@ -24,17 +24,37 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Inte
     Optional<ServiceOrder> findByMerchantUid(String merchantUid);
     Page<ServiceOrder> findByState(String state, Pageable pageable);
 
-    @Query("SELECT s FROM ServiceOrder s WHERE " +
-            "((:condition = 'code' AND CONCAT('', s.code) LIKE CONCAT('%', :keyword, '%')) OR " +
-            " (:condition = 'orderer_name' AND s.orderer LIKE CONCAT('%', :keyword, '%')))")
+    @Query("""
+        SELECT s
+        FROM ServiceOrder s
+        LEFT JOIN User u ON s.orderer = u.id
+        WHERE (
+            (:condition = 'code' AND CONCAT('', s.code) LIKE CONCAT('%', :keyword, '%'))
+            OR
+            (:condition = 'orderer_name' AND (
+                s.orderer LIKE CONCAT('%', :keyword, '%')
+                OR u.name LIKE CONCAT('%', :keyword, '%')
+            ))
+        )
+    """)
     Page<ServiceOrder> findByCondition(@Param("condition") String condition,
                                        @Param("keyword") String keyword,
                                        Pageable pageable);
 
-    @Query("SELECT s FROM ServiceOrder s WHERE " +
-            "((:condition = 'code' AND CONCAT('', s.code) LIKE CONCAT('%', :keyword, '%')) OR " +
-            " (:condition = 'orderer_name' AND s.orderer LIKE CONCAT('%', :keyword, '%'))) AND " +
-            "(:state IS NULL OR :state = '' OR s.state = :state)")
+    @Query("""
+        SELECT s
+        FROM ServiceOrder s
+        LEFT JOIN User u ON s.orderer = u.id
+        WHERE (
+            (:condition = 'code' AND CONCAT('', s.code) LIKE CONCAT('%', :keyword, '%'))
+            OR
+            (:condition = 'orderer_name' AND (
+                s.orderer LIKE CONCAT('%', :keyword, '%')
+                OR u.name LIKE CONCAT('%', :keyword, '%')
+            ))
+        )
+        AND (:state IS NULL OR :state = '' OR s.state = :state)
+    """)
     Page<ServiceOrder> findByConditionAndState(@Param("condition") String condition,
                                                @Param("keyword") String keyword,
                                                @Param("state") String state,

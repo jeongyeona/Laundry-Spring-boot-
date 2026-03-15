@@ -460,17 +460,22 @@ public class LoginController {
     public String getOrderDetail(
             HttpSession session,
             @RequestParam("code") Integer orderCode,
+            @RequestParam(value = "orderer", required = false) String orderer,
             Model model
     ) {
-        String userId = (String) session.getAttribute("LOGIN_USER");
-        if (userId == null) {
-            return "redirect:/login"; // 로그인 안 되어 있으면 로그인 페이지로 이동
+        String loginUserId = (String) session.getAttribute("LOGIN_USER");
+        if (loginUserId == null) {
+            return "redirect:/login";
         }
 
-        // 사용자 정보
-        UserResponseDto user = userService.findById(userId);
-        model.addAttribute("manager", user.manager());
-        model.addAttribute("id", userId);
+        // 로그인 사용자 정보
+        UserResponseDto loginUser = userService.findById(loginUserId);
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("manager", loginUser.manager());
+        model.addAttribute("id", loginUserId);
 
         // 주문 정보
         ServiceOrder order = serviceOrderService.findOrderByCode(orderCode);
@@ -478,9 +483,20 @@ public class LoginController {
             return "redirect:/Mypage/OrderList";
         }
 
-        if (!"Y".equals(user.manager()) && !order.getOrderer().equals(userId)) {
+        // 상세 화면에 보여줄 사용자 ID 결정
+        String targetUserId;
+        if ("Y".equals(loginUser.manager())) {
+            targetUserId = (orderer != null && !orderer.isBlank()) ? orderer : order.getOrderer();
+        } else {
+            targetUserId = loginUserId;
+        }
+
+        // 일반 사용자는 본인 주문만 접근 가능
+        if (!"Y".equals(loginUser.manager()) && !order.getOrderer().equals(targetUserId)) {
             return "redirect:/Mypage/OrderList";
         }
+
+        UserResponseDto user = userService.findById(targetUserId);
 
         // 주문 품목
         List<OrderItem> orderItems = orderItemRepository.findWithItemsByOrderCode(orderCode);

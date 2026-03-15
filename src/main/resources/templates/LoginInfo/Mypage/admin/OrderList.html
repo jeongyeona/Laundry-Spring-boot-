@@ -80,7 +80,7 @@
 <body>
 <div class="wrapper">
     <div th:insert="~{fragments/nav :: nav}"></div>
-    <div th:replace="~{fragments/subnav :: subnav('mypage','orderlist')}"></div>
+    <div th:replace="~{fragments/subnav :: subnav('manager','order')}"></div>
     <div id="order_wr" class="container my-4">
         <div id="body_content" class="w-100">
             <div class="d-flex flex-wrap justify-content-between gap-2 mb-3 align-items-center">
@@ -162,7 +162,7 @@
                             <td th:text="${tmp.reservationDate}"></td>
                             <td th:text="${tmp.getCourier != null ? tmp.getInvoiceNum : '-'}"></td>
                             <td th:text="${tmp.sendCourier != null ? tmp.sendInvoiceNum : '-'}"></td>
-                            <td><a th:href="@{/LoginInfo/Mypage/OrderDetail(code=${tmp.code})}" class="btn">상세</a></td>
+                            <td><a th:href="@{/LoginInfo/Mypage/OrderDetail(code=${tmp.code}, orderer=${tmp.orderer})}" class="btn">상세</a></td>
                         </tr>
                         </tbody>
                     </table>
