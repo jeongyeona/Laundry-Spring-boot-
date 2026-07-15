@@ -81,7 +81,7 @@ Laundry365는 Iamport(아임포트)를 통한 카드 결제 시뮬레이션 기�
 
 ## 🚀 배포 URL
 
-👉 [http://laundry365.store:8080/](http://laundry365.store:8080/)
+👉 [http://laundry365.shop:8080/](http://laundry365.shop:8080/)
 
 ---
 
